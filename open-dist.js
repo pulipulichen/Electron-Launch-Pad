@@ -6,7 +6,7 @@ const fs = require('fs')
 const os = require('os')
 const getLastLine = require('./build-scripts/fileTools.js').getLastLine
 
-let proejctName = 'electron-simple-spreadsheet-editor'
+let proejctName = 'electron-launch-pad'
 
 // ------------------------------
 // 記錄檔案大小 
