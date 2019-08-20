@@ -14,7 +14,7 @@ if (process.argv.indexOf('--mode') - process.argv.indexOf('development') === -1)
 // For test
 //mode = 'development'
 
-module.exports = function (filepath, callback) {
+module.exports = function (dirpath, callback) {
   
   let optionBrowserWindow = {
     //fullscreen: true,
@@ -53,6 +53,7 @@ module.exports = function (filepath, callback) {
   //win.rendererSideName.filepath = filepath
   //win.rendererSideName.mode = mode
   win.mode = mode
+  win.dirpath = dirpath
   
   //return win
   win.webContents.once('dom-ready', () => {

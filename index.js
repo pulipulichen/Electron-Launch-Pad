@@ -9,8 +9,15 @@ const {
   BrowserWindow,
   clipboard,
 } = require('electron')
-  
-//const settings = require('electron-settings');
+
+const ProcessArgvHelper = require('./app/helpers/electron/ProcessArgvHelper')
+
+let dirPath
+ProcessArgvHelper.getDirPaths().forEach(path => {
+  if (dirPath === undefined) {
+    dirPath = path
+  }
+})
 
 // ------------
 
@@ -27,7 +34,7 @@ app.commandLine.appendSwitch('disable-site-isolation-trials');
 
 //app.on('activate', () => {
 app.on('ready', () => {
-  createWindow()
+  createWindow(dirPath)
 })
 
 const createWindow = require('./CreateWindow')
