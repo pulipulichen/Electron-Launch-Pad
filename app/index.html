@@ -6,12 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <script src="./vendors/redips-drag/redips-drag-min.js"></script>
+    <script>
+      const launchpad = require('launchpad')
+    </script>
     <script src="./script.js"></script>
     <link href="./style.css" rel="stylesheet" type="text/css" media="screen"/>
   </head>
   <body>
     Hello world
-    
+    <script>
+      launchpad.setData([
+          {
+              icon:"http://images.apple.com/v/osx/c/images/better-apps/icon_photos_large_2x.png",
+              link: "http://www.apple.com/osx/apps/#numbers",
+              label: "Photos"
+          },
+          {
+              icon:"http://images.apple.com/v/mac/shared/built-in-apps/e/images/numbers_icon_large_2x.png",
+              link: "http://www.apple.com/osx/apps/#numbers",
+              label: "Numbers"
+          },
+          {
+              icon:"<i class=\"fa fa-leaf\"></i>",
+              link: "https://fortawesome.github.io/Font-Awesome/",
+              label: "Font-Awesome"
+          },
+          {
+              icon:"http://images.apple.com/v/osx/c/images/better-apps/icon_photos_large_2x.png",
+              link: "http://www.apple.com/osx/photos/",
+              label: "Photos"
+          }
+      ]);
+</script>
           <center>
 			<!-- tables inside this DIV could contain drag-able content  -->
 			<div id="redips-drag">
