@@ -6,176 +6,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <script src="./vendors/redips-drag/redips-drag-min.js"></script>
+    <script src="./vendors/jquery/jquery-3.4.1.min.js"></script>
     <script>
-      const launchpad = require('launchpad')
+      const $ = jQuery = require('jquery')
     </script>
-    <script src="./script.js"></script>
-    <link href="./style.css" rel="stylesheet" type="text/css" media="screen"/>
+
+<link href="./style-launchpad.less" rel="stylesheet/less" type="text/css" />
+<script>
+  less = {
+    logLevel: 0,
+  }
+</script>
+<script src="vendors/less/less.min.js" ></script>
   </head>
   <body>
-    Hello world
-    <script>
-      launchpad.setData([
-          {
-              icon:"http://images.apple.com/v/osx/c/images/better-apps/icon_photos_large_2x.png",
-              link: "http://www.apple.com/osx/apps/#numbers",
-              label: "Photos"
-          },
-          {
-              icon:"http://images.apple.com/v/mac/shared/built-in-apps/e/images/numbers_icon_large_2x.png",
-              link: "http://www.apple.com/osx/apps/#numbers",
-              label: "Numbers"
-          },
-          {
-              icon:"<i class=\"fa fa-leaf\"></i>",
-              link: "https://fortawesome.github.io/Font-Awesome/",
-              label: "Font-Awesome"
-          },
-          {
-              icon:"http://images.apple.com/v/osx/c/images/better-apps/icon_photos_large_2x.png",
-              link: "http://www.apple.com/osx/photos/",
-              label: "Photos"
-          }
-      ]);
-</script>
-          <center>
-			<!-- tables inside this DIV could contain drag-able content  -->
-			<div id="redips-drag">
-				<table class="tbl1">
-					<colgroup>
-						<col width="30"/>
-						<col width="100"/>
-						<col width="100"/>
-						<col width="100"/>
-						<col width="100"/>
-						<col width="100"/>
-					</colgroup>
-					<tbody>
-						<tr>
-							<th colspan="6" class="redips-mark">Table 1</th>
-						</tr>
-						<tr class="rl">
-							<td class="redips-rowhandler"><div class="redips-drag redips-row"></div></td>
-							<td class="cdark"></td>
-							<td></td>
-							<td><div class="redips-drag blue">Drag</div></td>
-							<td></td>
-							<td class="cdark"></td>
-						</tr>
-						<tr class="rd">
-							<td class="redips-rowhandler"><div class="redips-drag redips-row"></div></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-						</tr>
-						<tr class="rl">
-							<td class="redips-rowhandler"><div class="redips-drag redips-row"></div></td>
-							<td><div class="redips-drag blue">and</div></td>
-							<td class="cdark"></td>
-							<td><div class="redips-drag blue">drop</div></td>
-							<td class="cdark"></td>
-							<td><div class="redips-drag blue">table</div></td>
-						</tr>
-						<tr class="rd">
-							<td class="redips-rowhandler"><div class="redips-drag redips-row"></div></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-						</tr>
-						<tr class="rl">
-							<td class="redips-rowhandler"><div class="redips-drag redips-row"></div></td>
-							<td><div class="redips-drag blue">rows</div></td>
-							<td class="cdark"></td>
-							<td><div class="redips-drag blue">with</div></td>
-							<td class="cdark"></td>
-							<td><div class="redips-drag blue">REDIPS</div></td>
-						</tr>
-						<tr class="rd">
-							<td class="redips-rowhandler"><div class="redips-drag redips-row"></div></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-						</tr>
-						<tr class="rl">
-							<td class="redips-rowhandler"><div class="redips-drag redips-row"></div></td>
-							<td class="cdark"></td>
-							<td></td>
-							<td><div class="redips-drag blue">lib</div></td>
-							<td></td>
-							<td class="cdark"></td>
-						</tr>
-						<tr>
-							<td colspan="6" class="redips-mark"><span>Message line</span></td>
-						</tr>
-					</tbody>
-				</table>
 
-				<table>
-					<colgroup>
-						<col width="30"/>
-						<col width="100"/>
-						<col width="100"/>
-						<col width="100"/>
-						<col width="100"/>
-						<col width="100"/>
-					</colgroup>
-					<tbody>
-						<tr>
-							<th colspan="6" class="redips-mark">Table 2</th>
-						</tr>
-						<tr class="rd">
-							<td class="redips-rowhandler"><div class="redips-drag redips-row"></div></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-						</tr>
-						<tr class="rl">
-							<td class="redips-rowhandler"><div class="redips-drag redips-row"></div></td>
-							<td><div class="redips-drag orange">Drag</div></td>
-							<td></td>
-							<td class="cdark"></td>
-							<td></td>
-							<td><div class="redips-drag orange">rows</div></td>
-						</tr>
-						<tr class="rl">
-							<td class="redips-rowhandler"><div class="redips-drag redips-row"></div></td>
-							<td></td>
-							<td class="cdark"></td>
-							<td></td>
-							<td class="cdark"></td>
-							<td></td>
-						</tr>
-						<tr class="rl">
-							<td class="redips-rowhandler"><div class="redips-drag redips-row"></div></td>
-							<td class="cdark"></td>
-							<td><div class="redips-drag orange">and</div></td>
-							<td></td>
-							<td><div class="redips-drag orange">table</div></td>
-							<td class="cdark"></td>
-						</tr>
-						<tr class="rd">
-							<td class="redips-rowhandler"><div class="redips-drag redips-row"></div></td>
-							<td></td>
-							<td></td>
-							<td><div class="redips-drag orange">drop</div></td>
-							<td></td>
-							<td></td>
-						</tr>
-						<tr>
-							<td colspan="6" class="redips-mark"><span>Message line</span></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</center>    
+<div class="window">
+	<h1>Mac launchpad in CSS</h1>
+	<p>A simple demonstration of the Mac launchpad effect in CSS. JavaScript is used to control when the effect is triggered or removed.</p>
+	<p>
+		Made by <a href="http://migueljimenez.co" target="_blank">Miguel Jiménez</a> | 
+		<a target="_blank" href="https://twitter.com/jachinte">@jachinte</a>
+	</p>
+	<p>You may also like <a href="https://codepen.io/jachinte/pen/bVNraO" target="_blank">Mission Control in CSS</a></p>
+	<a title="Click to open" class="open-menu launchpad-icon"></a>
+</div>
+<div id="icons">
+	Icons by <a href="http://xenatt.deviantart.com/" target="_blank">xenatt</a> from <a href="https://www.iconfinder.com/iconsets/minimalism" target="_blank">Iconfinder</a>
+</div>
+<div id="launchpad">
+	<div class="content">
+		<nav>
+			<a class="icon-safari">Safari</a>
+			<a class="icon-notes">Notes</a>
+			<a class="icon-facetime">Facetime</a>
+			<a class="icon-appstore">App store</a>
+			<a class="icon-dictionary">Dictionary</a>
+			<a class="icon-texteditor">Text Editor</a>
+			<a class="icon-monitor">Activity Monitor</a>
+			<a class="icon-airport">AirPort Utility</a>
+			<a class="icon-chromium">Chromium</a>
+			<a class="icon-opera">Opera</a>
+			<a class="icon-skydrive">Skydrive</a>
+			<!--<a class="icon-dropbox">Dropbox</a>-->
+			<!--<a class="icon-soundcloud">Soundcloud</a>-->
+			<a class="icon-twitter">Twitter</a>
+			<a class="icon-pinterest">Pinterest</a>
+			<a class="icon-imovie">iMovie</a>
+		</nav>
+	</div>
+</div>
+
+<script src="./script-launchpad.js"></script>
 
   </body>
 </html>

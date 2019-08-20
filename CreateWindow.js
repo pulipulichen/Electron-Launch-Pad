@@ -18,6 +18,7 @@ module.exports = function (filepath, callback) {
   
   let optionBrowserWindow = {
     //fullscreen: true,
+    frame: false,
     icon: './app/imgs/icon256.ico',
     //useContentSize: true,
     webPreferences: {
@@ -30,7 +31,7 @@ module.exports = function (filepath, callback) {
             + '.ico'
   }
   let win = new BrowserWindow(optionBrowserWindow)
-  //win.maximize();
+  win.maximize();
   
   if (mode === 'production') {
     win.setMenu(null)
