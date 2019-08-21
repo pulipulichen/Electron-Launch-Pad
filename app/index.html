@@ -13,9 +13,17 @@
     <script src="./vendors/redips-drag/redips-drag-min.js"></script>
     <script src="./script.js"></script>
     <link href="./style.css" rel="stylesheet" type="text/css" media="screen"/>
-    
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.1/tiny-slider.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.1/min/tiny-slider.js"></script>
+
+<script src="vendors/less/less.min.js" ></script>
+<link href="./style-launchpad.less" rel="stylesheet/less" type="text/css" />
+<script>
+  less = {
+    logLevel: 0,
+  }
+</script> 
+
+<script src="./script.js"></script>
+<link href="./style.css" rel="stylesheet" type="text/css" media="screen"/>
 
   </head>
   <body>
@@ -98,16 +106,5 @@
   </div>
 </center>    
 
-<script>
-var slider = tns({
-    container: '#redips-drag',
-    axis: "vertical",
-    items: 1,
-    slideBy: 'page',
-    autoplay: false,
-    arrowKeys: true
-  });
-</script>
-  
   </body>
 </html>
