@@ -7,6 +7,9 @@ let RequireHelper = {
     if (moduleName.indexOf('/') > -1) {
       moduleName = moduleName.slice(moduleName.lastIndexOf('/') + 1)
     }
+    if (moduleName.endsWith('.js')) {
+      moduleName = moduleName.slice(0, -3)
+    }
     
     if (typeof(window[moduleName]) !== 'undefined') {
       return window[moduleName]

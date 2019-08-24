@@ -29,7 +29,6 @@ let ShortcutHelper = {
         exec: `echo "APP ${i}"`
       })
     }
-    
     return shortcuts
   }
 }
