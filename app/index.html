@@ -5,6 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+<script src="helpers/hyper-app/RequireHelper.js"></script>
+<script>
+  RequireHelper.requireJQuery()
+</script>
+    
     <script src="vendors/jquery/jquery-3.4.1-electron.js"></script>
     
     <link rel="stylesheet" type="text/css" href="vendors/semantic-ui/semantic.min.css">
@@ -14,8 +19,17 @@
     <script src="./script.js"></script>
     <link href="./style.css" rel="stylesheet" type="text/css" media="screen"/>
 
+<script>
+  less = {
+    logLevel: 0,
+  }
+</script>
 <script src="vendors/less/less.min.js" ></script>
 <link href="./style-launchpad.less" rel="stylesheet/less" type="text/css" />
+
+
+<script src="helpers/VueHelper.js"></script>
+<script src="vendors/vue/vue.min.js"></script>
 <script>
   less = {
     logLevel: 0,
