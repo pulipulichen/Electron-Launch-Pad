@@ -1,5 +1,5 @@
 let ViewInitConfig = {
-  el: '#app',
+  el: '#redips-drag',
   data: {
     shortcutDirPath: null,
     shortcuts: [],
@@ -61,7 +61,7 @@ let ViewInitConfig = {
   watch: {
   },
   computed: {
-    getTablesAAA: function () {
+    getTables: function () {
       if (Array.isArray(this.shortcuts) === false) {
         return []
       }
@@ -87,7 +87,17 @@ let ViewInitConfig = {
         lastRow.push(shortcut)
       })
       
-      //console.log(tables)
+      while (Array.isArray(lastRow) && lastRow.length < maxCols) {
+        lastRow.push(null)
+      }
+      
+      while (Array.isArray(lastTable) && lastTable.length < maxRows) {
+        let emptyRow = []
+        for (let i = 0; i < maxCols; i++) {
+          emptyRow.push(null)
+        }
+        lastTable.push(emptyRow)
+      }
       
       return tables
     }
@@ -95,15 +105,14 @@ let ViewInitConfig = {
   methods: {
     _afterMounted: function () {
       //this.shortcus.slice(0, this.shortcus.length)
-      
-      setTimeout(() => {
-        this.shortcus = this.lib.ShortcutHelper.get(this.shortcutDirPath)
-        console.log(this.shortcuts)
-        //console.log(this.getTables())
-        this.lib.REDIPSHelper.init()
-        console.log('bbb')
-      }, 0)
+
+      this.shortcuts = this.lib.ShortcutHelper.get(this.shortcutDirPath)
+      //console.log(this.shortcuts)
+      //console.log(this.getTables)
+      this.lib.REDIPSHelper.init()
+      //console.log('bbb')
     },
+    /*
     getTables: function () {
       if (Array.isArray(this.shortcuts) === false) {
         return []
@@ -134,6 +143,7 @@ let ViewInitConfig = {
       
       return tables
     }
+    */
   }
 }
 
