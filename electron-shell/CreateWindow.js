@@ -19,7 +19,7 @@ module.exports = function (dirpath, callback) {
   let optionBrowserWindow = {
     //fullscreen: true,
     frame: false,
-    icon: './app/imgs/icon256.ico',
+    icon: path.join(__dirname, '../app/imgs/icon256.ico'),
     //useContentSize: true,
     webPreferences: {
       nodeIntegration: true
@@ -39,7 +39,7 @@ module.exports = function (dirpath, callback) {
   }
   
   win.loadURL(url.format({
-    pathname: path.join(__dirname, 'app', 'index.html'),
+    pathname: path.join(__dirname, '../app', 'index.html'),
     protocol: 'file:',
     slashes: true
   }))
