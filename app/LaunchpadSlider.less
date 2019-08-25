@@ -4,7 +4,12 @@
 @pager-width: 50px;
 @scroll-down-padding-height: 5rem;
 
-@import "styles/pager.less";
+@import "./styles/searchbar.less";
+@import "./styles/pager.less";
+@import "./styles/buttons-panel.less";
+@import "./styles/app-list.less";
+@import "./styles/scroll-padding.less";
+@import "./styles/popup.less";
 
 body {
 	font-family: arial;
@@ -17,7 +22,7 @@ body {
     background-color: rgba(255,255,255, 0.25);
   }
 }
-#redips-drag {
+#app {
   padding: 0;
   margin: 0;
   //position: fixed;
@@ -29,157 +34,10 @@ body {
   &.disabled {
     cursor: wait;
   }
-    
-  
-  .searchbar {
-    height: @searchbar-height;
-    //position: fixed;
-    //top: 0;
-    //left: 0;
-    //z-index: 3;
-    position: relative;
-    z-index: 1000;
-    cursor: pointer;
-    
-    padding-left: calc(@pager-width * 2);
-    padding-right: calc(@pager-width * 2);
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    
-    .ui.search {
-      width: 100%;
-    }
-  }
   
   
   
-  .app-list {
-    //position: fixed;
-    //top: @searchbar-height;
-    //left: 0;
-    max-height: calc(100vh - (@searchbar-height * 2));
-    overflow-y: hidden;
-    outline: none;
-    
-    &.disabled,
-    &.disabled .launchpad-item {
-      cursor: wait;
-    }
-    
-    /*
-    transition: margin-top 700ms;
-    
-    &[data-page="0"] {
-      margin-top: 0;
-    }
-    &[data-page="1"] {
-      margin-top: calc(@searchbar-height - 100vh);
-    }
-    &[data-page="2"] {
-      margin-top: calc((@searchbar-height - 100vh) * 2);
-    }
-    */
-    
-    
-    margin-left: @pager-width;
-    margin-right: @pager-width;
-    
-    
-    //max-height: (100vh - @searchbar-height);
-    //overflow: hidden;
-
-    .launchpad-item {
-      display: inline-block;
-      height: calc(((100vh - @searchbar-height - @scroll-down-padding-height) / @max-rows));
-      width: calc(((100vw - (@pager-width * 2)) / @max-cols) - 10px);
-      
-      //border: 1px solid red;
-      text-align: center;
-      color: white;
-      font-size: 2rem;
-      user-select: none;
-      cursor: pointer;
-      //position: absolute;
-      border-radius: 1rem;
-
-      
-      div {
-        height: 2rem;
-      }
-      
-      img {
-        display: block;
-        height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem);
-        max-height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem);
-        width: auto;
-        margin: auto;
-      }
-      
-      &.empty {
-        cursor: default;
-        
-        img, div {
-          visibility: hidden;
-        }
-        
-      }
-      
-      &.disable {
-        pointer-events: none;
-      }
-      
-      &.draggable-source--is-dragging {
-        background-color: rgba(255, 255, 255, 0.5);
-        opacity: 0.5;
-      }
-    }
-    
-    // ----------------------------------------
-    
-    &> div > table {
-      height: calc(100vh - @searchbar-height - @scroll-down-padding-height); // 上面放搜尋列
-      width: calc(100vw - (@pager-width * 2));  // 右邊放點點
-      margin-left: auto;
-      margin-right: auto;
-      border: 1px solid red;
-      
-      //&:not([data-table-order="0"]) {
-      //  margin-top: @searchbar-height;
-      //}
-      
-      
-    }
-    
-    tr.launchpad-row[data-launchpad-row="3"] {
-      //margin-bottom: @searchbar-height;
-      height: calc(((100vh - @searchbar-height - @scroll-down-padding-height) / @max-rows) - 10px + @searchbar-height);
-    }
-    
-    tr.launchpad-row td.launchpad-cell {
-      vertical-align: top;
-    }
-      
-    .scroll-padding.down {
-      height: @scroll-down-padding-height;
-      //background-color: green;
-      //border: 1px solid blue;
-      //margin-left: auto;
-      //margin-right: auto;
-      cursor: pointer;
-      width: 100vw;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      z-index: 999;
-      
-      &.enable {
-        //background-color: red;
-        //position: relative;
-      }
-    }
-  }
+  
   
   /*
   .app-list:not(.draggable-container--over) .launchpad-item {
@@ -202,7 +60,7 @@ body {
     }
   }
   */
-  
+  /*
   .drag-overlay {
     position: fixed;
     top: 0;
@@ -217,8 +75,9 @@ body {
       display: block;
     }
   }
+  */
 }
-
+/*
 div#redips-drag td,
 div#redips-drag td .redips-drag {
   height: calc(((100vh - @searchbar-height - @scroll-down-padding-height) / @max-rows) - 10px);
@@ -242,12 +101,6 @@ div#redips-drag td {
     margin: auto;
   }
 }
+*/
 
 
-.popup-content {
-  div.launchpad-item {
-    display: inline-block;
-    width: 3rem;
-    height: 3rem;
-  }
-}

@@ -1,0 +1,108 @@
+#app .app-list {
+  //position: fixed;
+  //top: @searchbar-height;
+  //left: 0;
+  max-height: calc(100vh - (@searchbar-height * 2));
+  overflow-y: hidden;
+  outline: none;
+
+  &.disabled,
+  &.disabled .launchpad-item {
+    cursor: wait;
+  }
+
+  /*
+  transition: margin-top 700ms;
+  
+  &[data-page="0"] {
+    margin-top: 0;
+  }
+  &[data-page="1"] {
+    margin-top: calc(@searchbar-height - 100vh);
+  }
+  &[data-page="2"] {
+    margin-top: calc((@searchbar-height - 100vh) * 2);
+  }
+  */
+
+
+  margin-left: @pager-width;
+  margin-right: @pager-width;
+
+
+  //max-height: (100vh - @searchbar-height);
+  //overflow: hidden;
+
+  .launchpad-item {
+    display: inline-block;
+    height: calc(((100vh - @searchbar-height - @scroll-down-padding-height) / @max-rows));
+    width: calc(((100vw - (@pager-width * 2)) / @max-cols) - 10px);
+
+    //border: 1px solid red;
+    text-align: center;
+    color: white;
+    font-size: 2rem;
+    user-select: none;
+    cursor: pointer;
+    //position: absolute;
+    border-radius: 1rem;
+
+    div {
+      height: 2rem;
+    }
+
+    .icon {
+      display: block;
+      height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem);
+      max-height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem);
+      width: auto;
+      margin: auto;
+    }
+
+    &.empty {
+      cursor: default;
+
+      .icon, div {
+        visibility: hidden;
+      }
+
+    }
+
+    &.disable {
+      pointer-events: none;
+    }
+
+    &.draggable-source--is-dragging {
+      background-color: rgba(255, 255, 255, 0.5);
+      opacity: 0.5;
+    }
+  }
+
+  // ----------------------------------------
+
+  /*
+  &> div > table {
+    height: calc(100vh - @searchbar-height - @scroll-down-padding-height); // 上面放搜尋列
+    width: calc(100vw - (@pager-width * 2));  // 右邊放點點
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid red;
+
+    //&:not([data-table-order="0"]) {
+    //  margin-top: @searchbar-height;
+    //}
+
+
+  }
+
+  tr.launchpad-row[data-launchpad-row="3"] {
+    //margin-bottom: @searchbar-height;
+    height: calc(((100vh - @searchbar-height - @scroll-down-padding-height) / @max-rows) - 10px + @searchbar-height);
+  }
+
+  tr.launchpad-row td.launchpad-cell {
+    vertical-align: top;
+  }
+  */
+
+}

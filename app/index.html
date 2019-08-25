@@ -66,20 +66,24 @@
     <div v-for="i in maxPages"
          class="item"
          v-bind:class="{'current': ((i-1) === currentPage), 'disabled': waitDragScroll}"
-         v-on:click="scrollPage((i-1))">
+         v-on:click="scrollPage((i-1))"
+         v-bind:title="'Go to page ' + i">
     </div>
   </div>
   
-  <div class="buttons-panel">
+  <div class="buttons-panel"
+       v-on:click.stop="">
     <button class="ui icon button" 
             type="button"
-            v-on:click="removePage"
-            v-if="isPageRemoable">
+            v-on:click.stop="removePage"
+            v-if="isPageRemoable"
+            title="add page">
       <i class="minus icon"></i>
     </button>
     <button class="ui icon button" 
             type="button"
-            v-on:click="addPage">
+            v-on:click.stop="addPage"
+            title="remove page">
       <i class="plus icon"></i>
     </button>
   </div>
@@ -102,7 +106,8 @@
       <div v-for="item in getSortedShortcuts"
            class="launchpad-item"
            v-bind:class="{'empty': (item === null), 'disable': (item === null && enableDragScroll === false)}"
-           v-bind:tabindex="getTabIndex(item)">
+           v-bind:tabindex="getTabIndex(item)"
+           v-bind:title="displayDescription(item)">
         <template v-if="item === null">
           <img draggable="false"/>
           <div>
@@ -110,10 +115,19 @@
           </div>
         </template>
         <template v-else>
-          <img v-bind:src="item.icon" 
-               draggable="false"/>
+          <img class="icon"
+               v-bind:src="item.icon" 
+               draggable="false"
+               v-if="Array.isArray(item.icon) === false"/>
+          <div class="icon"
+               v-if="Array.isArray(item.icon)">
+            <img v-for="icon in item.icon"
+                 v-bind:src="icon.icon"
+                 draggable="false" />
+          </div>
           <div>
             {{ item.name }}
+            {{ Array.isArray(item.icon) }}
           </div>
         </template>
       </div>

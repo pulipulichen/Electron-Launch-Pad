@@ -358,6 +358,14 @@ let VueControllerConfig = {
         return this
       }
       console.log('addPage')
+    },
+    displayDescription: function (item) {
+      if (item === null || typeof(item.description) !== 'string') {
+        return ''
+      }
+      else {
+        return item.description
+      }
     }
   }
 }
