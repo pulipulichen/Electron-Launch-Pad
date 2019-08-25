@@ -4,19 +4,19 @@
     <title>Electron Launch Pad</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
 <script src="helpers/hyper-app/RequireHelper.js"></script>
 <script>
   RequireHelper.requireJQuery()
 </script>
     
-    <script src="vendors/jquery/jquery-3.4.1-electron.js"></script>
-    
-    <link href="vendors/semantic-ui/semantic.min.css" rel="stylesheet" type="text/css">
-    <script src="vendors/semantic-ui/semantic.min.js"></script>
-    
-    <script src="./vendors/redips-drag/redips-drag-min.js"></script>
+<script src="vendors/jquery/jquery-3.4.1-electron.js"></script>
 
+<link href="vendors/semantic-ui/semantic.min.css" rel="stylesheet" type="text/css">
+<script src="vendors/semantic-ui/semantic.min.js"></script>
+
+<script src="./vendors/redips-drag/redips-drag-min.js"></script>
+
+<link href="./LaunchpadSlider.less" rel="stylesheet/less" type="text/css" />
 <script>
   less = {
     logLevel: 0,
@@ -30,47 +30,101 @@
 
 <script src="helpers/VueHelper.js"></script>
 <script src="vendors/vue/vue.min.js"></script>
-<script>
-  less = {
-    logLevel: 0,
-  }
-</script> 
 
-<script src="./helpers/REDIPSHelper.js"></script>
-<link href="./helpers/REDIPSHelper.css" rel="stylesheet" type="text/css" />
 <script src="./helpers/ShortcutHelper.js"></script>
+
+<!-- Entire bundle -->
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/draggable.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/sortable.js"></script>
+
 
   </head>
   <body>
 
-<center>
-  <!-- tables inside this DIV could contain drag-able content  -->
-  <div id="redips-drag">
-    <div v-for="tables in getTables">
-      <table class="tbl1">
-          <colgroup>
-              <col v-for="col in tables[0]"
-                width="100" />
-          </colgroup>
-          <tbody>
-              <tr v-for="row in tables"
-                class="rl">
-                  <td v-for="col in row">
-                    <template v-if="col === null">
-                      
-                    </template>
-                    <template v-else>
-                      <div class="redips-drag blue">
-                        {{ col.name }}
-                      </div>
-                    </template>
-                  </td>
-              </tr>
-          </tbody>
-      </table>
-    </div>
-</center>
+<!-- tables inside this DIV could contain drag-able content  -->
+<div id="app" 
+     ref="main">
   
-  <script src="./VueInit.js"></script>
+  <div class="searchbar"
+       v-on:mouseover="scrollPaddingDragUpEnter"
+       v-on:click="scrollPage(false)">
+    <div class="ui search fluid" 
+         v-on:click.stop="">
+      <div class="ui icon fluid input">
+        <input class="prompt" type="text" 
+               placeholder="Search APP..."
+               v-modal="searchKeyword">
+        <i class="search icon"></i>
+      </div>
+      <div class="results"></div>
+    </div>
+  </div>
+  
+  <div class="pager"
+       v-on:wheel.stop=""
+       ref="pager">
+    <div v-for="i in maxPages"
+         class="item"
+         v-bind:class="{'current': ((i-1) === currentPage), 'disabled': waitDragScroll}"
+         v-on:click="scrollPage((i-1))">
+    </div>
+  </div>
+  
+  <div class="buttons-panel">
+    <button class="ui icon button" 
+            type="button"
+            v-on:click="removePage"
+            v-if="isPageRemoable">
+      <i class="minus icon"></i>
+    </button>
+    <button class="ui icon button" 
+            type="button"
+            v-on:click="addPage">
+      <i class="plus icon"></i>
+    </button>
+  </div>
+  
+  <!--
+  <div class="drag-overlay"
+       v-on:mousemove.stop=""
+       v-on:dragover.stop=""
+       v-on:dragenter.stop=""
+       v-bind:class="{enable: waitDragScroll}">
+  </div>
+  -->
+
+    <div class="app-list"
+         id="AppList"
+         v-bind:data-page="currentPage"
+         v-bind:class="{'disabled': waitDragScroll}"
+         ref="AppList"
+         tabindex="-1">
+      <div v-for="item in getSortedShortcuts"
+           class="launchpad-item"
+           v-bind:class="{'empty': (item === null), 'disable': (item === null && enableDragScroll === false)}"
+           v-bind:tabindex="getTabIndex(item)">
+        <template v-if="item === null">
+          <img draggable="false"/>
+          <div>
+            (NULL)
+          </div>
+        </template>
+        <template v-else>
+          <img v-bind:src="item.icon" 
+               draggable="false"/>
+          <div>
+            {{ item.name }}
+          </div>
+        </template>
+      </div>
+      
+      <div class="scroll-padding down"
+          v-bind:class="{'enable': enableDragScroll}"
+          v-on:mouseover="scrollPaddingDragDownEnter"
+          v-on:click="scrollPage(true)">
+      </div>
+  </div>
+  
+  <script src="./VueController.js"></script>
   </body>
 </html>

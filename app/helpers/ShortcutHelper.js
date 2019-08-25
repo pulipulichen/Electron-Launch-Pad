@@ -22,11 +22,12 @@ let ShortcutHelper = {
     
     let shortcuts = []
     
-    for (let i = 0; i < 23; i++) {
+    for (let i = 0; i < 43; i++) {
       shortcuts.push({
-        icon: this.lib.path.join(__dirname, '../imgs/icons8-app-symbol-256.png'),
+        icon: this.lib.path.join(__dirname, '/imgs/icons8-app-symbol-256.png'),
         name: `APP ${i}`,
-        exec: `echo "APP ${i}"`
+        exec: `echo "APP ${i}"`,
+        order: i
       })
     }
     return shortcuts

@@ -1,8 +1,9 @@
+const electron = require('electron')
 const {
   app,
   BrowserWindow,
   clipboard,
-} = require('electron')
+} = electron
 
 const url = require('url')
 const path = require('path')
@@ -16,10 +17,27 @@ if (process.argv.indexOf('--mode') - process.argv.indexOf('development') === -1)
 
 module.exports = function (shortcutDirPath, callback) {
   
+  let iconPath = path.join(__dirname, '../app/imgs/icon256.ico')
+  if (process.platform === 'linux') {
+    iconPath = path.join(__dirname, '../app/imgs/icon256.png')
+  }
+  
+  // https://electronjs.org/docs/api/screen
+  let screen = electron.screen
+  let point = screen.getCursorScreenPoint()
+  let display = screen.getDisplayNearestPoint(point)
+  let offsetX = display.bounds.x
+  let offsetY = display.bounds.y
+  //let displays = screen.getAllDisplays()
+  //console.log(display)
+  
   let optionBrowserWindow = {
+    x: offsetX,
+    y: offsetY,
     //fullscreen: true,
     frame: false,
-    icon: path.join(__dirname, '../app/imgs/icon256.ico'),
+    icon: iconPath,
+    transparent: true,
     //useContentSize: true,
     webPreferences: {
       nodeIntegration: true
@@ -37,6 +55,8 @@ module.exports = function (shortcutDirPath, callback) {
     win.setMenu(null)
     win.setMenuBarVisibility(false)
   }
+  
+  win.setResizable(false)
   
   win.loadURL(url.format({
     pathname: path.join(__dirname, '../app', 'index.html'),
@@ -57,6 +77,10 @@ module.exports = function (shortcutDirPath, callback) {
   
   //return win
   win.webContents.once('dom-ready', () => {
+    
+    //const electronVibrancy = require('electron-vibrancy')
+    //electronVibrancy.SetVibrancy(win, 0)
+    
     if (typeof(callback) === 'function') {
       callback(win)
     }
