@@ -44,6 +44,14 @@
 <center>
   <!-- tables inside this DIV could contain drag-able content  -->
   <div id="redips-drag" ref="main">
+    <div class="ui search">
+      <div class="ui icon input">
+        <input class="prompt" type="text" placeholder="Common passwords...">
+        <i class="search icon"></i>
+      </div>
+      <div class="results"></div>
+    </div>
+    
     <div v-for="tables in getTables">
       <table class="tbl1">
           <tbody>

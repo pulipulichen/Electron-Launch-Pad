@@ -35,8 +35,8 @@ div#redips-drag table {
 	border-spacing: 0px;
 	width: 580px;
     */
-    height: 100vh;
-    width: 100vw;
+    height: calc(100vh - 3rem); // 上面放搜尋列
+    width: calc(100vw - 50px);  // 右邊放點點
     border: 1px solid red;
 }
 	/* define margin below first table */
@@ -65,8 +65,8 @@ div#redips-drag table tr {
 div#redips-drag td {
 	//border: 2px groove white;
   border: 1px solid green;
-  height: calc((100vh / @max-rows) - 10px);
-  width: calc((100vw / @max-cols) - 10px);
+  height: calc(((100vh - 3rem) / @max-rows) - 10px);
+  width: calc(((100vw - 50px) / @max-cols) - 10px);
 }
 
 /* table titles */
@@ -93,8 +93,8 @@ div#redips-drag th {
 	//border-radius: 4px; /* Opera, Chrome */
 	//-moz-border-radius: 4px; /* FF */
     border: 1px solid red;
-    height: calc((100vh / @max-rows) - 10px);
-    width: calc((100vw / @max-cols) - 10px);
+    height: calc(((100vh - 3rem) / @max-rows) - 10px);
+    width: calc(((100vw - 50px) / @max-cols) - 10px);
     text-align: center;
     //position: absolute;
     
