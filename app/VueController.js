@@ -1,4 +1,4 @@
-let ViewInitConfig = {
+let VueControllerConfig = {
   el: '#redips-drag',
   data: {
     shortcutDirPath: null,
@@ -148,8 +148,8 @@ let ViewInitConfig = {
 }
 
 if (typeof(window) !== 'undefined') {
-  window.ViewInit = new Vue(ViewInitConfig)
+  window.VueController = new Vue(VueControllerConfig)
 }
 if (typeof(exports) !== 'undefined') {
-  exports.default = new Vue(ViewInitConfig)
+  exports.default = new Vue(VueControllerConfig)
 }

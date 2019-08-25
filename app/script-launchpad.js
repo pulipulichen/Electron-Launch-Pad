@@ -1,3 +1,5 @@
+// just for test.
+
 $(function () {
   var launchpad = $("#launchpad"),
           open = function () {
