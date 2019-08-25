@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Electron Launch Pad</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="helpers/hyper-app/RequireHelper.js"></script>
+<script>
+  RequireHelper.requireJQuery()
+</script>
+    
+<script src="vendors/jquery/jquery-3.4.1-electron.js"></script>
+
+<link href="vendors/semantic-ui/semantic.min.css" rel="stylesheet" type="text/css">
+<script src="vendors/semantic-ui/semantic.min.js"></script>
+
+<script src="./vendors/redips-drag/redips-drag-min.js"></script>
+
+<link href="./LaunchpadSlider.less" rel="stylesheet/less" type="text/css" />
+<script>
+  less = {
+    logLevel: 0,
+  }
+</script>
+<script src="vendors/less/less.min.js" ></script>
+
+
+<script src="helpers/electron/ElectronFileHelper.js"></script>
+<script src="helpers/electron/ElectronHelper.js"></script>
+
+<script src="helpers/VueHelper.js"></script>
+<script src="vendors/vue/vue.min.js"></script>
+
+<script src="./helpers/REDIPSHelper.js"></script>
+<!-- <link href="./helpers/REDIPSHelper.css" rel="stylesheet" type="text/css" /> -->
+<script src="./helpers/ShortcutHelper.js"></script>
+
+<!-- Entire bundle -->
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.6/lib/draggable.bundle.js"></script>
+<!-- legacy bundle for older browsers (IE11) -->
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.6/lib/draggable.bundle.legacy.js"></script>
+<!-- Draggable only -->
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.6/lib/draggable.js"></script>
+<!-- Sortable only -->
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.6/lib/sortable.js"></script>
+<!-- Droppable only -->
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.6/lib/droppable.js"></script>
+<!-- Swappable only -->
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.6/lib/swappable.js"></script>
+<!-- Plugins only -->
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.6/lib/plugins.js"></script>
+
+  </head>
+  <body>
+
+<!-- tables inside this DIV could contain drag-able content  -->
+<div id="redips-drag" ref="main">
+  <div class="searchbar"
+       v-on:mouseover="scrollPaddingDragUpEnter"
+       v-on:click="scrollPage(false)">
+    <div class="ui search fluid" 
+         v-on:click.stop="">
+      <div class="ui icon fluid input">
+        <input class="prompt" type="text" 
+               placeholder="Search APP..."
+               v-modal="searchKeyword">
+        <i class="search icon"></i>
+      </div>
+      <div class="results"></div>
+    </div>
+  </div>
+  
+  <div class="drag-overlay"
+       v-on:mousemove.stop=""
+       v-on:dragover.stop=""
+       v-on:dragenter.stop=""
+       v-bind:class="{enable: waitDragScroll}">
+    
+  </div>
+
+    <div class="app-list"
+         v-bind:class="'page-' + currentPage">
+      <!--
+      <div class="scroll-padding"
+           v-bind:class="{'enable': enableDragScroll}"
+           v-on:mouseover="scrollPaddingDragUpEnter">
+      </div>
+      -->
+        <table>
+          <tbody>
+            <template v-for="(tables, i) in getTables">
+              <tr v-for="(row, i) in tables"
+                  class="launchpad-row"
+                  v-bind:data-launchpad-row="i">
+                <td v-for="(col, i) in row"
+                    class="launchpad-cell"
+                    v-bind:data-launchpad-cell="i"
+                    draggable="true">
+                  <template v-if="col === null">
+
+                  </template>
+                  <template v-else>
+                    <div class="ui button redips-drag"
+                         v-bind:data-order="col.order">
+                      <img v-bind:src="col.icon" />
+                      {{ col.name }}
+                    </div>
+                  </template>
+                </td>
+              </tr>
+              <!--
+              <tr>
+                <td v-bind:colspan="maxCols"
+                    class="scroll-padding down redips-mark"
+                    v-bind:class="{'enable': enableDragScroll}"
+                    v-on:mouseover="scrollPaddingDragDownEnter"
+                    v-on:click="scrollPage(true)">
+                </td>
+              </tr>
+              -->
+            </template>
+          </tbody>
+        </table>
+        <div class="scroll-padding down"
+            v-bind:class="{'enable': enableDragScroll}"
+            v-on:mouseover="scrollPaddingDragDownEnter"
+            v-on:click="scrollPage(true)">
+        </div>
+      </div>
+  </div>
+  
+  <script src="./VueController.js"></script>
+  </body>
+</html>
