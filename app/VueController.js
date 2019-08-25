@@ -111,17 +111,27 @@ let VueControllerConfig = {
       this.shortcuts = this.lib.ShortcutHelper.get(this.shortcutDirPath)
       //console.log(this.shortcuts)
       //console.log(this.getTables)
-      //this.lib.REDIPSHelper.init()
+      this.lib.REDIPSHelper.init()
       //console.log('bbb')
     },
     initPopup: function () {
+      let popupOptions = {
+        on: 'click',
+        //hoverable: true, 
+        //position: 'top left'
+      }
+      
       setTimeout(() => {
+        /*
         $(this.$refs.main).find('.redips-drag').each((i, ele) => {
           $(ele).popup({
-    hoverable: true, 
-    position: 'top left'
+            on: 'click',
+            //hoverable: true, 
+            //position: 'top left'
           })
         })
+        */
+        $(this.$refs.main).find('.redips-drag').popup(popupOptions)
       }, 100)
     },
     /*
@@ -164,9 +174,4 @@ if (typeof(window) !== 'undefined') {
 }
 if (typeof(exports) !== 'undefined') {
   exports.default = new Vue(VueControllerConfig)
-}
-
-window.onscroll = function (e) {
-  e.preventDefault()
-  e.stopPropagation()
 }

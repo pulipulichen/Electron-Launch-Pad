@@ -28,7 +28,7 @@ body {
 }
 
 /* set border-collapse */
-div#redips-drag table {
+div#redips-drag .launchpad-table {
 /* 	border-collapse: collapse; */
     /*
 	border-collapse: separate;
@@ -40,9 +40,11 @@ div#redips-drag table {
     border: 1px solid red;
 }
 	/* define margin below first table */
+  /*
 	.tbl1 {
 		margin-bottom: 17px;
 	}
+  */
 
 /* set table row height */
 div#redips-drag table tr {
@@ -60,7 +62,7 @@ div#redips-drag table tr {
 	
 	wider border wins over narrower ones / double wins over solid, then dashed, dotted, ridge, outset, groove, inset
 */
-div#redips-drag td {
+div#redips-drag .launchpad-cell {
 	//border: 2px groove white;
     border: 1px solid green;
 }
@@ -143,3 +145,7 @@ div#redips-drag th {
 	background-color: #C6C8CB;
 }
 */
+
+.launchpad-cell {
+  display: inline-block;
+}
