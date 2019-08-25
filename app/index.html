@@ -44,12 +44,15 @@
 <center>
   <!-- tables inside this DIV could contain drag-able content  -->
   <div id="redips-drag" ref="main">
-    <div class="ui search">
-      <div class="ui icon input">
-        <input class="prompt" type="text" placeholder="Common passwords...">
-        <i class="search icon"></i>
+    <div class="searchbar">
+      <div class="ui search fluid">
+        <div class="ui icon fluid input">
+          <input class="prompt" type="text" 
+                 placeholder="Search APP...">
+          <i class="search icon"></i>
+        </div>
+        <div class="results"></div>
       </div>
-      <div class="results"></div>
     </div>
     
     <div v-for="tables in getTables">
@@ -72,6 +75,7 @@
               </tr>
           </tbody>
       </table>
+      <div class="scroll-down-padding"></div>
     </div>
 </center>
   
