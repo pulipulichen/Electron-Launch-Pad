@@ -120,7 +120,8 @@ let VueControllerConfig = {
       //console.log(this.shortcuts)
       //console.log(this.getTables)
       //console.log('bbb')
-      this.initREDIPS()
+      //this.initREDIPS()
+      this.initPopup()
     },
     initREDIPS: function () {
       
@@ -174,7 +175,7 @@ let VueControllerConfig = {
         })
         */
        
-        $(this.$refs.main).find('.redips-drag').popup(popupOptions)
+        $(this.$refs.main).find('.launchpad-item').popup(popupOptions)
         /*
         tippy('.redips-drag[data-order="3"]', {
           content: `<div>

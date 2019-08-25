@@ -70,6 +70,27 @@ body {
     //max-height: (100vh - @searchbar-height);
     //overflow: hidden;
 
+    .launchpad-item {
+      display: inline-block;
+      height: calc(((100vh - @searchbar-height - @scroll-down-padding-height) / @max-rows) - 10px);
+      width: calc(((100vw - (@pager-width * 2)) / @max-cols) - 10px);
+      
+      border: 1px solid red;
+      text-align: center;
+      color: white;
+      font-size: 2rem;
+      user-select: none;
+      //position: absolute;
+
+      img {
+        display: block;
+        max-height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem);
+        width: auto;
+        margin: auto;
+      }
+    }
+    
+    // ----------------------------------------
     
     &> div > table {
       height: calc(100vh - @searchbar-height - @scroll-down-padding-height); // 上面放搜尋列

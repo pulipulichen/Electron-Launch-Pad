@@ -80,52 +80,17 @@
 
     <div class="app-list"
          v-bind:class="'page-' + currentPage">
-      <!--
-      <div class="scroll-padding"
-           v-bind:class="{'enable': enableDragScroll}"
-           v-on:mouseover="scrollPaddingDragUpEnter">
+      <div v-for="item in shortcuts"
+           class="launchpad-item">
+        <img v-bind:src="item.icon" 
+             draggable="false"/>
+        {{ item.name }}
       </div>
-      -->
-        <table>
-          <tbody>
-            <template v-for="(tables, i) in getTables">
-              <tr v-for="(row, i) in tables"
-                  class="launchpad-row"
-                  v-bind:data-launchpad-row="i">
-                <td v-for="(col, i) in row"
-                    class="launchpad-cell"
-                    v-bind:data-launchpad-cell="i"
-                    draggable="true">
-                  <template v-if="col === null">
-
-                  </template>
-                  <template v-else>
-                    <div class="ui button redips-drag"
-                         v-bind:data-order="col.order">
-                      <img v-bind:src="col.icon" />
-                      {{ col.name }}
-                    </div>
-                  </template>
-                </td>
-              </tr>
-              <!--
-              <tr>
-                <td v-bind:colspan="maxCols"
-                    class="scroll-padding down redips-mark"
-                    v-bind:class="{'enable': enableDragScroll}"
-                    v-on:mouseover="scrollPaddingDragDownEnter"
-                    v-on:click="scrollPage(true)">
-                </td>
-              </tr>
-              -->
-            </template>
-          </tbody>
-        </table>
-        <div class="scroll-padding down"
-            v-bind:class="{'enable': enableDragScroll}"
-            v-on:mouseover="scrollPaddingDragDownEnter"
-            v-on:click="scrollPage(true)">
-        </div>
+      
+      <div class="scroll-padding down"
+          v-bind:class="{'enable': enableDragScroll}"
+          v-on:mouseover="scrollPaddingDragDownEnter"
+          v-on:click="scrollPage(true)">
       </div>
   </div>
   
