@@ -70,7 +70,10 @@ let VueControllerConfig = {
   computed: {
     getSortedShortcuts: function () {
       let sortedShortcuts = [null]
-      this.shortcuts.forEach(shortcut => {
+      this.shortcuts.forEach((shortcut, i) => {
+        if (i === 5) {
+          sortedShortcuts.push(null)
+        }
         sortedShortcuts.push(shortcut)
       })
       
@@ -137,6 +140,7 @@ let VueControllerConfig = {
       //console.log('bbb')
       this.initDraggable()
       this.initPopup()
+      this.initHotKeys()
     },
     initDraggable: function () {
       
@@ -182,7 +186,15 @@ let VueControllerConfig = {
         this.initPopup()
       });
       
-      //$('.launchpad-item').unbind('drag:start')
+      $(this.$refs.AppList).find('.launchpad-item.empty').removeAttr('tabindex')
+    },
+    getTabIndex: function (item) {
+      if (item === null) {
+        return -1
+      }
+      else {
+        return 0
+      }
     },
     initREDIPS: function () {
       
@@ -294,6 +306,14 @@ let VueControllerConfig = {
       return tables
     }
     */
+    initHotKeys: function () {
+      //console.log('i')
+      window.addEventListener("wheel", event => {
+        if (this.waitDragScroll === false) {
+          this.scrollPage((event.deltaY > 0))
+        }
+      });
+    },
     scrollPaddingDragUpEnter: function (event) {
       if (this.enableDragScroll === true 
               && this.waitDragScroll === false) {
@@ -303,7 +323,7 @@ let VueControllerConfig = {
       }
     },
     scrollPaddingDragDownEnter: function (event) {
-      console.log([this.enableDragScroll, this.waitDragScroll])
+      //console.log([this.enableDragScroll, this.waitDragScroll])
       if (this.enableDragScroll === true 
               && this.waitDragScroll === false) {
         event.stopPropagation()
@@ -313,7 +333,7 @@ let VueControllerConfig = {
     },
     scrollPage: function (isNext) {
       //this.currentPage++
-      console.log([this.currentPage, this.maxPages])
+      //console.log([this.currentPage, this.maxPages])
       if (isNext === undefined || isNext === true) {
         this.currentPage = (this.currentPage + 1) % this.maxPages
       }
@@ -323,6 +343,12 @@ let VueControllerConfig = {
           this.currentPage = this.maxPages - 1
         }
       }
+      
+      //this.$refs.AppList.scrollTop = $(this.$refs.AppList).height() * this.currentPage
+      let appList = $(this.$refs.AppList)
+      appList.animate({
+        scrollTop: (appList.height() * this.currentPage)
+      }, 700);
       
       this.waitDragScroll = true
       setTimeout(() => {

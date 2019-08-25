@@ -47,20 +47,22 @@ body {
     //position: fixed;
     //top: @searchbar-height;
     //left: 0;
-    //max-height: calc(100vh - @searchbar-height);
-    //overflow-y: hidden;
+    max-height: calc(100vh - (@searchbar-height * 2));
+    overflow-y: hidden;
     
+    /*
     transition: margin-top 700ms;
     
-    &.page-0 {
+    &[data-page="0"] {
       margin-top: 0;
     }
-    &.page-1 {
+    &[data-page="1"] {
       margin-top: calc(@searchbar-height - 100vh);
     }
-    &.page-2 {
+    &[data-page="2"] {
       margin-top: calc((@searchbar-height - 100vh) * 2);
     }
+    */
     
     
     margin-left: @pager-width;
@@ -72,27 +74,47 @@ body {
 
     .launchpad-item {
       display: inline-block;
-      height: calc(((100vh - @searchbar-height - @scroll-down-padding-height) / @max-rows) - 10px);
+      height: calc(((100vh - @searchbar-height - @scroll-down-padding-height) / @max-rows));
       width: calc(((100vw - (@pager-width * 2)) / @max-cols) - 10px);
       
-      border: 1px solid red;
+      //border: 1px solid red;
       text-align: center;
       color: white;
       font-size: 2rem;
       user-select: none;
       cursor: pointer;
       //position: absolute;
+      border-radius: 1rem;
 
+      
+      div {
+        height: 2rem;
+      }
+      
       img {
         display: block;
+        height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem);
         max-height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem);
         width: auto;
         margin: auto;
       }
       
       &.empty {
-        pointer-events: none;
         cursor: default;
+        
+        img, div {
+          visibility: hidden;
+        }
+        
+      }
+      
+      &.disable {
+        pointer-events: none;
+      }
+      
+      &.draggable-source--is-dragging {
+        background-color: rgba(255, 255, 255, 0.5);
+        opacity: 0.5;
       }
     }
     
@@ -123,8 +145,8 @@ body {
       
     .scroll-padding.down {
       height: @scroll-down-padding-height;
-      background-color: green;
-      border: 1px solid blue;
+      //background-color: green;
+      //border: 1px solid blue;
       //margin-left: auto;
       //margin-right: auto;
       cursor: pointer;
@@ -135,11 +157,33 @@ body {
       z-index: 999;
       
       &.enable {
-        background-color: red;
+        //background-color: red;
         //position: relative;
       }
     }
   }
+  
+  /*
+  .app-list:not(.draggable-container--over) .launchpad-item {
+    &:nth-child(16n),
+    &:nth-child(16n-1),
+    &:nth-child(16n-2),
+    &:nth-child(16n-3) {
+      background-color: yellow;
+      margin-bottom: @searchbar-height;
+    }
+  }
+  
+  .app-list.draggable-container--over .launchpad-item {
+    &:nth-child(16n),
+    &:nth-child(16n-1),
+    &:nth-child(16n-2),
+    &:nth-child(16n-3) {
+      background-color: yellow;
+      margin-bottom: @searchbar-height;
+    }
+  }
+  */
   
   .drag-overlay {
     position: fixed;

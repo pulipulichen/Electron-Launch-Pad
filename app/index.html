@@ -60,26 +60,36 @@
     </div>
   </div>
   
+  <!--
   <div class="drag-overlay"
        v-on:mousemove.stop=""
        v-on:dragover.stop=""
        v-on:dragenter.stop=""
        v-bind:class="{enable: waitDragScroll}">
-    
   </div>
+  -->
 
     <div class="app-list"
          id="AppList"
-         v-bind:class="'page-' + currentPage">
+         v-bind:data-page="currentPage"
+         ref="AppList"
+         tabindex="-1">
       <div v-for="item in getSortedShortcuts"
            class="launchpad-item"
-           v-bind:class="{'empty': (item === null && enableDragScroll === false)}">
+           v-bind:class="{'empty': (item === null), 'disable': (item === null && enableDragScroll === false)}"
+           v-bind:tabindex="getTabIndex(item)">
         <template v-if="item === null">
+          <img draggable="false"/>
+          <div>
+            (NULL)
+          </div>
         </template>
         <template v-else>
           <img v-bind:src="item.icon" 
                draggable="false"/>
-          {{ item.name }}
+          <div>
+            {{ item.name }}
+          </div>
         </template>
       </div>
       
