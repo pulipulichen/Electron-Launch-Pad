@@ -332,9 +332,16 @@ let VueControllerConfig = {
       }
     },
     scrollPage: function (isNext) {
+      if (this.waitDragScroll === true) {
+        return
+      }
+      
       //this.currentPage++
       //console.log([this.currentPage, this.maxPages])
-      if (isNext === undefined || isNext === true) {
+      if (typeof(isNext) === 'number') {
+        this.currentPage = isNext
+      }
+      else if (isNext === undefined || isNext === true) {
         this.currentPage = (this.currentPage + 1) % this.maxPages
       }
       else {
@@ -349,6 +356,20 @@ let VueControllerConfig = {
       appList.animate({
         scrollTop: (appList.height() * this.currentPage)
       }, 700);
+      
+      let pager = $(this.$refs.pager)
+      let pagerHeight = pager.height()
+      let pagerNumberPerPage = 20
+      let pagerPage = parseInt(this.currentPage / pagerNumberPerPage, 10)
+      let pagerMinTop = pagerHeight * pagerPage
+      let pagerMaxTop = pagerHeight * (pagerPage + 1)
+      let pagerScrollTop = pager[0].scrollTop
+      //console.log([pagerHeight, pagerMinTop, pagerMaxTop, pagerScrollTop])
+      if (pagerScrollTop < pagerMinTop || pagerScrollTop >= pagerMaxTop) {
+        pager.animate({
+          scrollTop: pagerMinTop
+        }, 700);
+      }
       
       this.waitDragScroll = true
       setTimeout(() => {

@@ -10,6 +10,10 @@ body {
   padding: 0;
   overflow: hidden;
   background-color: rgba(0, 0, 0, 0.7);
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(255,255,255, 0.25);
+  }
 }
 #redips-drag {
   padding: 0;
@@ -19,6 +23,10 @@ body {
   
   //max-height: calc(100vh - 1px);
   //overflow: auto;
+  
+  &.disabled {
+    cursor: wait;
+  }
     
   
   .searchbar {
@@ -43,12 +51,60 @@ body {
     }
   }
   
+  .pager {
+    position: fixed;
+    right: 0;
+    top: @searchbar-height;
+    width: @pager-width;
+    //text-align: center;
+    color: white;
+    font-size: 3rem;
+    
+    max-height: calc(100vh - (@searchbar-height * 2));
+    overflow-y: auto;
+    
+    .item {
+      //margin-bottom: 1rem;
+      height: calc((100vh - (@searchbar-height * 2)) / 20);
+      
+      @circle-width: 20px;
+      
+      &::before {
+        content: "";
+        display: inline-block;
+        width: @circle-width;
+        height: @circle-width;
+        -moz-border-radius: calc(@circle-width / 2);
+        -webkit-border-radius: calc(@circle-width / 2);
+        border-radius: calc(@circle-width / 2);
+        background-color: #666;
+        cursor: pointer;
+      }
+      &.current::before {
+        background-color: white;
+      }
+      
+      &.disabled {
+        //pointer-events: none;
+        &::before {
+          cursor: wait;
+        }
+      }
+    }
+  }
+  
   .app-list {
     //position: fixed;
     //top: @searchbar-height;
     //left: 0;
     max-height: calc(100vh - (@searchbar-height * 2));
     overflow-y: hidden;
+    outline: none;
+    
+    &.disabled,
+    &.disabled .launchpad-item {
+      cursor: wait;
+    }
     
     /*
     transition: margin-top 700ms;
