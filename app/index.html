@@ -41,28 +41,27 @@
   </head>
   <body>
 
-<center>
-  <!-- tables inside this DIV could contain drag-able content  -->
-  <div id="redips-drag" ref="main">
-    <div class="searchbar">
-      <div class="ui search fluid">
-        <div class="ui icon fluid input">
-          <input class="prompt" type="text" 
-                 placeholder="Search APP...">
-          <i class="search icon"></i>
-        </div>
-        <div class="results"></div>
+<!-- tables inside this DIV could contain drag-able content  -->
+<div id="redips-drag" ref="main">
+  <div class="searchbar">
+    <div class="ui search fluid">
+      <div class="ui icon fluid input">
+        <input class="prompt" type="text" 
+               placeholder="Search APP...">
+        <i class="search icon"></i>
       </div>
+      <div class="results"></div>
     </div>
-    
-    <div v-for="tables in getTables">
-      <table class="tbl1">
+  </div>
+
+  <div class="app-list">
+    <div v-for="(tables, i) in getTables">
+      <table v-bind:data-table-order="i">
           <tbody>
-              <tr v-for="row in tables"
-                class="rl">
+              <tr v-for="row in tables">
                   <td v-for="col in row">
                     <template v-if="col === null">
-                      
+
                     </template>
                     <template v-else>
                       <div class="ui button redips-drag"
@@ -77,7 +76,7 @@
       </table>
       <div class="scroll-down-padding"></div>
     </div>
-</center>
+  </div>
   
   <script src="./VueController.js"></script>
   </body>

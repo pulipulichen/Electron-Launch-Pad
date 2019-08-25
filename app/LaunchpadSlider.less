@@ -7,17 +7,20 @@
 body {
 	font-family: arial;
 	margin: 0px;
+  padding: 0;
   overflow: hidden;
 }
 #redips-drag {
   padding: 0;
   margin: 0;
   position: fixed;
+  margin-top: -100vh;
   
   .searchbar {
     height: @searchbar-height;
     
     padding-left: @pager-width;
+    padding-right: @pager-width;
     display: flex;
     width: 100%;
     align-items: center;
@@ -28,15 +31,38 @@ body {
     }
   }
   
-  .scroll-down-padding {
-    height: @scroll-down-padding-height;
-  }
-}
-div#redips-drag table {
-    height: calc(100vh - @searchbar-height - @scroll-down-padding-height); // 上面放搜尋列
-    width: calc(100vw - (@pager-width * 2));  // 右邊放點點
+  .app-list {
+    //position: fixed;
+    //top: @searchbar-height;
+    //left: 0;
+    //max-height: calc(100vh - @searchbar-height);
+    //overflow-y: hidden;
+    //margin-top: calc(@searchbar-height - 100vh);
     margin-left: @pager-width;
-    border: 1px solid red;
+    margin-right: @pager-width;
+    
+    &> div > table {
+      height: calc(100vh - @searchbar-height - @scroll-down-padding-height); // 上面放搜尋列
+      width: calc(100vw - (@pager-width * 2));  // 右邊放點點
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid red;
+      
+      &:not([data-table-order="1"]) {
+        margin-top: @searchbar-height;
+      }
+    }
+    
+    .scroll-down-padding {
+      height: @scroll-down-padding-height;
+      background-color: green;
+      border: 1px solid blue;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+  
+    
 }
 
 div#redips-drag td,
