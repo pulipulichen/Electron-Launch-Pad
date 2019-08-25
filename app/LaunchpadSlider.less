@@ -82,25 +82,52 @@ body {
       //  margin-top: @searchbar-height;
       //}
       
+      
     }
     
+    tr.launchpad-row[data-launchpad-row="3"] {
+      //margin-bottom: @searchbar-height;
+      height: calc(((100vh - @searchbar-height - @scroll-down-padding-height) / @max-rows) - 10px + @searchbar-height);
+    }
+    
+    tr.launchpad-row td.launchpad-cell {
+      vertical-align: top;
+    }
+      
     .scroll-padding.down {
       height: @scroll-down-padding-height;
       background-color: green;
       border: 1px solid blue;
-      margin-left: auto;
-      margin-right: auto;
+      //margin-left: auto;
+      //margin-right: auto;
       cursor: pointer;
+      width: 100vw;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      z-index: 999;
       
       &.enable {
         background-color: red;
-        position: relative;
-        z-index: 999;
+        //position: relative;
       }
     }
   }
   
+  .drag-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    //background-color: gray;
+    display: none;
+    z-index: 999;
     
+    &.enable {
+      display: block;
+    }
+  }
 }
 
 div#redips-drag td,

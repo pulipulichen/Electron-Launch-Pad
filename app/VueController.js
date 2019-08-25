@@ -4,6 +4,8 @@ let VueControllerConfig = {
     searchKeyword: "",
     currentPage: 0,
     maxPages: 0,
+    maxRows: 4,
+    maxCols: 4,
     shortcutDirPath: null,
     shortcuts: [],
     enableDragScroll: false,
@@ -121,6 +123,12 @@ let VueControllerConfig = {
       this.initREDIPS()
     },
     initREDIPS: function () {
+      const draggable = new Draggable(document.getElementById('draggableList'), {
+        draggable: 'li'
+      });
+      
+      return this
+      
       this.lib.REDIPSHelper.init({
         ondropped: (targetCell) => {
           this.initPopup()

@@ -1,3 +1,6 @@
+/**
+ * https://www.redips.net/javascript/redips-drag-documentation/
+ */
 let REDIPSHelper = {
   init: function (config) {
     
@@ -21,18 +24,23 @@ let REDIPSHelper = {
       rd.hover.borderTd = '2px solid #32568E';
       rd.hover.borderTr = '2px solid #32568E';
       // drop row after highlighted row (if row is dropped to other tables)
-      rd.dropMode = 'shift';
+      rd.dropMode = 'switch' // 
       rd.rowDropMode = 'after';
-      rd.scroll.enable = false;
-      if (typeof(config.ondropped) === 'function') {
-        rd.event.dropped = (targetCell) => {
-          config.ondropped(targetCell)
-        }
-      }
+      rd.scroll.enable = false
+      
+      
       
       if (typeof(config.onmoved) === 'function') {
         rd.event.moved = (cloned) => {
+          rd.enableDrag(false, 'redips-drag')
           config.onmoved(cloned)
+        }
+      }
+      
+      if (typeof(config.ondropped) === 'function') {
+        rd.event.dropped = (targetCell) => {
+          //rd.enableDrag(true, 'redips-drag')
+          config.ondropped(targetCell)
         }
       }
       // row was clicked - event handler
