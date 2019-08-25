@@ -153,3 +153,8 @@ if (typeof(window) !== 'undefined') {
 if (typeof(exports) !== 'undefined') {
   exports.default = new Vue(VueControllerConfig)
 }
+
+window.onscroll = function (e) {
+  e.preventDefault()
+  e.stopPropagation()
+}
