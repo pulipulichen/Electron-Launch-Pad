@@ -68,6 +68,21 @@ let VueControllerConfig = {
   watch: {
   },
   computed: {
+    getSortedShortcuts: function () {
+      let sortedShortcuts = [null]
+      this.shortcuts.forEach(shortcut => {
+        sortedShortcuts.push(shortcut)
+      })
+      
+      let pageItemCount = this.maxRows * this.maxCols
+      while (sortedShortcuts.length % pageItemCount !== 0) {
+        sortedShortcuts.push(null)
+      }
+      
+      this.maxPages = sortedShortcuts.length / pageItemCount
+      
+      return sortedShortcuts
+    },
     getTables: function () {
       if (Array.isArray(this.shortcuts) === false) {
         return []
@@ -124,15 +139,38 @@ let VueControllerConfig = {
       this.initPopup()
     },
     initDraggable: function () {
+      
+      $('.div.launchpad-item').on('dragstart', (event) => {
+        event.stopPropagation()
+        event.preventDefault()
+        event.cancelBubble()
+        return false
+      })
+      
       const draggable = new Draggable.Sortable(document.getElementById('AppList'), {
-        draggable: 'div',
+        draggable: 'div.launchpad-item',
         scrollable: {
           speed: 0
         }
       });
       
-      draggable.on('drag:start', () => {
+      draggable.on('drag:start', (event) => {
         console.log('drag:start')
+        //console.log(event)
+        /*
+        if ($(event.source).hasClass('disable')) {
+          event.stopPropagation()
+          event.preventDefault()
+          return false
+        }
+        */
+        /*
+        event.stopPropagation()
+        event.preventDefault()
+        event.cancelBubble()
+        return false
+        */
+        
         this.enableDragScroll = true
       });
       //draggable.on('drag:move', () => {
@@ -141,7 +179,10 @@ let VueControllerConfig = {
       draggable.on('drag:stop', () => {
         console.log('drag:stop')
         this.enableDragScroll = false
+        this.initPopup()
       });
+      
+      //$('.launchpad-item').unbind('drag:start')
     },
     initREDIPS: function () {
       
@@ -195,7 +236,7 @@ let VueControllerConfig = {
         })
         */
        
-        $(this.$refs.main).find('.launchpad-item').popup(popupOptions)
+        $(this.$refs.main).find('.launchpad-item:not(.empty)').popup(popupOptions)
         /*
         tippy('.redips-drag[data-order="3"]', {
           content: `<div>

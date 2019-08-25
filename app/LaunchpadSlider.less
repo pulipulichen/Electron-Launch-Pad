@@ -80,6 +80,7 @@ body {
       color: white;
       font-size: 2rem;
       user-select: none;
+      cursor: pointer;
       //position: absolute;
 
       img {
@@ -87,6 +88,11 @@ body {
         max-height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem);
         width: auto;
         margin: auto;
+      }
+      
+      &.empty {
+        pointer-events: none;
+        cursor: default;
       }
     }
     

@@ -71,11 +71,16 @@
     <div class="app-list"
          id="AppList"
          v-bind:class="'page-' + currentPage">
-      <div v-for="item in shortcuts"
-           class="launchpad-item">
-        <img v-bind:src="item.icon" 
-             draggable="false"/>
-        {{ item.name }}
+      <div v-for="item in getSortedShortcuts"
+           class="launchpad-item"
+           v-bind:class="{'empty': (item === null && enableDragScroll === false)}">
+        <template v-if="item === null">
+        </template>
+        <template v-else>
+          <img v-bind:src="item.icon" 
+               draggable="false"/>
+          {{ item.name }}
+        </template>
       </div>
       
       <div class="scroll-padding down"
