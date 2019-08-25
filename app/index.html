@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Electron Launch Pad</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="helpers/hyper-app/RequireHelper.js"></script>
+<script>
+  RequireHelper.requireJQuery()
+</script>
+    
+<script src="vendors/jquery/jquery-3.4.1-electron.js"></script>
+
+<link href="vendors/semantic-ui/semantic.min.css" rel="stylesheet" type="text/css">
+<script src="vendors/semantic-ui/semantic.min.js"></script>
+
+<script src="./vendors/redips-drag/redips-drag-min.js"></script>
+
+<link href="./LaunchpadSlider.less" rel="stylesheet/less" type="text/css" />
+<script>
+  less = {
+    logLevel: 0,
+  }
+</script>
+<script src="vendors/less/less.min.js" ></script>
+
+
+<script src="helpers/electron/ElectronFileHelper.js"></script>
+<script src="helpers/electron/ElectronHelper.js"></script>
+
+<script src="helpers/VueHelper.js"></script>
+<script src="vendors/vue/vue.min.js"></script>
+<script>
+  less = {
+    logLevel: 0,
+  }
+</script> 
+
+<script src="./helpers/REDIPSHelper.js"></script>
+<!-- <link href="./helpers/REDIPSHelper.css" rel="stylesheet" type="text/css" /> -->
+<script src="./helpers/ShortcutHelper.js"></script>
+
+  </head>
+  <body>
+
+<center>
+  <!-- tables inside this DIV could contain drag-able content  -->
+  <div id="redips-drag" ref="main">
+    <div v-for="tables in getTables">
+      <table class="tbl1">
+          <colgroup>
+              <col v-for="col in tables[0]"
+                width="100" />
+          </colgroup>
+          <tbody>
+              <tr v-for="row in tables"
+                class="rl">
+                  <td v-for="col in row">
+                    <template v-if="col === null">
+                      
+                    </template>
+                    <template v-else>
+                      <div class="ui button redips-drag"
+                           v-bind:data-order="col.order">
+                        <img v-bind:src="col.icon" />
+                        {{ col.name }}
+                      </div>
+                      <div class="ui fluid popup bottom center transition hidden"
+                           v-bind:data-order="col.order">
+                        <div class="ui four column divided center aligned grid">
+                          <div class="column">order {{ col.order }}</div>
+                          <div class="column">2</div>
+                          <div class="column">3</div>
+                          <div class="column">4</div>
+                        </div>
+                      </div>
+                    </template>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+    </div>
+</center>
+  
+  <script src="./VueController.js"></script>
+  </body>
+</html>

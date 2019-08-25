@@ -1,0 +1,173 @@
+// just for test.
+
+@duration: 0s;
+@blur: 30px;
+@background: url(http://media.idownloadblog.com/wp-content/uploads/2014/08/Yosemite-5-wallpaper-thumbnail.png);
+@icon-margin: 40px;
+
+.yosemite-background {
+	background: @background no-repeat center center fixed;
+	background-size: cover;
+}
+
+body {
+	.yosemite-background;
+	font-family: sans-serif;
+	margin: 0;
+	padding: 0;
+}
+
+* { box-sizing: border-box; }
+a { cursor: pointer; }
+
+#launchpad {
+	display: none;
+	
+	&.shown {
+		display: block;
+		
+		&.start { animation: show @duration 1; }
+		&.end { animation: hide @duration 1; }
+		
+		.content {
+			// counteracts the blurred edges
+			background: #310505;
+			bottom: 0;
+			left: 0;
+			position: fixed;
+			right: 0;
+			top: 0;
+			
+			&:before {
+				.yosemite-background;
+				bottom: 0;
+				content: '';
+				filter: blur(@blur);
+				left: 0;
+				position: absolute;
+				right: 0;
+				top: 0;
+				z-index: -1;
+			}
+			
+			nav {
+				margin: 20px auto;
+				width: 90%;
+				
+				a {
+					color: white;
+					filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+					font-size: 14px;
+					text-align: center;
+					text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+					&:active { 
+						opacity: .6;	
+					}
+				}
+				
+				&.scale-down { 
+					animation: scale-down @duration 1; }
+				&.scale-up { 
+					animation: scale-up @duration 1; }
+			}
+		}
+	}
+}
+
+.window {
+	background: white;
+	border-color: #eee;
+	border-width: 30px 0 0 0;
+	border-style: solid;
+	border-radius: 3px;
+	box-shadow: 0 0 60px 10px rgba(0, 0, 0, 0.2);
+	left: 50%;
+	margin: -160px 0 0 -320px;
+	min-height: 320px;
+	padding: 10px 30px;
+	position: absolute;
+	top: 50%;
+	width: 640px;
+	
+	h1 {
+		font-weight: normal;
+		text-align: center;
+	}
+	
+	a {
+		color: #00BFFF;
+		text-decoration: none;
+	}
+}
+
+// KEYFRAMES
+
+@keyframes show {
+	0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@keyframes hide {
+	0% { opacity: 1; }
+	100% { opacity: 0; }
+}
+
+@keyframes scale-up {
+	0% { transform: scale(1); }
+	100% { transform: scale(1.2); }
+}
+
+@keyframes scale-down {
+	0% { transform: scale(1.2); }
+	100% { transform: scale(1); }
+}
+
+// ICONS
+
+a[class^="icon"] {
+	background-position: top;
+	background-repeat: no-repeat;
+	display: inline-block;
+	height: 128px;
+	padding: 128px 0 0 0;
+	margin: @icon-margin;
+	width: 128px;
+}
+
+.launchpad-icon {
+	background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/Launcher.png);
+	background-position: top;
+	background-repeat: no-repeat;
+	display: block;
+	height: 128px;
+	margin: 15px auto;
+	width: 128px;
+}
+.icon-facetime { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/facetime.png); }
+.icon-skydrive { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/skydrive.png); }
+.icon-dropbox { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/dropbox.png); }
+.icon-soundcloud { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/soundcloud.png); }
+.icon-chromium { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/Chromium.png); }
+.icon-safari { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/istatmenu.png); }
+.icon-opera { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/opera.png); }
+.icon-appstore { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/Appstore.png); }
+.icon-airport { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/AirPortUtility.png); }
+.icon-pinterest { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/Pinterest.png); }
+.icon-twitter { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/twitter.png); }
+.icon-dictionary { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/dictionary.png); }
+.icon-notes { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/notes.png); }
+.icon-monitor { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/NetworkMonitor.png); }
+.icon-imovie { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/imovie.png); }
+.icon-texteditor { background: url(https://cdn2.iconfinder.com/data/icons/minimalism/128/tTextEditor.png); }
+
+#icons {
+	bottom: 10px;
+	color: #9E9E9E;
+	left: 10px;
+	position: absolute;
+	
+	a {
+		color: #BADA55;
+		text-decoration: none;
+	}
+}
