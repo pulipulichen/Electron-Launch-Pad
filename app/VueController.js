@@ -3,7 +3,7 @@ let VueControllerConfig = {
   data: {
     searchKeyword: "",
     currentPage: 0,
-    maxPages: 0,
+    maxPages: 3,
     maxRows: 4,
     maxCols: 4,
     shortcutDirPath: null,
@@ -120,8 +120,28 @@ let VueControllerConfig = {
       //console.log(this.shortcuts)
       //console.log(this.getTables)
       //console.log('bbb')
-      //this.initREDIPS()
+      this.initDraggable()
       this.initPopup()
+    },
+    initDraggable: function () {
+      const draggable = new Draggable.Sortable(document.getElementById('AppList'), {
+        draggable: 'div',
+        scrollable: {
+          speed: 0
+        }
+      });
+      
+      draggable.on('drag:start', () => {
+        console.log('drag:start')
+        this.enableDragScroll = true
+      });
+      //draggable.on('drag:move', () => {
+      //  console.log('drag:move')
+      //});
+      draggable.on('drag:stop', () => {
+        console.log('drag:stop')
+        this.enableDragScroll = false
+      });
     },
     initREDIPS: function () {
       
@@ -242,6 +262,7 @@ let VueControllerConfig = {
       }
     },
     scrollPaddingDragDownEnter: function (event) {
+      console.log([this.enableDragScroll, this.waitDragScroll])
       if (this.enableDragScroll === true 
               && this.waitDragScroll === false) {
         event.stopPropagation()
@@ -251,13 +272,14 @@ let VueControllerConfig = {
     },
     scrollPage: function (isNext) {
       //this.currentPage++
+      console.log([this.currentPage, this.maxPages])
       if (isNext === undefined || isNext === true) {
-        this.currentPage = (this.currentPage + 1) % this.maxPage
+        this.currentPage = (this.currentPage + 1) % this.maxPages
       }
       else {
         this.currentPage--
         if (this.currentPage < 0) {
-          this.currentPage = this.maxPage - 1
+          this.currentPage = this.maxPages - 1
         }
       }
       
