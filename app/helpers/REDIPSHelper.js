@@ -1,5 +1,5 @@
 let REDIPSHelper = {
-  init: function () {
+  init: function (config) {
     
     /* enable strict mode */
     "use strict";
@@ -23,6 +23,11 @@ let REDIPSHelper = {
       // drop row after highlighted row (if row is dropped to other tables)
       rd.dropMode = 'switching';
       rd.rowDropMode = 'after';
+      if (typeof(config.ondropped) === 'function') {
+        rd.event.dropped = (targetCell) => {
+          config.ondropped(targetCell)
+        }
+      }
       // row was clicked - event handler
       /*
       rd.event.rowClicked = function () {

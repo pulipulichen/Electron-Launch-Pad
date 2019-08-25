@@ -35,6 +35,9 @@
 <!-- <link href="./helpers/REDIPSHelper.css" rel="stylesheet" type="text/css" /> -->
 <script src="./helpers/ShortcutHelper.js"></script>
 
+<script src="https://unpkg.com/popper.js@1"></script>
+<script src="https://unpkg.com/tippy.js@4"></script>
+
   </head>
   <body>
 
@@ -42,43 +45,25 @@
   <!-- tables inside this DIV could contain drag-able content  -->
   <div id="redips-drag" ref="main">
     <div v-for="tables in getTables">
-      <div class="launchpad-table">
-          <div v-for="row in tables"
-               class="launchpad-row">
-              <div v-for="col in row"
-                   class="launchpad-cell">
-                <template v-if="col === null">
-
-                </template>
-                <template v-else>
-                  <div class="ui button redips-drag"
-                       v-bind:data-order="col.order">
-                    <img v-bind:src="col.icon" />
-                    {{ col.name }}
-                  </div>
-<div class="ui flowing popup">
-  <div class="ui three column divided center aligned grid">
-    <div class="column">
-      <h4 class="ui header">Basic Plan</h4>
-      <p><b>2</b> projects, $10 a month</p>
-      <div class="ui button">Choose</div>
-    </div>
-    <div class="column">
-      <h4 class="ui header">Business Plan</h4>
-      <p><b>5</b> projects, $20 a month</p>
-      <div class="ui button">Choose</div>
-    </div>
-    <div class="column">
-      <h4 class="ui header">Premium Plan</h4>
-      <p><b>8</b> projects, $25 a month</p>
-      <div class="ui button">Choose</div>
-    </div>
-  </div>
-</div>
-                </template>
-              </div>
-          </div>
-      </div>
+      <table class="tbl1">
+          <tbody>
+              <tr v-for="row in tables"
+                class="rl">
+                  <td v-for="col in row">
+                    <template v-if="col === null">
+                      
+                    </template>
+                    <template v-else>
+                      <div class="ui button redips-drag"
+                           v-bind:data-order="col.order">
+                        <img v-bind:src="col.icon" />
+                        {{ col.name }}
+                      </div>
+                    </template>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
     </div>
 </center>
   

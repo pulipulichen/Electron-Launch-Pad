@@ -13,6 +13,11 @@ A Mac style launch pad with Electron.js
 
 ----
 
+# REDIPS
+- https://www.redips.net/javascript/redips-drag-documentation/
+
+----
+
 # NPM
 
 ## Install electron in Linux
