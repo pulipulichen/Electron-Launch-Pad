@@ -123,9 +123,6 @@ let VueControllerConfig = {
       this.initREDIPS()
     },
     initREDIPS: function () {
-      const draggable = new Draggable(document.getElementById('draggableList'), {
-        draggable: 'li'
-      });
       
       return this
       
