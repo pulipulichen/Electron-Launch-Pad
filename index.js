@@ -4,11 +4,13 @@ const fs = require('fs')
 
 // ------------
 
+const electron = require('electron')
+
 const {
   app,
   BrowserWindow,
   clipboard,
-} = require('electron')
+} = electron
 
 const ProcessArgvHelper = require('./electron-shell/ProcessArgvHelper.js')
 
