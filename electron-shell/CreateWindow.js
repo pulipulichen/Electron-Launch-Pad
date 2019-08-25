@@ -16,10 +16,15 @@ if (process.argv.indexOf('--mode') - process.argv.indexOf('development') === -1)
 
 module.exports = function (shortcutDirPath, callback) {
   
+  let iconPath = path.join(__dirname, '../app/imgs/icon256.ico')
+  if (process.platform === 'linux') {
+    iconPath = path.join(__dirname, '../app/imgs/icon256.png')
+  }
+  
   let optionBrowserWindow = {
     //fullscreen: true,
     frame: false,
-    icon: path.join(__dirname, '../app/imgs/icon256.ico'),
+    icon: iconPath,
     //useContentSize: true,
     webPreferences: {
       nodeIntegration: true
