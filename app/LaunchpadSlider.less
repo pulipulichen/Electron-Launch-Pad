@@ -9,6 +9,7 @@ body {
 	margin: 0px;
   padding: 0;
   overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.7);
 }
 #redips-drag {
   padding: 0;
@@ -28,9 +29,10 @@ body {
     //z-index: 3;
     position: relative;
     z-index: 1000;
+    cursor: pointer;
     
-    padding-left: @pager-width;
-    padding-right: @pager-width;
+    padding-left: calc(@pager-width * 2);
+    padding-right: calc(@pager-width * 2);
     display: flex;
     width: 100%;
     align-items: center;
@@ -82,12 +84,13 @@ body {
       
     }
     
-    .scroll-padding {
+    .scroll-padding.down {
       height: @scroll-down-padding-height;
       background-color: green;
       border: 1px solid blue;
       margin-left: auto;
       margin-right: auto;
+      cursor: pointer;
       
       &.enable {
         background-color: red;

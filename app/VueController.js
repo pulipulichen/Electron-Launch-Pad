@@ -230,32 +230,35 @@ let VueControllerConfig = {
     scrollPaddingDragUpEnter: function (event) {
       if (this.enableDragScroll === true 
               && this.waitDragScroll === false) {
-        //this.currentPage--
-        //this.currentPage = (this.currentPage - 1) % this.maxPage
-        this.currentPage--
-        if (this.currentPage < 0) {
-          this.currentPage = this.maxPage - 1
-        }
         event.stopPropagation()
         
-        this.waitDragScroll = true
-        setTimeout(() => {
-          this.waitDragScroll = false
-        }, 700)
+        this.scrollPage(false)
       }
     },
     scrollPaddingDragDownEnter: function (event) {
       if (this.enableDragScroll === true 
               && this.waitDragScroll === false) {
-        //this.currentPage++
-        this.currentPage = (this.currentPage + 1) % this.maxPage
         event.stopPropagation()
         
-        this.waitDragScroll = true
-        setTimeout(() => {
-          this.waitDragScroll = false
-        }, 700)
+        this.scrollPage(true)
       }
+    },
+    scrollPage: function (isNext) {
+      //this.currentPage++
+      if (isNext === undefined || isNext === true) {
+        this.currentPage = (this.currentPage + 1) % this.maxPage
+      }
+      else {
+        this.currentPage--
+        if (this.currentPage < 0) {
+          this.currentPage = this.maxPage - 1
+        }
+      }
+      
+      this.waitDragScroll = true
+      setTimeout(() => {
+        this.waitDragScroll = false
+      }, 700)
     }
   }
 }
