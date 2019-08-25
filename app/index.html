@@ -43,38 +43,52 @@
 
 <!-- tables inside this DIV could contain drag-able content  -->
 <div id="redips-drag" ref="main">
-  <div class="searchbar">
+  <div class="searchbar"
+       v-on:mouseover="scrollPaddingDragUpEnter">
     <div class="ui search fluid">
       <div class="ui icon fluid input">
         <input class="prompt" type="text" 
-               placeholder="Search APP...">
+               placeholder="Search APP..."
+               v-modal="searchKeyword">
         <i class="search icon"></i>
       </div>
       <div class="results"></div>
     </div>
   </div>
 
-  <div class="app-list">
-    <div v-for="(tables, i) in getTables">
-      <table v-bind:data-table-order="i">
+  <div id="drag-wrapper">
+    <div class="app-list"
+         v-bind:class="'page-' + currentPage">
+      <!--
+      <div class="scroll-padding"
+           v-bind:class="{'enable': enableDragScroll}"
+           v-on:mouseover="scrollPaddingDragUpEnter">
+      </div>
+      -->
+      <div v-for="(tables, i) in getTables">
+        <table v-bind:data-table-order="i">
           <tbody>
-              <tr v-for="row in tables">
-                  <td v-for="col in row">
-                    <template v-if="col === null">
+            <tr v-for="row in tables">
+              <td v-for="col in row">
+                <template v-if="col === null">
 
-                    </template>
-                    <template v-else>
-                      <div class="ui button redips-drag"
-                           v-bind:data-order="col.order">
-                        <img v-bind:src="col.icon" />
-                        {{ col.name }}
-                      </div>
-                    </template>
-                  </td>
-              </tr>
+                </template>
+                <template v-else>
+                  <div class="ui button redips-drag"
+                       v-bind:data-order="col.order">
+                    <img v-bind:src="col.icon" />
+                    {{ col.name }}
+                  </div>
+                </template>
+              </td>
+            </tr>
           </tbody>
-      </table>
-      <div class="scroll-down-padding"></div>
+        </table>
+        <div class="scroll-padding"
+             v-bind:class="{'enable': enableDragScroll}"
+             v-on:mouseover="scrollPaddingDragDownEnter">   
+        </div>
+      </div>
     </div>
   </div>
   

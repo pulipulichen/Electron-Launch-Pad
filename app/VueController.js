@@ -1,8 +1,13 @@
 let VueControllerConfig = {
   el: '#redips-drag',
   data: {
+    searchKeyword: "",
+    currentPage: 0,
+    maxPages: 0,
     shortcutDirPath: null,
     shortcuts: [],
+    enableDragScroll: false,
+    waitDragScroll: false,
     lib: {
       ElectronHelper: null,
       electron: null,
@@ -99,6 +104,7 @@ let VueControllerConfig = {
         lastTable.push(emptyRow)
       }
       
+      this.maxPage = tables.length
       this.initPopup()
       
       return tables
@@ -111,12 +117,19 @@ let VueControllerConfig = {
       this.shortcuts = this.lib.ShortcutHelper.get(this.shortcutDirPath)
       //console.log(this.shortcuts)
       //console.log(this.getTables)
+      //console.log('bbb')
+      this.initREDIPS()
+    },
+    initREDIPS: function () {
       this.lib.REDIPSHelper.init({
         ondropped: (targetCell) => {
           this.initPopup()
+          this.enableDragScroll = false
+        },
+        onmoved: () => {
+          this.enableDragScroll = true
         }
       })
-      //console.log('bbb')
     },
     initPopup: function () {
       let popupOptions = {
@@ -214,6 +227,36 @@ let VueControllerConfig = {
       return tables
     }
     */
+    scrollPaddingDragUpEnter: function (event) {
+      if (this.enableDragScroll === true 
+              && this.waitDragScroll === false) {
+        //this.currentPage--
+        //this.currentPage = (this.currentPage - 1) % this.maxPage
+        this.currentPage--
+        if (this.currentPage < 0) {
+          this.currentPage = this.maxPage - 1
+        }
+        event.stopPropagation()
+        
+        this.waitDragScroll = true
+        setTimeout(() => {
+          this.waitDragScroll = false
+        }, 700)
+      }
+    },
+    scrollPaddingDragDownEnter: function (event) {
+      if (this.enableDragScroll === true 
+              && this.waitDragScroll === false) {
+        //this.currentPage++
+        this.currentPage = (this.currentPage + 1) % this.maxPage
+        event.stopPropagation()
+        
+        this.waitDragScroll = true
+        setTimeout(() => {
+          this.waitDragScroll = false
+        }, 700)
+      }
+    }
   }
 }
 

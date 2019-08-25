@@ -21,11 +21,18 @@ let REDIPSHelper = {
       rd.hover.borderTd = '2px solid #32568E';
       rd.hover.borderTr = '2px solid #32568E';
       // drop row after highlighted row (if row is dropped to other tables)
-      rd.dropMode = 'switching';
+      rd.dropMode = 'shift';
       rd.rowDropMode = 'after';
+      rd.scroll.enable = false;
       if (typeof(config.ondropped) === 'function') {
         rd.event.dropped = (targetCell) => {
           config.ondropped(targetCell)
+        }
+      }
+      
+      if (typeof(config.onmoved) === 'function') {
+        rd.event.moved = (cloned) => {
+          config.onmoved(cloned)
         }
       }
       // row was clicked - event handler

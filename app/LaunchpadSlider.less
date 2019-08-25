@@ -2,7 +2,7 @@
 @max-cols: 4;
 @searchbar-height: 5rem;
 @pager-width: 50px;
-@scroll-down-padding-height: 50px;
+@scroll-down-padding-height: 5rem;
 
 body {
 	font-family: arial;
@@ -13,11 +13,21 @@ body {
 #redips-drag {
   padding: 0;
   margin: 0;
-  position: fixed;
-  margin-top: -100vh;
+  //position: fixed;
+  //margin-top: -100vh;
+  
+  //max-height: calc(100vh - 1px);
+  //overflow: auto;
+    
   
   .searchbar {
     height: @searchbar-height;
+    //position: fixed;
+    //top: 0;
+    //left: 0;
+    //z-index: 3;
+    position: relative;
+    z-index: 1000;
     
     padding-left: @pager-width;
     padding-right: @pager-width;
@@ -37,9 +47,27 @@ body {
     //left: 0;
     //max-height: calc(100vh - @searchbar-height);
     //overflow-y: hidden;
-    //margin-top: calc(@searchbar-height - 100vh);
+    
+    transition: margin-top 700ms;
+    
+    &.page-0 {
+      margin-top: 0;
+    }
+    &.page-1 {
+      margin-top: calc(@searchbar-height - 100vh);
+    }
+    &.page-2 {
+      margin-top: calc((@searchbar-height - 100vh) * 2);
+    }
+    
+    
     margin-left: @pager-width;
     margin-right: @pager-width;
+    
+    
+    //max-height: (100vh - @searchbar-height);
+    //overflow: hidden;
+
     
     &> div > table {
       height: calc(100vh - @searchbar-height - @scroll-down-padding-height); // 上面放搜尋列
@@ -48,17 +76,24 @@ body {
       margin-right: auto;
       border: 1px solid red;
       
-      &:not([data-table-order="1"]) {
-        margin-top: @searchbar-height;
-      }
+      //&:not([data-table-order="0"]) {
+      //  margin-top: @searchbar-height;
+      //}
+      
     }
     
-    .scroll-down-padding {
+    .scroll-padding {
       height: @scroll-down-padding-height;
       background-color: green;
       border: 1px solid blue;
       margin-left: auto;
       margin-right: auto;
+      
+      &.enable {
+        background-color: red;
+        position: relative;
+        z-index: 999;
+      }
     }
   }
   
