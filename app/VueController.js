@@ -216,24 +216,35 @@ let VueControllerConfig = {
         //hoverable: true, 
         //position: 'top left'
         html  : `<div>
-  <div class="ui fluid three column divided center aligned grid">
-    <div class="column">
-      <h4 class="ui header">Basic Plan</h4>
-      <p><b>2</b> projects, $10 a month</p>
-      <div class="ui button">Choose</div>
+  <div class="popup-content">
+    <div class="launchpad-item">
+      A
     </div>
-    <div class="column">
-      <h4 class="ui header">Business Plan</h4>
-      <p><b>5</b> projects, $20 a month</p>
-      <div class="ui button">Choose</div>
+    <div class="launchpad-item">
+      B
     </div>
-    <div class="column">
-      <h4 class="ui header">Premium Plan</h4>
-      <p><b>8</b> projects, $25 a month</p>
-      <div class="ui button">Choose</div>
+    <div class="launchpad-item">
+      C
     </div>
   </div>
-</div>`
+</div>`,  
+          onVisible: () => {
+            
+            //console.log(this)
+            $('#redips-drag').css('pointer-events', 'none')
+
+            setTimeout(() => {
+              let popupContent = $('.popup-content:visible:first')[0]
+              //console.log(popupContent)
+              const draggable = new Draggable.Sortable(popupContent, {
+                draggable: 'div'
+              });
+            }, 300)
+          },
+          onHidden: () => {
+            console.log('A')
+            $('#redips-drag').css('pointer-events', 'all')
+          }
         
       }
       
@@ -248,7 +259,10 @@ let VueControllerConfig = {
         })
         */
        
-        $(this.$refs.main).find('.launchpad-item:not(.empty)').popup(popupOptions)
+        let items = $(this.$refs.main).find('.launchpad-item:not(.empty)')
+        items.popup(popupOptions)
+        items.click(function () {
+        })
         /*
         tippy('.redips-drag[data-order="3"]', {
           content: `<div>
