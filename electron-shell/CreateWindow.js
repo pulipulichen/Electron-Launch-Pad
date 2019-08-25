@@ -14,12 +14,12 @@ if (process.argv.indexOf('--mode') - process.argv.indexOf('development') === -1)
 // For test
 //mode = 'development'
 
-module.exports = function (dirpath, callback) {
+module.exports = function (shortcutDirPath, callback) {
   
   let optionBrowserWindow = {
     //fullscreen: true,
     frame: false,
-    icon: './app/imgs/icon256.ico',
+    icon: path.join(__dirname, '../app/imgs/icon256.ico'),
     //useContentSize: true,
     webPreferences: {
       nodeIntegration: true
@@ -39,7 +39,7 @@ module.exports = function (dirpath, callback) {
   }
   
   win.loadURL(url.format({
-    pathname: path.join(__dirname, 'app', 'index.html'),
+    pathname: path.join(__dirname, '../app', 'index.html'),
     protocol: 'file:',
     slashes: true
   }))
@@ -53,7 +53,7 @@ module.exports = function (dirpath, callback) {
   //win.rendererSideName.filepath = filepath
   //win.rendererSideName.mode = mode
   win.mode = mode
-  win.dirpath = dirpath
+  win.shortcutDirPath = shortcutDirPath
   
   //return win
   win.webContents.once('dom-ready', () => {

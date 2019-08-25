@@ -10,7 +10,7 @@ const {
   clipboard,
 } = require('electron')
 
-const ProcessArgvHelper = require('./app/helpers/electron/ProcessArgvHelper')
+const ProcessArgvHelper = require('./electron-shell/ProcessArgvHelper.js')
 
 let dirPath
 ProcessArgvHelper.getDirPaths().forEach(path => {
@@ -37,6 +37,6 @@ app.on('ready', () => {
   createWindow(dirPath)
 })
 
-const createWindow = require('./CreateWindow')
+const createWindow = require('./electron-shell/CreateWindow')
 
-require('./IpcEventManager')
+require('./electron-shell/IpcEventManager')
