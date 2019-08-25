@@ -1,0 +1,23 @@
+{
+  "name": "electron-launch-pad",
+  "version": "1.0.0",
+  "description": "A Mac style launch pad with Electron.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://pulipuli.chen@gmail.com@github.com/pulipulichen/Electron-Launch-Pad.git"
+  },
+  "keywords": [
+    "electron",
+    "launchpad"
+  ],
+  "author": "Pulipuli Chen <blog@pulipuli.info>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pulipulichen/Electron-Launch-Pad/issues"
+  },
+  "homepage": "https://github.com/pulipulichen/Electron-Launch-Pad#readme"
+}
