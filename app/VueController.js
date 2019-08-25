@@ -99,6 +99,8 @@ let VueControllerConfig = {
         lastTable.push(emptyRow)
       }
       
+      this.initPopup()
+      
       return tables
     }
   },
@@ -109,8 +111,18 @@ let VueControllerConfig = {
       this.shortcuts = this.lib.ShortcutHelper.get(this.shortcutDirPath)
       //console.log(this.shortcuts)
       //console.log(this.getTables)
-      this.lib.REDIPSHelper.init()
+      //this.lib.REDIPSHelper.init()
       //console.log('bbb')
+    },
+    initPopup: function () {
+      setTimeout(() => {
+        $(this.$refs.main).find('.redips-drag').each((i, ele) => {
+          $(ele).popup({
+    hoverable: true, 
+    position: 'top left'
+          })
+        })
+      }, 100)
     },
     /*
     getTables: function () {

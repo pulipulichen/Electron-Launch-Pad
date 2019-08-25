@@ -45,7 +45,7 @@
 
 <center>
   <!-- tables inside this DIV could contain drag-able content  -->
-  <div id="redips-drag">
+  <div id="redips-drag" ref="main">
     <div v-for="tables in getTables">
       <table class="tbl1">
           <colgroup>
@@ -60,9 +60,19 @@
                       
                     </template>
                     <template v-else>
-                      <div class="redips-drag">
+                      <div class="ui button redips-drag"
+                           v-bind:data-order="col.order">
                         <img v-bind:src="col.icon" />
                         {{ col.name }}
+                      </div>
+                      <div class="ui fluid popup bottom center transition hidden"
+                           v-bind:data-order="col.order">
+                        <div class="ui four column divided center aligned grid">
+                          <div class="column">order {{ col.order }}</div>
+                          <div class="column">2</div>
+                          <div class="column">3</div>
+                          <div class="column">4</div>
+                        </div>
                       </div>
                     </template>
                   </td>
