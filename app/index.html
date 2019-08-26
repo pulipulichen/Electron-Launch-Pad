@@ -134,7 +134,8 @@
            v-bind:title="displayDescription(item)"
            v-bind:data-shortcut-index="i">
         <template v-if="item === null">
-          <img draggable="false"/>
+          <img class="icon"
+               draggable="false"/>
           <div>
             (NULL)
           </div>
