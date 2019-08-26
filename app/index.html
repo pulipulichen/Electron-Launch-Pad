@@ -129,7 +129,7 @@
          tabindex="-1">
       <div v-for="(item, i) in getSortedShortcuts"
            class="launchpad-item"
-           v-bind:class="{'empty': (item === null), 'disable': (item === null && enableDragScroll === false)}"
+           v-bind:class="{'empty': (item === null), 'disable': (item === null && enableDragScroll === false), 'folder': (item !== null && Array.isArray(item.items) === true)}"
            v-bind:tabindex="getTabIndex(item)"
            v-bind:title="displayDescription(item)"
            v-bind:data-shortcut-index="i">

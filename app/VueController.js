@@ -128,34 +128,34 @@ let VueControllerConfig = {
     },
     initPopup: function () {
       
-      let html = $(`<div>
-  <div class="popup-content">
-    <div class="launchpad-item">
-      A
-    </div>
-    <div class="launchpad-item">
-      B
-    </div>
-    <div class="launchpad-item">
-      C
-    </div>
-  </div>
-</div>`)
+      // https://semantic-ui.com/modules/popup.html
+      let html = $(`<div style="overflow: auto;"></div>`)
       //html = $('#AAA')
       
       let popupOptions = {
         on: 'click',
         position: 'bottom center',
         hoverable: true, 
+        
         //popup: $('#popup-content'),
         //hoverable: true, 
-        
+        delay: {
+          //show: 50,
+          hide: 1000 * 30
+        },
         html  : html,  
-          onShow: function (a, b) {
-            console.log(a.getAttribute('data-shortcut-index'))
-            console.log(b)
-            html.find('div.launchpad-item').html('ddd')
-          },
+        onShow: (trigger) => {
+          let index = trigger.getAttribute('data-shortcut-index')
+          index = parseInt(index, 10)
+          console.log(index)
+          console.log(this.getSortedShortcuts[index])
+          let items = this.getSortedShortcuts[index].items
+          //console.log(a.getAttribute('data-shortcut-index'))
+          console.log(items)
+
+          // 先做比較簡單的形式吧
+          html.html(this.buildFolderItems(items))
+        },
           onVisible: function () {
             //console.log(2)
             //console.log(this)
@@ -187,9 +187,28 @@ let VueControllerConfig = {
         })
         */
        
-        let items = $(this.$refs.main).find('.launchpad-item:not(.empty)')
+        let items = $(this.$refs.main).find('.launchpad-item.folder:not(.empty)')
         items.popup(popupOptions)
       }, 0)
+    },
+    buildFolderItems: function (shortcuts) {
+      let container = $('<div></div>')
+      if (Array.isArray(shortcuts)) {
+        shortcuts.forEach((shortcut) => {
+          let item = $(`
+            <div class="launchpad-item" 
+                 title="${shortcut.description}"
+                 data-exec="${shortcut.exec}">
+              <img class="icon" draggable="false"
+                   src="${shortcut.icon}" />
+              ${shortcut.name}
+            </div>`)
+          
+          container.append(item)
+        })
+      }
+      
+      return container
     },
     initHotKeys: function () {
       //console.log('i')
