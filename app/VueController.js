@@ -156,12 +156,21 @@ let VueControllerConfig = {
       return sortedShortcuts
     },
     searchResultList: function () {
-      let keyword = this.searchKeyword.trim().toLowerCase()
-      if (keyword === '') {
+      let keywords = this.searchKeyword.trim().toLowerCase()
+      if (keywords === '') {
         return []
       }
       
       let searchResult = []
+      
+      keywords = keywords.split(' ')
+      let uniqueList = []
+      keywords.forEach(keyword => {
+        if (uniqueList.indexOf(keyword) === -1) {
+          uniqueList.push(keyword)
+        }
+      })
+      keywords = uniqueList
       
       this.sortedMainItems.forEach(item => {
         if (item === null) {
@@ -169,22 +178,32 @@ let VueControllerConfig = {
         }
         
         if (Array.isArray(item.subItems) === false) {
-          if ((item.name.toLowerCase().indexOf(keyword) > -1)
-                  || (typeof(item.description) === 'string' && item.description.toLowerCase().indexOf(keyword) > -1)
-                  || item.exec.toLowerCase().indexOf(keyword) > -1) {
-            searchResult.push(item)
-          }
+          keywords.forEach(keyword => {
+            if (keyword === '') {
+              return
+            }
+            if ((item.name.toLowerCase().indexOf(keyword) > -1)
+                    || (typeof(item.description) === 'string' && item.description.toLowerCase().indexOf(keyword) > -1)
+                    || item.exec.toLowerCase().indexOf(keyword) > -1) {
+              searchResult.push(item)
+            }
+          })
         }
         else {
           let folderName = item.name
           item.subItems.forEach(item => {
-            if ((item.name.toLowerCase().indexOf(keyword) > -1)
-                    || (typeof(item.description) === 'string' && item.description.toLowerCase().indexOf(keyword) > -1)
-                    || item.exec.toLowerCase().indexOf(keyword) > -1) {
-              let cloneItem = JSON.parse(JSON.stringify(item))
-              cloneItem.name = folderName + '/' + cloneItem.name
-              searchResult.push(cloneItem)
-            }
+            keywords.forEach(keyword => {
+              if (keyword === '') {
+                return
+              }
+              if ((item.name.toLowerCase().indexOf(keyword) > -1)
+                      || (typeof(item.description) === 'string' && item.description.toLowerCase().indexOf(keyword) > -1)
+                      || item.exec.toLowerCase().indexOf(keyword) > -1) {
+                let cloneItem = JSON.parse(JSON.stringify(item))
+                cloneItem.name = folderName + '/' + cloneItem.name
+                searchResult.push(cloneItem)
+              }
+            })
           })
         }
       })
@@ -721,13 +740,30 @@ let VueControllerConfig = {
       //fork(exec)
     },
     displaySearchNameMatch: function (name) {
-      let keyword = this.searchKeyword.trim()
-      if (keyword === '') {
+      let keywords = this.searchKeyword.trim()
+      if (keywords === '') {
         return name
       }
       
-      let markedKeyword = `<span class="match">${keyword}</span>`
-      let markedName = name.split(keyword).join(markedKeyword)
+      //let markedKeyword = `<span class="match">${keyword}</span>`
+      //let markedName = name.split(keyword).join(markedKeyword)
+      keywords = keywords.split(' ')
+      let uniqueList = []
+      keywords.forEach(keyword => {
+        if (uniqueList.indexOf(keyword) === -1) {
+          uniqueList.push(keyword)
+        }
+      })
+      keywords = uniqueList
+      
+      let markedName = name
+      //keywords.forEach(keyword => {
+      let re = new RegExp(keywords.join('|'),"gi");
+      markedName = markedName.replace(re, (match) => {
+        return `<span class="match">${match}</span>`
+      });
+      //})
+      
       return markedName
     }
   }
