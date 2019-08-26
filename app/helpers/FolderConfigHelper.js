@@ -32,14 +32,19 @@ let FolderConfigHelper = {
   },
   _getConfigPath: function (folderPath) {
     let configName = this._getConfigName(folderPath)
-    let configPath = this.lib.ElectronFileHelper.resolve(configName)
-    console.log(configPath)
+    let configPath = this.lib.ElectronFileHelper.resolve('config/' + configName)
+    //console.log(configPath)
     return configPath
   },
-  read: function (folderPath) {
+  read: function (folderPath, key) {
     if (typeof(folderPath) !== 'string') {
       // || this.lib.ElectronFileHelper.existsSync(folderPath) === false
-      return {}
+      if (typeof(key) === 'string') {
+        return undefined
+      }
+      else {
+        return {}
+      }
     }
     
     this.init()
@@ -47,7 +52,12 @@ let FolderConfigHelper = {
     let configPath = this._getConfigPath(folderPath)
     
     if (this.lib.ElectronFileHelper.existsSync(configPath) === false) {
-      return {}
+      if (typeof(key) === 'string') {
+        return undefined
+      }
+      else {
+        return {}
+      }
     }
     
     let configText = this.lib.ElectronFileHelper.readFileSync(configPath)
@@ -58,7 +68,13 @@ let FolderConfigHelper = {
     catch (e) {
       console.error(e)
     }
-    return configJSON
+    
+    if (typeof(key) === 'string') {
+      return configJSON[key]
+    }
+    else {
+      return configJSON
+    }
   },
   write: function (folderPath, key, value) {
     this.init()

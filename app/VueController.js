@@ -109,6 +109,13 @@ let VueControllerConfig = {
       this.initDraggable()
       this.initPopup()
       this.initHotKeys()
+      this.initCurrentPage()
+    },
+    initCurrentPage: function () {
+      let currentPage = this.lib.FolderConfigHelper.read(this.shortcutsFolderPath, 'currentPage')
+      if (typeof(currentPage) === 'number') {
+        this.scrollPage(currentPage, false)
+      }
     },
     initDraggable: function () {
       const draggable = new this.lib.Draggable.Sortable(document.getElementById('AppList'), {
@@ -290,9 +297,14 @@ let VueControllerConfig = {
         this.scrollPage(true)
       }
     },
-    scrollPage: function (isNext) {
+    scrollPage: function (isNext, doTransition) {
       if (this.waitDragScroll === true || this.isPopupVisiable === true) {
         return this
+      }
+      
+      let duration = 700
+      if (doTransition === false) {
+        duration = 10
       }
       
       //this.currentPage++
@@ -314,7 +326,7 @@ let VueControllerConfig = {
       let appList = $(this.$refs.AppList)
       appList.animate({
         scrollTop: (appList.height() * this.currentPage)
-      }, 700);
+      }, duration);
       
       let pager = $(this.$refs.pager)
       let pagerHeight = pager.height()
@@ -327,7 +339,7 @@ let VueControllerConfig = {
       if (pagerScrollTop < pagerMinTop || pagerScrollTop >= pagerMaxTop) {
         pager.animate({
           scrollTop: pagerMinTop
-        }, 700);
+        }, duration);
       }
       
       // 保存現在頁數
@@ -336,7 +348,7 @@ let VueControllerConfig = {
       this.waitDragScroll = true
       setTimeout(() => {
         this.waitDragScroll = false
-      }, 700)
+      }, duration)
     },
     addPage: function () {
       console.error('addPage')
