@@ -103,11 +103,12 @@
          v-bind:class="{'disabled': waitDragScroll}"
          ref="AppList"
          tabindex="-1">
-      <div v-for="item in getSortedShortcuts"
+      <div v-for="(item, i) in getSortedShortcuts"
            class="launchpad-item"
            v-bind:class="{'empty': (item === null), 'disable': (item === null && enableDragScroll === false)}"
            v-bind:tabindex="getTabIndex(item)"
-           v-bind:title="displayDescription(item)">
+           v-bind:title="displayDescription(item)"
+           v-bind:data-shortcut-index="i">
         <template v-if="item === null">
           <img draggable="false"/>
           <div>
@@ -128,8 +129,9 @@
           </div>
           <div>
             {{ item.name }}
-            {{ Array.isArray(item.icon) }}
           </div>
+        
+  
         </template>
       </div>
       

@@ -76,7 +76,7 @@ let ShortcutHelper = {
       }
     }
     
-    console.log(shortcuts)
+    //console.log(shortcuts)
     
     return shortcuts
   }

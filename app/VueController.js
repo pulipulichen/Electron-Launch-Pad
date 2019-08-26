@@ -10,6 +10,7 @@ let VueControllerConfig = {
     shortcuts: [],
     enableDragScroll: false,
     waitDragScroll: false,
+    
     lib: {
       ElectronHelper: null,
       electron: null,
@@ -171,11 +172,8 @@ let VueControllerConfig = {
       })
     },
     initPopup: function () {
-      let popupOptions = {
-        on: 'click',
-        //hoverable: true, 
-        //position: 'top left'
-        html  : `<div>
+      
+      let html = $(`<div>
   <div class="popup-content">
     <div class="launchpad-item">
       A
@@ -187,9 +185,23 @@ let VueControllerConfig = {
       C
     </div>
   </div>
-</div>`,  
-          onVisible: () => {
-            
+</div>`)
+      
+      let popupOptions = {
+        on: 'click',
+        position: 'bottom center',
+        hoverable: true, 
+        //popup: $('#popup-content'),
+        //hoverable: true, 
+        
+        html  : html,  
+          onShow: function (a, b) {
+            console.log(a.getAttribute('data-shortcut-index'))
+            console.log(b)
+            html.find('div.launchpad-item').html('ddd')
+          },
+          onVisible: function () {
+            //console.log(2)
             //console.log(this)
             $('#redips-drag').css('pointer-events', 'none')
 
