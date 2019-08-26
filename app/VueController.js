@@ -15,6 +15,7 @@ let VueControllerConfig = {
     
     lib: {
       ElectronHelper: null,
+      FolderConfigHelper: null,
       electron: null,
       ipc: null,
       path: null,
@@ -42,6 +43,7 @@ let VueControllerConfig = {
   },
   mounted: function () {
     this.lib.ElectronHelper = RequireHelper.require('./helpers/electron/ElectronHelper')
+    this.lib.FolderConfigHelper = RequireHelper.require('./helpers/FolderConfigHelper')
     this.lib.electron = RequireHelper.require('electron')
     this.lib.remote = this.lib.electron.remote
     this.lib.execFile = RequireHelper.require('child_process').execFile;
@@ -327,6 +329,9 @@ let VueControllerConfig = {
           scrollTop: pagerMinTop
         }, 700);
       }
+      
+      // 保存現在頁數
+      this.lib.FolderConfigHelper.write(this.shortcutsFolderPath, 'currentPage', this.currentPage)
       
       this.waitDragScroll = true
       setTimeout(() => {
