@@ -19,6 +19,7 @@ let VueControllerConfig = {
       ipc: null,
       path: null,
       remote: null,
+      execFile: null,
       mode: null,
       win: null,
       //REDIPSHelper: null,
@@ -35,11 +36,15 @@ let VueControllerConfig = {
       FileDragNDropHelper: null,
       */
     },
+    debug: {
+      enableClick: false
+    }
   },
   mounted: function () {
     this.lib.ElectronHelper = RequireHelper.require('./helpers/electron/ElectronHelper')
     this.lib.electron = RequireHelper.require('electron')
     this.lib.remote = this.lib.electron.remote
+    this.lib.execFile = RequireHelper.require('child_process').execFile;
     this.lib.win = this.lib.remote.getCurrentWindow()
     this.lib.mode = this.lib.win.mode
     this.lib.shortcutDirPath = this.lib.win.shortcutDirPath
@@ -108,7 +113,8 @@ let VueControllerConfig = {
         draggable: 'div.launchpad-item',
         scrollable: {
           speed: 0
-        }
+        },
+        delay: 500,
       });
       
       draggable.on('drag:start', (event) => {
@@ -219,6 +225,7 @@ let VueControllerConfig = {
       }, 0)
     },
     buildFolderItems: function (shortcuts) {
+      let _this = this
       let container = $('<div class="launchpad-items-container"></div>')
       if (Array.isArray(shortcuts)) {
         shortcuts.forEach((shortcut) => {
@@ -232,6 +239,11 @@ let VueControllerConfig = {
                 ${shortcut.name}
               </div>
             </div>`)
+          
+          item.click(function () {
+            let exec = this.getAttribute('data-exec')
+            _this.exec(exec)
+          })
           
           container.append(item)
         })
@@ -346,9 +358,30 @@ let VueControllerConfig = {
     },
     exit: function () {
       this.lib.win.close()
+      return this
     },
     onDropped: function () {
       console.log('onDropped')
+    },
+    exec: function (execCommand) {
+      if (typeof(execCommand) !== 'string') {
+        return this
+      }
+      if (this.debug.enableClick === false) {
+        return this
+      }
+      
+      //let parameters = []
+      this.lib.win.hide()
+      this.lib.execFile(execCommand, (err, data) => {
+        //console.log(err)
+        //console.log(data.toString());
+        
+        return this.exit()
+      })
+      //const { shell } = require('electron')
+      //shell.openExternal(execCommand)
+      //fork(exec)
     }
   }
 }

@@ -133,6 +133,7 @@
            v-bind:tabindex="getTabIndex(item)"
            v-bind:title="displayDescription(item)">
         <div class="item-wrapper"
+             v-on:click="exec(item.exec)"
              v-bind:data-shortcut-index="i">
           <template v-if="item === null">
             <img class="icon"
