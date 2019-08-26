@@ -30,57 +30,35 @@
 
 <script src="helpers/VueHelper.js"></script>
 <script src="vendors/vue/vue.min.js"></script>
-<script>
-  less = {
-    logLevel: 0,
-  }
-</script> 
 
-<script src="./helpers/REDIPSHelper.js"></script>
-<!-- <link href="./helpers/REDIPSHelper.css" rel="stylesheet" type="text/css" /> -->
 <script src="./helpers/ShortcutHelper.js"></script>
+
+<!-- Entire bundle -->
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/draggable.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/sortable.js"></script>
+
 
   </head>
   <body>
 
-<center>
-  <!-- tables inside this DIV could contain drag-able content  -->
-  <div id="redips-drag" ref="main">
-    <div v-for="tables in getTables">
-      <table class="tbl1">
-          <colgroup>
-              <col v-for="col in tables[0]"
-                width="100" />
-          </colgroup>
-          <tbody>
-              <tr v-for="row in tables"
-                class="rl">
-                  <td v-for="col in row">
-                    <template v-if="col === null">
-                      
-                    </template>
-                    <template v-else>
-                      <div class="ui button redips-drag"
-                           v-bind:data-order="col.order">
-                        <img v-bind:src="col.icon" />
-                        {{ col.name }}
-                      </div>
-                      <div class="ui fluid popup bottom center transition hidden"
-                           v-bind:data-order="col.order">
-                        <div class="ui four column divided center aligned grid">
-                          <div class="column">order {{ col.order }}</div>
-                          <div class="column">2</div>
-                          <div class="column">3</div>
-                          <div class="column">4</div>
-                        </div>
-                      </div>
-                    </template>
-                  </td>
-              </tr>
-          </tbody>
-      </table>
+<!-- tables inside this DIV could contain drag-able content  -->
+<div id="app" 
+     ref="main">
+  
+  <div class="searchbar"
+       v-on:mouseover="scrollPaddingDragUpEnter"
+       v-on:click="scrollPage(false)">
+    <div class="ui search fluid" 
+         v-on:click.stop="">
+      <div class="ui icon fluid input">
+        <input class="prompt" type="text" 
+               placeholder="Search APP..."
+               v-modal="searchKeyword">
+        <i class="search icon"></i>
+      </div>
+      <div class="results"></div>
     </div>
-</center>
+  </div>
   
   <div class="pager"
        v-on:wheel.stop=""
@@ -162,8 +140,8 @@
           v-on:mouseover="scrollPaddingDragDownEnter"
           v-on:click="scrollPage(true)">
       </div>
+      
   </div>
-  
   <script src="./VueController.js"></script>
   </body>
 </html>

@@ -1,8 +1,16 @@
 let VueControllerConfig = {
-  el: '#redips-drag',
+  el: '#app',
   data: {
+    searchKeyword: "",
+    currentPage: 0,
+    maxPages: 3,
+    maxRows: 4,
+    maxCols: 4,
     shortcutDirPath: null,
     shortcuts: [],
+    enableDragScroll: false,
+    waitDragScroll: false,
+    
     lib: {
       ElectronHelper: null,
       electron: null,
@@ -10,7 +18,7 @@ let VueControllerConfig = {
       path: null,
       remote: null,
       mode: null,
-      REDIPSHelper: null,
+      //REDIPSHelper: null,
       ShortcutHelper: null
       /*
       readChunk: null,
@@ -32,7 +40,7 @@ let VueControllerConfig = {
     this.lib.mode = this.lib.win.mode
     this.lib.shortcutDirPath = this.lib.win.shortcutDirPath
     
-    this.lib.REDIPSHelper = RequireHelper.require('./helpers/REDIPSHelper')
+    //this.lib.REDIPSHelper = RequireHelper.require('./helpers/REDIPSHelper')
     this.lib.ShortcutHelper = RequireHelper.require('./helpers/ShortcutHelper')
     
     /*
@@ -61,47 +69,26 @@ let VueControllerConfig = {
   watch: {
   },
   computed: {
-    getTables: function () {
-      if (Array.isArray(this.shortcuts) === false) {
-        return []
-      }
-      
-      let tables = []
-      
-      let lastTable
-      let lastRow
-      let maxCols = 4
-      let maxRows = 4
-      
+    getSortedShortcuts: function () {
+      let sortedShortcuts = [null]
       this.shortcuts.forEach((shortcut, i) => {
-        if (i % (maxCols * maxRows) === 0) {
-          lastTable = []
-          tables.push(lastTable)
+        if (i === 5) {
+          sortedShortcuts.push(null)
         }
-        
-        if (i % maxCols === 0) {
-          lastRow = []
-          lastTable.push(lastRow)
-        }
-        
-        lastRow.push(shortcut)
+        sortedShortcuts.push(shortcut)
       })
       
-      while (Array.isArray(lastRow) && lastRow.length < maxCols) {
-        lastRow.push(null)
+      let pageItemCount = this.maxRows * this.maxCols
+      while (sortedShortcuts.length % pageItemCount !== 0) {
+        sortedShortcuts.push(null)
       }
       
-      while (Array.isArray(lastTable) && lastTable.length < maxRows) {
-        let emptyRow = []
-        for (let i = 0; i < maxCols; i++) {
-          emptyRow.push(null)
-        }
-        lastTable.push(emptyRow)
-      }
+      this.maxPages = sortedShortcuts.length / pageItemCount
       
-      this.initPopup()
-      
-      return tables
+      return sortedShortcuts
+    },
+    isPageRemoable: function () {
+      return true
     }
   },
   methods: {
@@ -111,8 +98,78 @@ let VueControllerConfig = {
       this.shortcuts = this.lib.ShortcutHelper.get(this.shortcutDirPath)
       //console.log(this.shortcuts)
       //console.log(this.getTables)
-      //this.lib.REDIPSHelper.init()
       //console.log('bbb')
+      this.initDraggable()
+      this.initPopup()
+      this.initHotKeys()
+    },
+    initDraggable: function () {
+      
+      $('.div.launchpad-item').on('dragstart', (event) => {
+        event.stopPropagation()
+        event.preventDefault()
+        event.cancelBubble()
+        return false
+      })
+      
+      const draggable = new Draggable.Sortable(document.getElementById('AppList'), {
+        draggable: 'div.launchpad-item',
+        scrollable: {
+          speed: 0
+        }
+      });
+      
+      draggable.on('drag:start', (event) => {
+        console.log('drag:start')
+        //console.log(event)
+        /*
+        if ($(event.source).hasClass('disable')) {
+          event.stopPropagation()
+          event.preventDefault()
+          return false
+        }
+        */
+        /*
+        event.stopPropagation()
+        event.preventDefault()
+        event.cancelBubble()
+        return false
+        */
+        
+        this.enableDragScroll = true
+      });
+      //draggable.on('drag:move', () => {
+      //  console.log('drag:move')
+      //});
+      draggable.on('drag:stop', () => {
+        console.log('drag:stop')
+        this.enableDragScroll = false
+        this.initPopup()
+      });
+      
+      $(this.$refs.AppList).find('.launchpad-item.empty').removeAttr('tabindex')
+    },
+    getTabIndex: function (item) {
+      if (item === null) {
+        return -1
+      }
+      else {
+        return 0
+      }
+    },
+    initREDIPS: function () {
+      
+      return this
+      
+      this.lib.REDIPSHelper.init({
+        ondropped: (targetCell) => {
+          this.initPopup()
+          this.enableDragScroll = false
+        },
+        onmoved: () => {
+          this.enableDragScroll = true
+        }
+      })
     },
     initPopup: function () {
       
@@ -129,6 +186,7 @@ let VueControllerConfig = {
     </div>
   </div>
 </div>`)
+      html = $('#AAA')
       
       let popupOptions = {
         on: 'click',
@@ -164,12 +222,43 @@ let VueControllerConfig = {
       }
       
       setTimeout(() => {
+        /*
         $(this.$refs.main).find('.redips-drag').each((i, ele) => {
           $(ele).popup({
-    hoverable: true, 
-    position: 'top left'
+            on: 'click',
+            //hoverable: true, 
+            //position: 'top left'
           })
         })
+        */
+       
+        let items = $(this.$refs.main).find('.launchpad-item:not(.empty)')
+        items.popup(popupOptions)
+        items.click(function () {
+        })
+        /*
+        tippy('.redips-drag[data-order="3"]', {
+          content: `<div>
+  <div class="ui three column divided center aligned grid">
+    <div class="column">
+      <h4 class="ui header">Basic Plan</h4>
+      <p><b>2</b> projects, $10 a month</p>
+      <div class="ui button">Choose</div>
+    </div>
+    <div class="column">
+      <h4 class="ui header">Business Plan</h4>
+      <p><b>5</b> projects, $20 a month</p>
+      <div class="ui button">Choose</div>
+    </div>
+    <div class="column">
+      <h4 class="ui header">Premium Plan</h4>
+      <p><b>8</b> projects, $25 a month</p>
+      <div class="ui button">Choose</div>
+    </div>
+  </div>
+</div>`,
+        })
+        */
       }, 100)
     },
     /*
@@ -204,6 +293,93 @@ let VueControllerConfig = {
       return tables
     }
     */
+    initHotKeys: function () {
+      //console.log('i')
+      window.addEventListener("wheel", event => {
+        if (this.waitDragScroll === false) {
+          this.scrollPage((event.deltaY > 0))
+        }
+      });
+    },
+    scrollPaddingDragUpEnter: function (event) {
+      if (this.enableDragScroll === true 
+              && this.waitDragScroll === false) {
+        event.stopPropagation()
+        
+        this.scrollPage(false)
+      }
+    },
+    scrollPaddingDragDownEnter: function (event) {
+      //console.log([this.enableDragScroll, this.waitDragScroll])
+      if (this.enableDragScroll === true 
+              && this.waitDragScroll === false) {
+        event.stopPropagation()
+        
+        this.scrollPage(true)
+      }
+    },
+    scrollPage: function (isNext) {
+      if (this.waitDragScroll === true) {
+        return
+      }
+      
+      //this.currentPage++
+      //console.log([this.currentPage, this.maxPages])
+      if (typeof(isNext) === 'number') {
+        this.currentPage = isNext
+      }
+      else if (isNext === undefined || isNext === true) {
+        this.currentPage = (this.currentPage + 1) % this.maxPages
+      }
+      else {
+        this.currentPage--
+        if (this.currentPage < 0) {
+          this.currentPage = this.maxPages - 1
+        }
+      }
+      
+      //this.$refs.AppList.scrollTop = $(this.$refs.AppList).height() * this.currentPage
+      let appList = $(this.$refs.AppList)
+      appList.animate({
+        scrollTop: (appList.height() * this.currentPage)
+      }, 700);
+      
+      let pager = $(this.$refs.pager)
+      let pagerHeight = pager.height()
+      let pagerNumberPerPage = 20
+      let pagerPage = parseInt(this.currentPage / pagerNumberPerPage, 10)
+      let pagerMinTop = pagerHeight * pagerPage
+      let pagerMaxTop = pagerHeight * (pagerPage + 1)
+      let pagerScrollTop = pager[0].scrollTop
+      //console.log([pagerHeight, pagerMinTop, pagerMaxTop, pagerScrollTop])
+      if (pagerScrollTop < pagerMinTop || pagerScrollTop >= pagerMaxTop) {
+        pager.animate({
+          scrollTop: pagerMinTop
+        }, 700);
+      }
+      
+      this.waitDragScroll = true
+      setTimeout(() => {
+        this.waitDragScroll = false
+      }, 700)
+    },
+    addPage: function () {
+      console.log('addPage')
+    },
+    removePage: function () {
+      if (this.isPageRemovable === false) {
+        return this
+      }
+      console.log('addPage')
+    },
+    displayDescription: function (item) {
+      if (item === null || typeof(item.description) !== 'string') {
+        return ''
+      }
+      else {
+        return item.description
+      }
+    }
   }
 }
 
@@ -212,9 +388,4 @@ if (typeof(window) !== 'undefined') {
 }
 if (typeof(exports) !== 'undefined') {
   exports.default = new Vue(VueControllerConfig)
-}
-
-window.onscroll = function (e) {
-  e.preventDefault()
-  e.stopPropagation()
 }

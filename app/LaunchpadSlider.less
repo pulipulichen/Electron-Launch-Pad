@@ -1,145 +1,106 @@
 @max-rows: 4;
 @max-cols: 4;
+@searchbar-height: 5rem;
+@pager-width: 50px;
+@scroll-down-padding-height: 5rem;
 
-
-/*
-
-Darko Bunic
-http://www.redips.net/
-Apr, 2011.
-
-*/
+@import "./styles/searchbar.less";
+@import "./styles/pager.less";
+@import "./styles/buttons-panel.less";
+@import "./styles/app-list.less";
+@import "./styles/scroll-padding.less";
+@import "./styles/popup.less";
 
 body {
 	font-family: arial;
 	margin: 0px;
-    overflow: hidden;
+  padding: 0;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.7);
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(255,255,255, 0.25);
+  }
 }
-
-/* make drag container visible */
-#redips-drag {
-	//border: 2px dashed LightBlue;
-	//width: 580px;
-	//padding: 10px;
-	//margin: 0px auto;
-    padding: 0;
-    margin: 0;
-    //position: fixed;
-}
-
-/* set border-collapse */
-div#redips-drag table {
-/* 	border-collapse: collapse; */
-    /*
-	border-collapse: separate;
-	border-spacing: 0px;
-	width: 580px;
-    */
-    height: 100vh;
-    width: 100vw;
-    border: 1px solid red;
-}
-	/* define margin below first table */
-	.tbl1 {
-		margin-bottom: 17px;
-	}
-
-/* set table row height */
-div#redips-drag table tr {
-	//height: 40px;
-}
-
-/*
-	http://stackoverflow.com/questions/4096390/table-border-color-in-css-with-border-collapse
-	
-	if collapsing borders have the same style and width, but differ in color,
-	then from most to least preferred: cell, row, row group, column, column group, table.
-	
-	if ... come from same type of element, such as two rows... then color is taken from
-	borders that are the topmost and the leftmost.
-	
-	wider border wins over narrower ones / double wins over solid, then dashed, dotted, ridge, outset, groove, inset
-*/
-div#redips-drag td {
-	//border: 2px groove white;
-    border: 1px solid green;
-}
-
-/* table titles */
-div#redips-drag th {
-	//font-size: 14pt;
-}
-
-/* drag object (DIV inside table cell) */
-.redips-drag {
-    /*
-	margin: auto;
-	margin-bottom: 1px;
-	margin-top: 1px;
-	text-align: center;
-	font-size: 10pt;
-	width: 70px;
-	height: 20px;
-	line-height: 20px;
-	border-width: 2px;
-	border-style: solid;
-	background-color: white;
-    */
-	/* round corners */
-	//border-radius: 4px; /* Opera, Chrome */
-	//-moz-border-radius: 4px; /* FF */
-    border: 1px solid red;
-    height: calc((100vh / @max-rows) - 10px);
-    width: calc((100vw / @max-cols) - 10px);
-    text-align: center;
-    
-    img {
-      display: block;
-      max-height: calc((100vh / @max-rows) - 10px - 3rem);
-      width: auto;
-      margin: auto;
-    }
-}
-
-
-/* DIV row handlers (blue left column) */
-.redips-row {
+#app {
+  padding: 0;
+  margin: 0;
+  //position: fixed;
+  //margin-top: -100vh;
+  
+  //max-height: calc(100vh - 1px);
+  //overflow: auto;
+  
+  &.disabled {
+    cursor: wait;
+  }
+  
+  
+  
+  
+  
   /*
-	width: 20px;
-	margin: 2px;
-	border-color: SteelBlue;
-	background-color: SteelBlue;
+  .app-list:not(.draggable-container--over) .launchpad-item {
+    &:nth-child(16n),
+    &:nth-child(16n-1),
+    &:nth-child(16n-2),
+    &:nth-child(16n-3) {
+      background-color: yellow;
+      margin-bottom: @searchbar-height;
+    }
+  }
+  
+  .app-list.draggable-container--over .launchpad-item {
+    &:nth-child(16n),
+    &:nth-child(16n-1),
+    &:nth-child(16n-2),
+    &:nth-child(16n-3) {
+      background-color: yellow;
+      margin-bottom: @searchbar-height;
+    }
+  }
   */
-	/* round corners */
-	//border-radius: 14px; /* Opera, Chrome */
-	//-moz-border-radius: 14px; /* FF */
+  /*
+  .drag-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    //background-color: gray;
+    display: none;
+    z-index: 999;
+    
+    &.enable {
+      display: block;
+    }
+  }
+  */
 }
-
-/* row handler TD background color */
-.redips-rowhandler {
-	//background-color: #76ACDA;
-}
-
-/* marked cells (forbidden access for header and message line) */
-.redips-mark {
-	//color: white;
-	//background-color: #aaa;
-	//text-align: center;
-}
-
-/* row dark */
-.rd {
-	//background-color: #ddd;
-}
-
-/* row light */
-.rl {
-	//background-color: #eee;
-}
-
-/* cell dark */
 /*
-.cdark {
-	background-color: #C6C8CB;
+div#redips-drag td,
+div#redips-drag td .redips-drag {
+  height: calc(((100vh - @searchbar-height - @scroll-down-padding-height) / @max-rows) - 10px);
+  width: calc(((100vw - (@pager-width * 2)) / @max-cols) - 10px);
+}
+
+div#redips-drag td {
+  border: 1px solid green;
+}
+
+
+.redips-drag {
+  border: 1px solid red;
+  text-align: center;
+  //position: absolute;
+
+  img {
+    display: block;
+    max-height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem);
+    width: auto;
+    margin: auto;
+  }
 }
 */
+
+
