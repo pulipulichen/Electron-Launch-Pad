@@ -240,11 +240,12 @@ let VueControllerConfig = {
           draggable: 'div.launchpad-item'
         });
         
-        draggable.on('drag:start', (event) => {
-          console.log('folder item drag:start')
-        });
+        //draggable.on('drag:start', (event) => {
+        //  console.log('folder item drag:start')
+        //});
         draggable.on('drag:stop', () => {
-          console.log('folder item drag:stop')
+          this.onDropped()
+          //console.log('folder item drag:stop')
         });
       }
       
@@ -345,6 +346,9 @@ let VueControllerConfig = {
     },
     exit: function () {
       this.lib.win.close()
+    },
+    onDropped: function () {
+      console.log('onDropped')
     }
   }
 }

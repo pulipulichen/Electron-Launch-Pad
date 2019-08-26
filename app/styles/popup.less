@@ -59,6 +59,8 @@
     width: @folder-item-width;
     height: @folder-item-height;
     
+    border-radius: 0.5rem;
+    
     .icon {
       height: calc(@folder-item-width);
       max-height: calc(@folder-item-width);
@@ -68,15 +70,17 @@
     
     .name {
       font-size: 1.5rem;
-      overflow-x:hidden;
+      overflow:hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      max-width: @folder-item-width;
+      max-width: calc(@folder-item-width - 1rem);
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
     }
     
     &.draggable-source--is-dragging {
-      background-color: rgba(255, 255, 255, 0.5);
-      opacity: 0.5;
+      background-color: rgba(189, 195, 199,1.0);
+      opacity: 0.7;
     }
   }
 }
