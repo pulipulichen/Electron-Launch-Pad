@@ -4,22 +4,49 @@
   max-width: 70vw;
   //width: calc(100vw - (@pager-width * 4));
   
-  @folder-item-width: (((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem);
-  @folder-item-height: @folder-item-width + 1.5rem;
+  @folder-item-width: (((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px);
+  @folder-item-height: @folder-item-width + 2rem;
   
   &[data-grid-size="1"] {
-    height: calc(@folder-item-height);
+    //height: calc(@folder-item-height);
     width: calc(@folder-item-width);
   }
   
   &[data-grid-size="2"] {
-    height: calc(@folder-item-height * 2 + 20px);
+    //height: calc(@folder-item-height * 2);
     width: calc(@folder-item-width * 2);
   }
   
+  &[data-grid-size="3"] {
+    //height: calc(@folder-item-height * 3);
+    width: calc(@folder-item-width * 3);
+  }
+  
+  &[data-grid-size="4"] {
+    //height: calc(@folder-item-height * 4);
+    width: calc(@folder-item-width * 4);
+    max-height: calc(@folder-item-height * 4);
+  }
+  
+  &[data-grid-size=">4"] {
+    //height: calc(@folder-item-height * 4);
+    width: calc(@folder-item-width * 4 + 10px);
+    max-height: calc(@folder-item-height * 4 + 10px);
+  }
+  
+  /*
+  &[data-grid-size="5"] {
+    
+    width: calc(@folder-item-width * 5);
+    max-height: calc(@folder-item-height * 5);
+  }
+  */
+  
+  
+  
   .items-wrpper {
-    margin-left: auto;
-    margin-right: auto;
+    //margin-left: auto;
+    //margin-right: auto;
   }
   
   .launchpad-item {
@@ -29,6 +56,8 @@
     //height: 3rem;
     cursor: pointer;
     text-align: center;
+    width: @folder-item-width;
+    height: @folder-item-height;
     
     .icon {
       height: calc(@folder-item-width);

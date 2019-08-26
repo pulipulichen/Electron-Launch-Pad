@@ -146,6 +146,7 @@ let VueControllerConfig = {
         },
         exclusive: true,
         movePopup: false,
+        //preserve: true,
         html  : html,  
         onShow: (trigger) => {
           this.isPopupVisiable = true
@@ -159,27 +160,32 @@ let VueControllerConfig = {
 
           // 先做比較簡單的形式吧
           html.html(this.buildFolderItems(items))
-          html.attr('data-grid-size', Math.ceil(Math.sqrt(items.length)))
+          
+          let size = Math.ceil(Math.sqrt(items.length))
+          if (size > 4) {
+            size = ">4"
+          }
+          html.attr('data-grid-size', size)
           //html.html('AAA')
         },
-          onVisible: function () {
-            //console.log(2)
-            //console.log(this)
-            //$('#redips-drag').css('pointer-events', 'none')
+        onVisible: function () {
+          //console.log(2)
+          //console.log(this)
+          //$('#redips-drag').css('pointer-events', 'none')
 
-            setTimeout(() => {
-              let popupContent = $('.popup-content:visible:first')[0]
-              //console.log(popupContent)
-              const draggable = new Draggable.Sortable(popupContent, {
-                draggable: 'div'
-              });
-            }, 300)
-          },
-          onHidden: () => {
-            //console.log('A')
-            //$('#redips-drag').css('pointer-events', 'all')
-            this.isPopupVisiable = false
-          }
+          setTimeout(() => {
+            let popupContent = $('.popup-content:visible:first')[0]
+            //console.log(popupContent)
+            const draggable = new Draggable.Sortable(popupContent, {
+              draggable: 'div'
+            });
+          }, 300)
+        },
+        onHide: () => {
+          //console.log('A')
+          //$('#redips-drag').css('pointer-events', 'all')
+          this.isPopupVisiable = false
+        }
         
       }
       
