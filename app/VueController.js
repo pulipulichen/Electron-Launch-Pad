@@ -11,7 +11,7 @@ let VueControllerConfig = {
     enableDragScroll: false,
     isPopupVisiable: false,
     waitDragScroll: false,
-    shortcutsFolderPath: 'path-for-test',
+    shortcutsFolderPath: 'folder-path-for-test',
     
     lib: {
       ElectronHelper: null,

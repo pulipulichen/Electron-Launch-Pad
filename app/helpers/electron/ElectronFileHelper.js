@@ -42,6 +42,74 @@ let ElectronFileHelper = {
     this.init()
     return this.lib.fs.existsSync(filepath)
   },
+  readFileSync: function (filepath) {
+    return this.lib.fs.readFileSync(filepath, 'utf8')
+  },
+  writeFileSync: function (filepath, content) {
+    return this.lib.fs.writeFileSync(filepath, content, 'utf8')
+  },
+  getBasePath: function () {
+    this.init()
+    
+    if (this.basepath === null) {
+      let basepath = './'
+      if (typeof(process.env.PORTABLE_EXECUTABLE_DIR) === 'string') {
+        basepath = process.env.PORTABLE_EXECUTABLE_DIR
+      }
+      this.basepath = basepath
+    }
+    return this.basepath
+  },
+  basepath: null,
+  resolve: function (filePath) {
+    this.init()
+    
+    let basepath = this.getBasePath()
+    return this.lib.path.resolve(basepath, filePath)
+  },
+  _tmpDirChecked: false,
+  getTmpDirPath: function (filePath) {
+    this.init()
+    
+    let tmpDirPath
+    if (this._tmpDirChecked === false) {
+      tmpDirPath = this.resolve('tmp')
+      if (this.lib.fs.existsSync(tmpDirPath) === false) {
+        this.lib.fs.mkdirSync(tmpDirPath)
+      }
+      this._tmpDirChecked = true
+    }
+    
+    if (typeof(filePath) === 'string') {
+      filePath = 'tmp/' + filePath
+      tmpDirPath = this.resolve(filePath)
+    }
+    else {
+      tmpDirPath = this.resolve('tmp')
+    }
+    
+    return tmpDirPath
+  },
+  resolveAppPath: function (filePath) {
+    this.init()
+    
+    //console.log([process.env.PORTABLE_EXECUTABLE_DIR, filePath, __dirname])
+    
+    return this.lib.path.join(__dirname, filePath)
+    /*
+    if (typeof(process.env.PORTABLE_EXECUTABLE_DIR) === 'string') {
+      //console.log(FileSet)
+      //alert(['error', filePath ])
+      //throw Error('resolveAppPath')
+      //console.log(filePath)
+      filePath = path.join(__dirname, '/resources/app.asar/app/', filePath)
+      return filePath
+    }
+    else {
+      return this.resolve('app/' + filePath)
+    }
+    */
+  },
 }
 
 //ElectronFileHelper.init()
