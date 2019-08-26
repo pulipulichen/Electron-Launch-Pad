@@ -219,7 +219,7 @@ let VueControllerConfig = {
       }, 0)
     },
     buildFolderItems: function (shortcuts) {
-      let container = $('<div class="items-wrpper"></div>')
+      let container = $('<div class="launchpad-items-container"></div>')
       if (Array.isArray(shortcuts)) {
         shortcuts.forEach((shortcut) => {
           let item = $(`
@@ -336,6 +336,9 @@ let VueControllerConfig = {
       else {
         return item.description
       }
+    },
+    openFolder: function () {
+      console.error('open folder')
     },
     changeFolder: function () {
       console.error('change folder')
