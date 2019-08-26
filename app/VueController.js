@@ -186,6 +186,7 @@ let VueControllerConfig = {
     </div>
   </div>
 </div>`)
+      html = $('#AAA')
       
       let popupOptions = {
         on: 'click',
