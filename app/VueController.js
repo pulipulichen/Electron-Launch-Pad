@@ -1,5 +1,5 @@
 let VueControllerConfig = {
-  el: '#redips-drag',
+  el: '#app',
   data: {
     searchKeyword: "",
     currentPage: 0,
@@ -10,6 +10,8 @@ let VueControllerConfig = {
     shortcuts: [],
     enableDragScroll: false,
     waitDragScroll: false,
+    shortcutsFolderPath: null,
+    
     lib: {
       ElectronHelper: null,
       electron: null,
@@ -17,7 +19,8 @@ let VueControllerConfig = {
       path: null,
       remote: null,
       mode: null,
-      REDIPSHelper: null,
+      win: null,
+      //REDIPSHelper: null,
       ShortcutHelper: null
       /*
       readChunk: null,
@@ -39,7 +42,7 @@ let VueControllerConfig = {
     this.lib.mode = this.lib.win.mode
     this.lib.shortcutDirPath = this.lib.win.shortcutDirPath
     
-    this.lib.REDIPSHelper = RequireHelper.require('./helpers/REDIPSHelper')
+    //this.lib.REDIPSHelper = RequireHelper.require('./helpers/REDIPSHelper')
     this.lib.ShortcutHelper = RequireHelper.require('./helpers/ShortcutHelper')
     
     /*
@@ -86,48 +89,8 @@ let VueControllerConfig = {
       
       return sortedShortcuts
     },
-    getTables: function () {
-      if (Array.isArray(this.shortcuts) === false) {
-        return []
-      }
-      
-      let tables = []
-      
-      let lastTable
-      let lastRow
-      let maxCols = 4
-      let maxRows = 4
-      
-      this.shortcuts.forEach((shortcut, i) => {
-        if (i % (maxCols * maxRows) === 0) {
-          lastTable = []
-          tables.push(lastTable)
-        }
-        
-        if (i % maxCols === 0) {
-          lastRow = []
-          lastTable.push(lastRow)
-        }
-        
-        lastRow.push(shortcut)
-      })
-      
-      while (Array.isArray(lastRow) && lastRow.length < maxCols) {
-        lastRow.push(null)
-      }
-      
-      while (Array.isArray(lastTable) && lastTable.length < maxRows) {
-        let emptyRow = []
-        for (let i = 0; i < maxCols; i++) {
-          emptyRow.push(null)
-        }
-        lastTable.push(emptyRow)
-      }
-      
-      this.maxPage = tables.length
-      this.initPopup()
-      
-      return tables
+    isPageRemoable: function () {
+      return false
     }
   },
   methods: {
@@ -211,11 +174,8 @@ let VueControllerConfig = {
       })
     },
     initPopup: function () {
-      let popupOptions = {
-        on: 'click',
-        //hoverable: true, 
-        //position: 'top left'
-        html  : `<div>
+      
+      let html = $(`<div>
   <div class="popup-content">
     <div class="launchpad-item">
       A
@@ -227,9 +187,24 @@ let VueControllerConfig = {
       C
     </div>
   </div>
-</div>`,  
-          onVisible: () => {
-            
+</div>`)
+      html = $('#AAA')
+      
+      let popupOptions = {
+        on: 'click',
+        position: 'bottom center',
+        hoverable: true, 
+        //popup: $('#popup-content'),
+        //hoverable: true, 
+        
+        html  : html,  
+          onShow: function (a, b) {
+            console.log(a.getAttribute('data-shortcut-index'))
+            console.log(b)
+            html.find('div.launchpad-item').html('ddd')
+          },
+          onVisible: function () {
+            //console.log(2)
             //console.log(this)
             $('#redips-drag').css('pointer-events', 'none')
 
@@ -389,6 +364,29 @@ let VueControllerConfig = {
       setTimeout(() => {
         this.waitDragScroll = false
       }, 700)
+    },
+    addPage: function () {
+      console.log('addPage')
+    },
+    removePage: function () {
+      if (this.isPageRemovable === false) {
+        return this
+      }
+      console.log('addPage')
+    },
+    displayDescription: function (item) {
+      if (item === null || typeof(item.description) !== 'string') {
+        return ''
+      }
+      else {
+        return item.description
+      }
+    },
+    changeFolder: function () {
+      console.error('change folder')
+    },
+    exit: function () {
+      this.lib.win.close()
     }
   }
 }

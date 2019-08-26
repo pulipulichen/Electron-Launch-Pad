@@ -1,0 +1,23 @@
+#app {
+  .searchbar {
+    height: @searchbar-height;
+    //position: fixed;
+    //top: 0;
+    //left: 0;
+    //z-index: 3;
+    position: relative;
+    z-index: 1000;
+    cursor: pointer;
+    
+    padding-left: calc(@pager-width * 2);
+    padding-right: calc(@pager-width * 2);
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    
+    .ui.search {
+      width: 100%;
+    }
+  }
+}

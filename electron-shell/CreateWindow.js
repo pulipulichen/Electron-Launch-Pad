@@ -29,7 +29,9 @@ module.exports = function (shortcutDirPath, callback) {
   let offsetX = display.bounds.x
   let offsetY = display.bounds.y
   //let displays = screen.getAllDisplays()
-  //console.log(display)
+  console.log(display)
+  
+  let {width, height} = display.workArea
   
   let optionBrowserWindow = {
     x: offsetX,
@@ -38,18 +40,19 @@ module.exports = function (shortcutDirPath, callback) {
     frame: false,
     icon: iconPath,
     transparent: true,
+    width: width,
+    height: height,
     //useContentSize: true,
     webPreferences: {
       nodeIntegration: true
     }
   }
-  
   if (process.platform === 'win') {
     optionBrowserWindow.icon = optionBrowserWindow.icon.slice(0, optionBrowserWindow.icon.lastIndexOf('.')) 
             + '.ico'
   }
   let win = new BrowserWindow(optionBrowserWindow)
-  win.maximize();
+  win.maximize()
   
   if (mode === 'production') {
     win.setMenu(null)
