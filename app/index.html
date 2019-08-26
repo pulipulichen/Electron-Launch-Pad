@@ -119,11 +119,12 @@
                v-bind:src="item.icon" 
                draggable="false"
                v-if="Array.isArray(item.icon) === false"/>
-          <div class="icon"
-               v-if="Array.isArray(item.icon)">
-            <img v-for="icon in item.icon"
-                 v-bind:src="icon.icon"
-                 draggable="false" />
+          <div class="icon folder"
+               v-if="Array.isArray(item.icon) === true">
+            <template v-for="path in item.icon">
+              <img v-bind:src="path"
+                   draggable="false" />
+            </template>
           </div>
           <div>
             {{ item.name }}

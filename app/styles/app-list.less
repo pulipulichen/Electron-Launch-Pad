@@ -57,8 +57,28 @@
       max-height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem);
       width: auto;
       margin: auto;
+      
+      &.folder {
+        height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px);
+        max-height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px);
+        width: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px);
+        max-width: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px);
+        border: 2px solid white;
+        border-radius: 2rem;
+        padding: 2px;
+        margin-bottom: 0.5rem;
+        background-color: rgba(255,255,255,0.3);
+        overflow: hidden;
+      }
+      
+      img {
+        display: inline-block;
+        height: calc(((((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px) / 2) - 4px);
+        max-height: calc(((((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px) / 2) - 4px);
+        width: auto;
+      }
     }
-
+    
     &.empty {
       cursor: default;
 
