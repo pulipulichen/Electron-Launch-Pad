@@ -24,12 +24,23 @@ module.exports = function (shortcutDirPath, callback) {
   
   // https://electronjs.org/docs/api/screen
   let screen = electron.screen
-  let point = screen.getCursorScreenPoint()
-  let display = screen.getDisplayNearestPoint(point)
+  let display
+  if (false) {
+    let point = screen.getCursorScreenPoint()
+    display = screen.getDisplayNearestPoint(point)
+  }
+  else {
+    // 測試用，固定用最後一個熒幕
+    let displays = screen.getAllDisplays()
+    display = displays[0]
+  }
+  
   let offsetX = display.bounds.x
   let offsetY = display.bounds.y
   //let displays = screen.getAllDisplays()
   //console.log(display)
+  
+  let {width, height} = display.workArea
   
   let optionBrowserWindow = {
     x: offsetX,
@@ -38,18 +49,19 @@ module.exports = function (shortcutDirPath, callback) {
     frame: false,
     icon: iconPath,
     transparent: true,
+    width: width,
+    height: height,
     //useContentSize: true,
     webPreferences: {
       nodeIntegration: true
     }
   }
-  
   if (process.platform === 'win') {
     optionBrowserWindow.icon = optionBrowserWindow.icon.slice(0, optionBrowserWindow.icon.lastIndexOf('.')) 
             + '.ico'
   }
   let win = new BrowserWindow(optionBrowserWindow)
-  win.maximize();
+  win.maximize()
   
   if (mode === 'production') {
     win.setMenu(null)

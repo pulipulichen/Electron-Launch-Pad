@@ -1,6 +1,8 @@
 # Electron-Launch-Pad
 A Mac style launch pad with Electron.js
 
+Last update: 2019/08/26 14:42
+
 - Project: https://github.com/pulipulichen/Electron-Launch-Pad
 - Issues: https://github.com/pulipulichen/Electron-Launch-Pad/issues
 - Download: https://github.com/pulipulichen/Electron-Launch-Pad/releases
@@ -10,11 +12,12 @@ A Mac style launch pad with Electron.js
 # ICON
 - http://www.icons101.com/icon/id_16252/setid_1784/Mac_Apps_by_Rudolf/launcher
 - https://icons8.com/icons/set/app
+- https://semantic-ui.com/elements/icon.html
 
 ----
 
-# REDIPS
-- https://www.redips.net/javascript/redips-drag-documentation/
+# Draggable.js
+- https://github.com/Shopify/draggable/tree/master/src/Draggable
 
 ----
 
