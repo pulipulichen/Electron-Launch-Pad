@@ -43,7 +43,8 @@
 
 <!-- tables inside this DIV could contain drag-able content  -->
 <div id="app" 
-     ref="main">
+     ref="main"
+     v-bind:class="{'popup-visible': isPopupVisiable}">
   
   <div class="searchbar"
        v-on:mouseover="scrollPaddingDragUpEnter"
@@ -131,33 +132,33 @@
            class="launchpad-item"
            v-bind:class="{'empty': (item === null), 'disable': (item === null && enableDragScroll === false), 'folder': (item !== null && Array.isArray(item.items) === true)}"
            v-bind:tabindex="getTabIndex(item)"
-           v-bind:title="displayDescription(item)"
-           v-bind:data-shortcut-index="i">
-        <template v-if="item === null">
-          <img class="icon"
-               draggable="false"/>
-          <div>
-            (NULL)
-          </div>
-        </template>
-        <template v-else>
-          <img class="icon"
-               v-bind:src="item.icon" 
-               draggable="false"
-               v-if="Array.isArray(item.icon) === false"/>
-          <div class="icon folder"
-               v-if="Array.isArray(item.icon) === true">
-            <template v-for="path in item.icon">
-              <img v-bind:src="path"
-                   draggable="false" />
-            </template>
-          </div>
-          <div>
-            {{ item.name }}
-          </div>
-        
-  
-        </template>
+           v-bind:title="displayDescription(item)">
+        <div class="item-wrapper"
+             v-bind:data-shortcut-index="i">
+          <template v-if="item === null">
+            <img class="icon"
+                 draggable="false"/>
+            <div>
+              (NULL)
+            </div>
+          </template>
+          <template v-else>
+            <img class="icon"
+                 v-bind:src="item.icon" 
+                 draggable="false"
+                 v-if="Array.isArray(item.icon) === false"/>
+            <div class="icon folder"
+                 v-if="Array.isArray(item.icon) === true">
+              <template v-for="path in item.icon">
+                <img v-bind:src="path"
+                     draggable="false" />
+              </template>
+            </div>
+            <div class="name">
+              {{ item.name }}
+            </div>
+          </template>
+        </div>
       </div>
       
       <div class="scroll-padding down"

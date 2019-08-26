@@ -1,7 +1,43 @@
-.popup-content {
-  div.launchpad-item {
+.popup-panel {
+  overflow: auto;
+  max-height: 70vh;
+  max-width: 70vw;
+  //width: calc(100vw - (@pager-width * 4));
+  
+  @folder-item-width: (((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem);
+  @folder-item-height: @folder-item-width + 1.5rem;
+  
+  &[data-grid-size="1"] {
+    height: calc(@folder-item-height);
+    width: calc(@folder-item-width);
+  }
+  
+  &[data-grid-size="2"] {
+    height: calc(@folder-item-height * 2 + 20px);
+    width: calc(@folder-item-width * 2);
+  }
+  
+  .items-wrpper {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .launchpad-item {
+    
     display: inline-block;
-    width: 3rem;
-    height: 3rem;
+    //width: 3rem;
+    //height: 3rem;
+    cursor: pointer;
+    text-align: center;
+    
+    .icon {
+      height: calc(@folder-item-width);
+      max-height: calc(@folder-item-width);
+      width: auto;
+      display: block;
+    }
+    .name {
+      font-size: 1.5rem;
+    }
   }
 }

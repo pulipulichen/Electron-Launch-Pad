@@ -29,7 +29,7 @@ module.exports = function (shortcutDirPath, callback) {
   let offsetX = display.bounds.x
   let offsetY = display.bounds.y
   //let displays = screen.getAllDisplays()
-  console.log(display)
+  //console.log(display)
   
   let {width, height} = display.workArea
   

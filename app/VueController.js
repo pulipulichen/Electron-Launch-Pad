@@ -9,6 +9,7 @@ let VueControllerConfig = {
     shortcutDirPath: null,
     shortcuts: [],
     enableDragScroll: false,
+    isPopupVisiable: false,
     waitDragScroll: false,
     shortcutsFolderPath: null,
     
@@ -129,12 +130,12 @@ let VueControllerConfig = {
     initPopup: function () {
       
       // https://semantic-ui.com/modules/popup.html
-      let html = $(`<div style="overflow: auto;"></div>`)
+      let html = $(`<div class="popup-panel" style="overflow: auto;"></div>`)
       //html = $('#AAA')
       
       let popupOptions = {
         on: 'click',
-        position: 'bottom center',
+        position: 'top center',
         hoverable: true, 
         
         //popup: $('#popup-content'),
@@ -143,23 +144,28 @@ let VueControllerConfig = {
           //show: 50,
           hide: 1000 * 30
         },
+        exclusive: true,
+        movePopup: false,
         html  : html,  
         onShow: (trigger) => {
+          this.isPopupVisiable = true
           let index = trigger.getAttribute('data-shortcut-index')
           index = parseInt(index, 10)
-          console.log(index)
-          console.log(this.getSortedShortcuts[index])
+          //console.log(index)
+          //console.log(this.getSortedShortcuts[index])
           let items = this.getSortedShortcuts[index].items
           //console.log(a.getAttribute('data-shortcut-index'))
-          console.log(items)
+          //console.log(items)
 
           // 先做比較簡單的形式吧
           html.html(this.buildFolderItems(items))
+          html.attr('data-grid-size', Math.ceil(Math.sqrt(items.length)))
+          //html.html('AAA')
         },
           onVisible: function () {
             //console.log(2)
             //console.log(this)
-            $('#redips-drag').css('pointer-events', 'none')
+            //$('#redips-drag').css('pointer-events', 'none')
 
             setTimeout(() => {
               let popupContent = $('.popup-content:visible:first')[0]
@@ -170,8 +176,9 @@ let VueControllerConfig = {
             }, 300)
           },
           onHidden: () => {
-            console.log('A')
-            $('#redips-drag').css('pointer-events', 'all')
+            //console.log('A')
+            //$('#redips-drag').css('pointer-events', 'all')
+            this.isPopupVisiable = false
           }
         
       }
@@ -187,12 +194,12 @@ let VueControllerConfig = {
         })
         */
        
-        let items = $(this.$refs.main).find('.launchpad-item.folder:not(.empty)')
+        let items = $(this.$refs.main).find('.launchpad-item.folder:not(.empty) > .item-wrapper')
         items.popup(popupOptions)
       }, 0)
     },
     buildFolderItems: function (shortcuts) {
-      let container = $('<div></div>')
+      let container = $('<div class="items-wrpper"></div>')
       if (Array.isArray(shortcuts)) {
         shortcuts.forEach((shortcut) => {
           let item = $(`
@@ -201,7 +208,9 @@ let VueControllerConfig = {
                  data-exec="${shortcut.exec}">
               <img class="icon" draggable="false"
                    src="${shortcut.icon}" />
-              ${shortcut.name}
+              <div class="name">
+                ${shortcut.name}
+              </div>
             </div>`)
           
           container.append(item)
@@ -236,7 +245,7 @@ let VueControllerConfig = {
       }
     },
     scrollPage: function (isNext) {
-      if (this.waitDragScroll === true) {
+      if (this.waitDragScroll === true || this.isPopupVisiable === true) {
         return this
       }
       
