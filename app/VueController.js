@@ -81,7 +81,7 @@ let VueControllerConfig = {
   watch: {
   },
   computed: {
-    getSortedShortcuts: function () {
+    getSortedMainItems: function () {
       if (this.lib.FolderConfigHelper === null) {
         return []
       }
@@ -210,15 +210,15 @@ let VueControllerConfig = {
           index = parseInt(index, 10)
           //console.log(index)
           //console.log(this.getSortedShortcuts[index])
-          let folderName = this.getSortedShortcuts[index].name
-          let items = this.getSortedShortcuts[index].items
+          let folderName = this.getSortedMainItems[index].name
+          let subItems = this.getSortedMainItems[index].subItems
           //console.log(a.getAttribute('data-shortcut-index'))
           //console.log(items)
 
           // 先做比較簡單的形式吧
-          html.html(this.buildFolderItems(folderName, items))
+          html.html(this.buildSubItems(folderName, subItems))
           
-          let size = Math.ceil(Math.sqrt(items.length))
+          let size = Math.ceil(Math.sqrt(subItems.length))
           if (size > 4) {
             size = ">4"
           }
@@ -275,11 +275,13 @@ let VueControllerConfig = {
         items.popup(popupOptions)
       }, 0)
     },
-    buildFolderItems: function (foldername, shortcuts) {
+    buildSubItems: function (folderName, shortcuts) {
       let _this = this
       let container = $('<div class="launchpad-items-container"></div>')
-      container.attr('data-folder-name', foldername)
+      container.attr('data-folder-name', folderName)
       if (Array.isArray(shortcuts)) {
+        shortcuts = this.getSortedSubItems(folderName, shortcuts)
+        
         shortcuts.forEach((shortcut) => {
           let item = $(`
             <div class="launchpad-item" 
@@ -324,6 +326,35 @@ let VueControllerConfig = {
       }
       
       return container
+    },
+    getSortedSubItems: function (folderName, shortcuts) {
+      let subItemsSorted = this.lib.FolderConfigHelper.readSubItemSort(this.shortcutsFolderPath, folderName)
+      if (subItemsSorted === undefined) {
+        return shortcuts
+      }
+      
+      let sorted = []
+      
+      for (let i = 0; i < shortcuts.length; i++) {
+        sorted.push(undefined)
+      }
+      
+      shortcuts.forEach(shortcut => {
+        let name = shortcut.name
+        if (typeof(subItemsSorted[name]) === 'number') {
+          sorted[subItemsSorted[name]] = shortcut
+        }
+        else {
+          sorted.push(shortcut)
+        }
+      })
+      
+      // 移除空白的資料
+      sorted = sorted.filter(item => (item !== undefined))
+      
+      //console.log(subItemsSorted)
+      
+      return sorted
     },
     initHotKeys: function () {
       //console.log('i')

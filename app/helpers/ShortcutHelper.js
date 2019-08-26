@@ -47,7 +47,7 @@ let ShortcutHelper = {
           name: `${i} APP`,
           //exec: `echo "APP ${i}"`,
           description: 'description',
-          items: items,
+          subItems: items,
           order: i
         })
       }
@@ -67,7 +67,7 @@ let ShortcutHelper = {
           name: `${i} APP`,
           //exec: `echo "APP ${i}"`,
           description: 'description',
-          items: items,
+          subItems: items,
           order: i
         })
       }

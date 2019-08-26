@@ -97,6 +97,31 @@ let FolderConfigHelper = {
       return configJSON
     }
   },
+  readSubItemSort: function (folderPath, folderName) {
+    this.init()
+    
+    let configPath = this._getConfigPath(folderPath)
+    
+    if (this.lib.ElectronFileHelper.existsSync(configPath) === false) {
+      return {}
+    }
+    
+    let configText = this.lib.ElectronFileHelper.readFileSync(configPath)
+    let configJSON = {}
+    try {
+      configJSON = JSON.parse(configText)
+    }
+    catch (e) {
+      console.error(e)
+    }
+    
+    if (typeof(configJSON['subItemsSorted']) !== 'object') {
+      return {}
+    }
+    else {
+      return configJSON['subItemsSorted'][folderName]
+    }
+  },
   write: function (folderPath, key, value) {
     this.init()
     
