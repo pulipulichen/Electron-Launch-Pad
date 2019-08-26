@@ -185,6 +185,13 @@ let VueControllerConfig = {
           //console.log('A')
           //$('#redips-drag').css('pointer-events', 'all')
           this.isPopupVisiable = false
+          //console.log('onHide')
+        },
+        onHidden: () => {
+          //console.log('A')
+          //$('#redips-drag').css('pointer-events', 'all')
+          this.isPopupVisiable = false
+          //console.log('onHidden')
         }
         
       }
