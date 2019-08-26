@@ -167,6 +167,10 @@ let VueControllerConfig = {
       this.initCurrentPage()
     },
     initCurrentPage: function () {
+      if (this.debug.enableSortPersist === false) {
+        return this
+      }
+      
       let currentPage = this.lib.FolderConfigHelper.read(this.shortcutsFolderPath, 'currentPage')
       if (typeof(currentPage) === 'number') {
         this.scrollPage(currentPage, false)
@@ -495,7 +499,48 @@ let VueControllerConfig = {
       if (this.isPageRemovable === false) {
         return this
       }
-      console.error('removePage')
+      //console.error('removePage')
+      
+      let itemCountInPage = this.maxCols * this.maxRows
+      
+      let anchorIndex = (this.currentPage * itemCountInPage) - 1
+      let anchorItem = $(this.$refs.AppList).children(`.launchpad-item:eq(${anchorIndex})`)
+      //anchorItem.css('background-color', 'red')
+      
+      // 嘗試移除16個格子吧
+      let removedCount = 0
+      while (removedCount < itemCountInPage) {
+        if (anchorItem.next().length > 0) {
+          if (anchorItem.next().hasClass('empty')) {
+            anchorItem.next().remove()
+            removedCount++
+          }
+          else {
+            anchorItem = anchorItem.next()
+          }
+        }
+        else {
+          if (anchorItem.prev().hasClass('empty')) {
+            anchorItem.prev().remove()
+            removedCount++
+          }
+          else {
+            anchorItem = anchorItem.prev()
+          }
+        }
+      }
+      
+      this.maxPages--
+      if (this.currentPage > this.maxPages - 1) {
+        this.currentPage = this.maxPages - 1
+      }
+      //this.isPopupVisiable = true
+      //setTimeout(() => {
+        //this.scrollPage(false)
+        this.initDraggable()
+        //this.isPopupVisiable = false
+      //}, 300)
+      
       return this
     },
     displayDescription: function (item) {
