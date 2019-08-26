@@ -115,6 +115,54 @@ let VueControllerConfig = {
       //console.log('bbb')
     },
     initPopup: function () {
+      
+      let html = $(`<div>
+  <div class="popup-content">
+    <div class="launchpad-item">
+      A
+    </div>
+    <div class="launchpad-item">
+      B
+    </div>
+    <div class="launchpad-item">
+      C
+    </div>
+  </div>
+</div>`)
+      
+      let popupOptions = {
+        on: 'click',
+        position: 'bottom center',
+        hoverable: true, 
+        //popup: $('#popup-content'),
+        //hoverable: true, 
+        
+        html  : html,  
+          onShow: function (a, b) {
+            console.log(a.getAttribute('data-shortcut-index'))
+            console.log(b)
+            html.find('div.launchpad-item').html('ddd')
+          },
+          onVisible: function () {
+            //console.log(2)
+            //console.log(this)
+            $('#redips-drag').css('pointer-events', 'none')
+
+            setTimeout(() => {
+              let popupContent = $('.popup-content:visible:first')[0]
+              //console.log(popupContent)
+              const draggable = new Draggable.Sortable(popupContent, {
+                draggable: 'div'
+              });
+            }, 300)
+          },
+          onHidden: () => {
+            console.log('A')
+            $('#redips-drag').css('pointer-events', 'all')
+          }
+        
+      }
+      
       setTimeout(() => {
         $(this.$refs.main).find('.redips-drag').each((i, ele) => {
           $(ele).popup({
