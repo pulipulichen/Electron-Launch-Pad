@@ -33,12 +33,14 @@
   //max-height: (100vh - @searchbar-height);
   //overflow: hidden;
 
+  
   .launchpad-item {
     display: inline-block;
     height: calc(((100vh - @searchbar-height - @scroll-down-padding-height) / @max-rows));
     width: calc(((100vw - (@pager-width * 2)) / @max-cols) - 10px);
 
-    //border: 1px solid red;
+    border: 1px solid yellow;
+    
     text-align: center;
     color: white;
     font-size: 2rem;
@@ -59,7 +61,12 @@
     }
     
     .name {
-      height: 2rem;
+      line-height: 1rem;
+      font-size: 1rem;
+      overflow:hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: calc(((100vw - (@pager-width * 2)) / @max-cols) - 50px);
     }
 
     .icon {

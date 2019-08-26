@@ -68,6 +68,10 @@
     
     .name {
       font-size: 1.5rem;
+      overflow-x:hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: @folder-item-width;
     }
     
     &.draggable-source--is-dragging {

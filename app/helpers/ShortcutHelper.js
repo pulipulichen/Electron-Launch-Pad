@@ -18,7 +18,7 @@ let ShortcutHelper = {
   buildMockShortcut: function (i) {
     return {
       icon: this.lib.path.join(__dirname, '/imgs/icons8-app-symbol-256.png'),
-      name: `APP ${i}`,
+      name: `APP ${i} - -----------------------------------------`,
       exec: `echo "APP ${i}"`,
       description: 'description',
       order: i
