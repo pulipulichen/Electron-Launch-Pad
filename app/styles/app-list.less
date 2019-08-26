@@ -5,6 +5,7 @@
   max-height: calc(100vh - (@searchbar-height * 2));
   overflow-y: hidden;
   outline: none;
+  user-select: none;
 
   &.disabled,
   &.disabled .launchpad-item {
@@ -46,7 +47,7 @@
     font-size: 2rem;
     user-select: none;
     //position: absolute;
-    border-radius: 1rem;
+    //border-radius: 1rem;
     outline: none;
     
     &:focus .item-wrapper {
@@ -112,7 +113,7 @@
     }
 
     &.disable {
-      pointer-events: none;
+      //pointer-events: none;
     }
 
     &.draggable-source--is-dragging .item-wrapper {

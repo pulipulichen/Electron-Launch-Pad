@@ -77,7 +77,10 @@ let FolderConfigHelper = {
     let configText = this.lib.ElectronFileHelper.readFileSync(configPath)
     let configJSON = {}
     try {
-      configJSON = JSON.parse(configText)
+      configText = configText.trim()
+      if (configText !== '' && configText.startsWith('{') && configText.endsWith('}')) {
+        configJSON = JSON.parse(configText)
+      }
     }
     catch (e) {
       console.error(e)

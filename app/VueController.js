@@ -12,7 +12,7 @@ let VueControllerConfig = {
     isPopupVisiable: false,
     waitDragScroll: false,
     shortcutsFolderPath: 'folder-path-for-test',
-    
+    mainItemsDraggable: null,
     lib: {
       ElectronHelper: null,
       FolderConfigHelper: null,
@@ -38,7 +38,8 @@ let VueControllerConfig = {
       */
     },
     debug: {
-      enableClick: false
+      enableClick: false,
+      enableSortPersist: false,
     }
   },
   mounted: function () {
@@ -86,48 +87,56 @@ let VueControllerConfig = {
         return []
       }
       let {mainItemsSorted, itemsCount} = this.lib.FolderConfigHelper.read(this.shortcutsFolderPath, ['mainItemsSorted', 'itemsCount'])
+      
+      
       //console.log(mainItemsSorted)
       
       let sortedShortcuts = []
-      if (typeof(itemsCount) === 'number') {
-        for (let i = 0; i < itemsCount; i++) {
-          sortedShortcuts.push(null)
-        }
-      }
       
-      
-      let notInSorted = []
-      this.shortcuts.forEach((shortcut, i) => {
-        //if (i === 5) {
-        //  sortedShortcuts.push(null)
-        //}
-        //sortedShortcuts.push(shortcut)
-        
-        // 檢查這個項目有沒有在sort裡面
-        let name = shortcut.name
-        if (typeof(mainItemsSorted[name]) === 'number') {
-          sortedShortcuts[mainItemsSorted[name]] = shortcut
-        }
-        else {
-          notInSorted.push(shortcut)
-        }
-      })
-      
-      // 把未填滿的部分填滿
-      if (notInSorted.length > 0) {
-        for (let i = 0; i < sortedShortcuts.length; i++) {
-          if (sortedShortcuts[i] === null) {
-            sortedShortcuts[i] = notInSorted.shift()
-            if (notInSorted.length === 0) {
-              break;
-            }
+      if (mainItemsSorted !== undefined) {
+        if (typeof(itemsCount) === 'number') {
+          for (let i = 0; i < itemsCount; i++) {
+            sortedShortcuts.push(null)
           }
         }
-        
-        // 如果全部填滿了位置還是不夠，那就再新增吧
+
+
+        let notInSorted = []
+        this.shortcuts.forEach((shortcut, i) => {
+          //if (i === 5) {
+          //  sortedShortcuts.push(null)
+          //}
+          //sortedShortcuts.push(shortcut)
+
+          // 檢查這個項目有沒有在sort裡面
+          let name = shortcut.name
+          if (typeof(mainItemsSorted[name]) === 'number') {
+            sortedShortcuts[mainItemsSorted[name]] = shortcut
+          }
+          else {
+            notInSorted.push(shortcut)
+          }
+        })
+
+        // 把未填滿的部分填滿
         if (notInSorted.length > 0) {
-          sortedShortcuts = sortedShortcuts.concat(notInSorted)
+          for (let i = 0; i < sortedShortcuts.length; i++) {
+            if (sortedShortcuts[i] === null) {
+              sortedShortcuts[i] = notInSorted.shift()
+              if (notInSorted.length === 0) {
+                break;
+              }
+            }
+          }
+
+          // 如果全部填滿了位置還是不夠，那就再新增吧
+          if (notInSorted.length > 0) {
+            sortedShortcuts = sortedShortcuts.concat(notInSorted)
+          }
         }
+      }
+      else {
+        sortedShortcuts = this.shortcuts
       }
       
       let pageItemCount = this.maxRows * this.maxCols
@@ -158,12 +167,18 @@ let VueControllerConfig = {
       }
     },
     initDraggable: function () {
+      if (this.mainItemsDraggable !== null && typeof(this.mainItemsDraggable.destroy) === 'function') {
+        //console.log(111)
+        this.mainItemsDraggable.destroy()
+      }
+      
       const draggable = new this.lib.Draggable.Sortable(document.getElementById('AppList'), {
         draggable: 'div.launchpad-item',
         scrollable: {
           speed: 0
         },
-        delay: 500,
+        delay: 100,
+        handle: 'div.launchpad-item:not(.empty)'
       });
       
       draggable.on('drag:start', (event) => {
@@ -174,6 +189,7 @@ let VueControllerConfig = {
         this.initPopup()
         this.onMainItemDropped()
       });
+      this.mainItemsDraggable = draggable
     },
     getTabIndex: function (item) {
       if (item === null) {
@@ -433,15 +449,48 @@ let VueControllerConfig = {
       setTimeout(() => {
         this.waitDragScroll = false
       }, duration)
+      return this
     },
     addPage: function () {
-      console.error('addPage')
+      //console.error('addPage')
+      let itemCountInPage = this.maxCols * this.maxRows
+      
+      let anchorIndex = ((this.currentPage + 1) * itemCountInPage) - 1
+      let anchorItem = $(this.$refs.AppList).children(`.launchpad-item:eq(${anchorIndex})`)
+      //console.log(anchorIndex)
+      //anchorItem.css('background-color', 'red')
+      
+      for (let i = 0; i < itemCountInPage; i++) {
+        anchorItem.after(this.buildEmptyItem())
+      }
+      
+      //this.initDraggable()
+      
+      this.maxPages++
+      //this.isPopupVisiable = true
+      setTimeout(() => {
+        this.scrollPage(true)
+        this.initDraggable()
+        //this.isPopupVisiable = false
+      }, 300)
+      //
+      
+      return this
+    },
+    buildEmptyItem: function () {
+      return `<div tabindex="-1" class="launchpad-item empty">
+  <div class="item-wrapper">
+    <img draggable="false" class="icon">
+    <div class="name">(NULL)</div>
+  </div>
+</div>`
     },
     removePage: function () {
       if (this.isPageRemovable === false) {
         return this
       }
-      console.error('addPage')
+      console.error('removePage')
+      return this
     },
     displayDescription: function (item) {
       if (item === null || typeof(item.description) !== 'string') {
@@ -462,6 +511,9 @@ let VueControllerConfig = {
       return this
     },
     onMainItemDropped: function () {
+      if (this.debug.enableSortPersist === false) {
+        return this
+      }
       //console.log('onDropped')
       
       setTimeout(() => {
@@ -489,6 +541,10 @@ let VueControllerConfig = {
       return this
     },
     onSubItemDropped: function (folderName, container) {
+      if (this.debug.enableSortPersist === false) {
+        return this
+      }
+      
       // 這個要考慮到現在是那一個folder的問題
       //console.log(folderName)
       
