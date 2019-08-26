@@ -85,7 +85,27 @@ let FolderConfigHelper = {
     let configPath = this._getConfigPath(folderPath)
     let configText = JSON.stringify(configJSON, null, "\t")
     this.lib.ElectronFileHelper.writeFileSync(configPath, configText)
+    return this
+  },
+  writeMainItemsSort: function (folderPath, sorted) {
+    this.init()
+    return this.write(folderPath, 'mainItemsSorted', sorted)
+  },
+  writeSubItemsSort: function (folderPath, folderName, sorted) {
+    this.init()
+    
+    let configJSON = this.read(folderPath)
+    let key = 'subItemsSorted'
+    if (typeof(configJSON[key]) !== 'object') {
+      configJSON[key] = {}
+    }
+    configJSON[key][folderName] = sorted
+    
+    let configPath = this._getConfigPath(folderPath)
+    let configText = JSON.stringify(configJSON, null, "\t")
+    this.lib.ElectronFileHelper.writeFileSync(configPath, configText)
   }
+  
 }
 
 if (typeof(window) !== 'undefined') {

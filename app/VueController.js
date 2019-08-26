@@ -132,6 +132,7 @@ let VueControllerConfig = {
       draggable.on('drag:stop', () => {
         this.enableDragScroll = false
         this.initPopup()
+        this.onMainItemDropped()
       });
     },
     getTabIndex: function (item) {
@@ -169,12 +170,13 @@ let VueControllerConfig = {
           index = parseInt(index, 10)
           //console.log(index)
           //console.log(this.getSortedShortcuts[index])
+          let folderName = this.getSortedShortcuts[index].name
           let items = this.getSortedShortcuts[index].items
           //console.log(a.getAttribute('data-shortcut-index'))
           //console.log(items)
 
           // 先做比較簡單的形式吧
-          html.html(this.buildFolderItems(items))
+          html.html(this.buildFolderItems(folderName, items))
           
           let size = Math.ceil(Math.sqrt(items.length))
           if (size > 4) {
@@ -183,7 +185,7 @@ let VueControllerConfig = {
           html.attr('data-grid-size', size)
           //html.html('AAA')
         },
-        onVisible: function () {
+        onVisible: () => {
           this.isPopupVisiable = true
           //console.log(2)
           //console.log(this)
@@ -192,7 +194,7 @@ let VueControllerConfig = {
           setTimeout(() => {
             let popupContent = $('.popup-content:visible:first')[0]
             //console.log(popupContent)
-            const draggable = new Draggable.Sortable(popupContent, {
+            const draggable = new this.lib.Draggable.Sortable(popupContent, {
               draggable: 'div'
             });
           }, 300)
@@ -233,9 +235,10 @@ let VueControllerConfig = {
         items.popup(popupOptions)
       }, 0)
     },
-    buildFolderItems: function (shortcuts) {
+    buildFolderItems: function (foldername, shortcuts) {
       let _this = this
       let container = $('<div class="launchpad-items-container"></div>')
+      container.attr('data-folder-name', foldername)
       if (Array.isArray(shortcuts)) {
         shortcuts.forEach((shortcut) => {
           let item = $(`
@@ -261,11 +264,21 @@ let VueControllerConfig = {
           draggable: 'div.launchpad-item'
         });
         
+        setTimeout(() => {
+          container.find('[tabindex="0"]').prop('tabindex', '-1')
+          container.prop('tabindex', '-1')
+        }, 100)
+        
+        
         //draggable.on('drag:start', (event) => {
         //  console.log('folder item drag:start')
         //});
-        draggable.on('drag:stop', () => {
-          this.onDropped()
+        draggable.on('drag:stop', (event) => {
+          //console.log(event.)
+          let container = event.sourceContainer
+          let folderName = container.getAttribute('data-folder-name')
+          
+          this.onSubItemDropped(folderName, container)
           //console.log('folder item drag:stop')
         });
       }
@@ -377,8 +390,54 @@ let VueControllerConfig = {
       this.lib.win.close()
       return this
     },
-    onDropped: function () {
-      console.log('onDropped')
+    onMainItemDropped: function () {
+      //console.log('onDropped')
+      
+      setTimeout(() => {
+        // 開始蒐集所有排序的順序
+        let sorted = {}
+        //console.log($(this.$refs.AppList).children('.launchpad-item').length)
+        let items = $(this.$refs.AppList).children('.launchpad-item')
+        //$(this.$refs.AppList).children('.launchpad-item').each((i, ele) => {
+        for (let i = 0; i < items.length; i++) {
+          let ele = items.eq(i)
+          //console.log(i)
+          //ele = $(ele)
+          if (ele.hasClass('empty')) {
+            continue;
+          }
+
+          let name = ele.find('.name:first').text().trim()
+          sorted[name] = i
+        }
+
+        //console.log(sorted)
+        this.lib.FolderConfigHelper.writeMainItemsSort(this.shortcutsFolderPath, sorted)
+      }, 100)
+              
+      return this
+    },
+    onSubItemDropped: function (folderName, container) {
+      // 這個要考慮到現在是那一個folder的問題
+      //console.log(folderName)
+      
+      setTimeout(() => {
+        // 開始蒐集所有排序的順序
+        let sorted = {}
+        //console.log($(this.$refs.AppList).children('.launchpad-item').length)
+        let items = $(container).children('.launchpad-item')
+        //$(this.$refs.AppList).children('.launchpad-item').each((i, ele) => {
+        for (let i = 0; i < items.length; i++) {
+          let ele = items.eq(i)
+          let name = ele.find('.name:first').text().trim()
+          sorted[name] = i
+        }
+
+        //console.log(sorted)
+        this.lib.FolderConfigHelper.writeSubItemsSort(this.shortcutsFolderPath, folderName, sorted)
+      }, 100)
+
+      return this
     },
     exec: function (execCommand) {
       if (typeof(execCommand) !== 'string') {

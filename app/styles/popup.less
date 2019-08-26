@@ -47,6 +47,10 @@
   .launchpad-items-container {
     //margin-left: auto;
     //margin-right: auto;
+    
+    &:focus {
+      outline: none;
+    }
   }
   
   .launchpad-item {
@@ -57,9 +61,14 @@
     cursor: pointer;
     text-align: center;
     width: @folder-item-width;
-    height: @folder-item-height;
+    //height: @folder-item-height;
     
     border-radius: 0.5rem;
+    
+    &:focus {
+      outline: none;
+      background-color: @launchpad-item-selected;
+    }
     
     .icon {
       height: calc(@folder-item-width);

@@ -18,7 +18,7 @@ let ShortcutHelper = {
   buildMockShortcut: function (i) {
     return {
       icon: this.lib.path.join(__dirname, '/imgs/icons8-app-symbol-256.png'),
-      name: `APP ${i} - -----------------------------------------`,
+      name: `${i} APP`,
       exec: `C:\\Windows\\notepad.exe`,
       description: 'description',
       order: i
@@ -44,7 +44,7 @@ let ShortcutHelper = {
             this.lib.path.join(__dirname, '/imgs/icons8-app-symbol-256.png'),
             this.lib.path.join(__dirname, '/imgs/icons8-app-symbol-256.png')
           ],
-          name: `APP ${i}`,
+          name: `${i} APP`,
           //exec: `echo "APP ${i}"`,
           description: 'description',
           items: items,
@@ -64,7 +64,7 @@ let ShortcutHelper = {
             this.lib.path.join(__dirname, '/imgs/icons8-app-symbol-256.png'),
             this.lib.path.join(__dirname, '/imgs/icons8-app-symbol-256.png')
           ],
-          name: `APP ${i}`,
+          name: `${i} APP`,
           //exec: `echo "APP ${i}"`,
           description: 'description',
           items: items,
