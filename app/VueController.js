@@ -149,7 +149,13 @@ let VueControllerConfig = {
       return sortedShortcuts
     },
     isPageRemovable: function () {
-      return false
+      // 計算現在頁面數量跟格子數量
+      let pageItemCount = this.maxRows * this.maxCols
+      let minItems = pageItemCount * (this.maxPages - 1)
+      
+      let items = $(this.$refs.AppList).find('.launchpad-item:not(.empty)').length
+      
+      return (items <= minItems)
     }
   },
   methods: {
