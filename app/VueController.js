@@ -21,7 +21,8 @@ let VueControllerConfig = {
       mode: null,
       win: null,
       //REDIPSHelper: null,
-      ShortcutHelper: null
+      ShortcutHelper: null,
+      Draggable: null
       /*
       readChunk: null,
       fileType: null,
@@ -44,6 +45,7 @@ let VueControllerConfig = {
     
     //this.lib.REDIPSHelper = RequireHelper.require('./helpers/REDIPSHelper')
     this.lib.ShortcutHelper = RequireHelper.require('./helpers/ShortcutHelper')
+    this.lib.Draggable = RequireHelper.require('Draggable')
     
     /*
     this.lib.electron = RequireHelper.require('electron')
@@ -107,14 +109,16 @@ let VueControllerConfig = {
     },
     initDraggable: function () {
       
+      /*
       $('.div.launchpad-item').on('dragstart', (event) => {
         event.stopPropagation()
         event.preventDefault()
         event.cancelBubble()
         return false
       })
+      */
       
-      const draggable = new Draggable.Sortable(document.getElementById('AppList'), {
+      const draggable = new this.lib.Draggable.Sortable(document.getElementById('AppList'), {
         draggable: 'div.launchpad-item',
         scrollable: {
           speed: 0
@@ -122,7 +126,7 @@ let VueControllerConfig = {
       });
       
       draggable.on('drag:start', (event) => {
-        console.log('drag:start')
+        //console.log('drag:start')
         //console.log(event)
         /*
         if ($(event.source).hasClass('disable')) {
@@ -144,12 +148,12 @@ let VueControllerConfig = {
       //  console.log('drag:move')
       //});
       draggable.on('drag:stop', () => {
-        console.log('drag:stop')
+        //console.log('drag:stop')
         this.enableDragScroll = false
         this.initPopup()
       });
       
-      $(this.$refs.AppList).find('.launchpad-item.empty').removeAttr('tabindex')
+      //$(this.$refs.AppList).find('.launchpad-item.empty').removeAttr('tabindex')
     },
     getTabIndex: function (item) {
       if (item === null) {
@@ -188,7 +192,7 @@ let VueControllerConfig = {
     </div>
   </div>
 </div>`)
-      html = $('#AAA')
+      //html = $('#AAA')
       
       let popupOptions = {
         on: 'click',
