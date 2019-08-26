@@ -16,8 +16,8 @@ Last update: 2019/08/26 14:42
 
 ----
 
-# REDIPS
-- https://www.redips.net/javascript/redips-drag-documentation/
+# Draggable.js
+- https://github.com/Shopify/draggable/tree/master/src/Draggable
 
 ----
 

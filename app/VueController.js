@@ -169,6 +169,7 @@ let VueControllerConfig = {
           //html.html('AAA')
         },
         onVisible: function () {
+          this.isPopupVisiable = true
           //console.log(2)
           //console.log(this)
           //$('#redips-drag').css('pointer-events', 'none')
@@ -181,16 +182,22 @@ let VueControllerConfig = {
             });
           }, 300)
         },
+        /*
         onHide: () => {
           //console.log('A')
           //$('#redips-drag').css('pointer-events', 'all')
-          this.isPopupVisiable = false
+          if ($('.popup-panel:visible').length === 0) {
+            this.isPopupVisiable = false
+          }
           //console.log('onHide')
         },
+        */
         onHidden: () => {
           //console.log('A')
           //$('#redips-drag').css('pointer-events', 'all')
-          this.isPopupVisiable = false
+          if ($('.popup-panel:visible').length === 0) {
+            this.isPopupVisiable = false
+          }
           //console.log('onHidden')
         }
         
@@ -228,6 +235,17 @@ let VueControllerConfig = {
           
           container.append(item)
         })
+        
+        const draggable = new this.lib.Draggable.Sortable(container[0], {
+          draggable: 'div.launchpad-item'
+        });
+        
+        draggable.on('drag:start', (event) => {
+          console.log('folder item drag:start')
+        });
+        draggable.on('drag:stop', () => {
+          console.log('folder item drag:stop')
+        });
       }
       
       return container
