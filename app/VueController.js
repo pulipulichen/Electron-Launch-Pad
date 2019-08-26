@@ -2,6 +2,7 @@ let VueControllerConfig = {
   el: '#app',
   data: {
     searchKeyword: "",
+    currentSearchResultPage: 0,
     
     currentPage: 0,
     maxPages: 3,
@@ -84,6 +85,10 @@ let VueControllerConfig = {
   watch: {
   },
   computed: {
+    isSearchMode: function () {
+      let keyword = this.searchKeyword.trim()
+      return (keyword !== "")
+    },
     sortedMainItems: function () {
       if (this.lib.FolderConfigHelper === null) {
         return []
@@ -151,30 +156,34 @@ let VueControllerConfig = {
       return sortedShortcuts
     },
     searchResultList: function () {
-      if (this.searchKeyword.trim() === '') {
+      let keyword = this.searchKeyword.trim().toLowerCase()
+      if (keyword === '') {
         return []
       }
       
       let searchResult = []
-      let keyword = this.searchKeyword
+      
       this.sortedMainItems.forEach(item => {
         if (item === null) {
           return this
         }
         
         if (Array.isArray(item.subItems) === false) {
-          if ((item.name.indexOf(keyword) > -1)
-                  || (typeof(item.description) === 'string' && item.description.indexOf(keyword) > -1)
-                  || item.exec.indexOf(keyword) > -1) {
+          if ((item.name.toLowerCase().indexOf(keyword) > -1)
+                  || (typeof(item.description) === 'string' && item.description.toLowerCase().indexOf(keyword) > -1)
+                  || item.exec.toLowerCase().indexOf(keyword) > -1) {
             searchResult.push(item)
           }
         }
         else {
+          let folderName = item.name
           item.subItems.forEach(item => {
-            if ((item.name.indexOf(keyword) > -1)
-                    || (typeof(item.description) === 'string' && item.description.indexOf(keyword) > -1)
-                    || item.exec.indexOf(keyword) > -1) {
-              searchResult.push(item)
+            if ((item.name.toLowerCase().indexOf(keyword) > -1)
+                    || (typeof(item.description) === 'string' && item.description.toLowerCase().indexOf(keyword) > -1)
+                    || item.exec.toLowerCase().indexOf(keyword) > -1) {
+              let cloneItem = JSON.parse(JSON.stringify(item))
+              cloneItem.name = folderName + '/' + cloneItem.name
+              searchResult.push(cloneItem)
             }
           })
         }
@@ -457,29 +466,57 @@ let VueControllerConfig = {
       
       //this.currentPage++
       //console.log([this.currentPage, this.maxPages])
+      
+      let page = this.currentPage
+      let pageLength = this.maxPages
+      if (this.isSearchMode === true) {
+        page = this.currentSearchResultPage
+        pageLength = this.searchResultPageLength
+      }
+      
       if (typeof(isNext) === 'number') {
-        this.currentPage = isNext
+        page = isNext
       }
       else if (isNext === undefined || isNext === true) {
-        this.currentPage = (this.currentPage + 1) % this.maxPages
+        page = (page + 1) % pageLength
       }
       else {
-        this.currentPage--
-        if (this.currentPage < 0) {
-          this.currentPage = this.maxPages - 1
+        page--
+        if (page < 0) {
+          page = pageLength - 1
         }
       }
       
+      if (this.isSearchMode === false) {
+        this.currentPage = page
+      }
+      else {
+        this.currentSearchResultPage = page
+      }
+      
       //this.$refs.AppList.scrollTop = $(this.$refs.AppList).height() * this.currentPage
-      let appList = $(this.$refs.AppList)
+      let appList
+      if (this.isSearchMode === false) {
+        appList = $(this.$refs.AppList)
+      }
+      else {
+        appList = $(this.$refs.SearchResultList)
+      }
+      
       appList.animate({
-        scrollTop: (appList.height() * this.currentPage)
+        scrollTop: (appList.height() * page)
       }, duration);
       
-      let pager = $(this.$refs.pager)
+      let pager
+      if (this.isSearchMode === false) {
+        pager = $(this.$refs.pager)
+      }
+      else {
+        pager = $(this.$refs.searchResultPager)
+      }
       let pagerHeight = pager.height()
       let pagerNumberPerPage = 20
-      let pagerPage = parseInt(this.currentPage / pagerNumberPerPage, 10)
+      let pagerPage = parseInt(page / pagerNumberPerPage, 10)
       let pagerMinTop = pagerHeight * pagerPage
       let pagerMaxTop = pagerHeight * (pagerPage + 1)
       let pagerScrollTop = pager[0].scrollTop
@@ -491,7 +528,9 @@ let VueControllerConfig = {
       }
       
       // 保存現在頁數
-      this.lib.FolderConfigHelper.write(this.shortcutsFolderPath, 'currentPage', this.currentPage)
+      if (this.isSearchMode === false) {
+        this.lib.FolderConfigHelper.write(this.shortcutsFolderPath, 'currentPage', this.currentPage)
+      }
       
       this.waitDragScroll = true
       setTimeout(() => {
@@ -681,7 +720,7 @@ let VueControllerConfig = {
       //shell.openExternal(execCommand)
       //fork(exec)
     },
-    displayNameMatch: function (name) {
+    displaySearchNameMatch: function (name) {
       let keyword = this.searchKeyword.trim()
       if (keyword === '') {
         return name
