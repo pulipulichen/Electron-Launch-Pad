@@ -97,27 +97,12 @@ let VueControllerConfig = {
   },
   methods: {
     _afterMounted: function () {
-      //this.shortcus.slice(0, this.shortcus.length)
-
       this.shortcuts = this.lib.ShortcutHelper.get(this.shortcutDirPath)
-      //console.log(this.shortcuts)
-      //console.log(this.getTables)
-      //console.log('bbb')
       this.initDraggable()
       this.initPopup()
       this.initHotKeys()
     },
     initDraggable: function () {
-      
-      /*
-      $('.div.launchpad-item').on('dragstart', (event) => {
-        event.stopPropagation()
-        event.preventDefault()
-        event.cancelBubble()
-        return false
-      })
-      */
-      
       const draggable = new this.lib.Draggable.Sortable(document.getElementById('AppList'), {
         draggable: 'div.launchpad-item',
         scrollable: {
@@ -126,34 +111,12 @@ let VueControllerConfig = {
       });
       
       draggable.on('drag:start', (event) => {
-        //console.log('drag:start')
-        //console.log(event)
-        /*
-        if ($(event.source).hasClass('disable')) {
-          event.stopPropagation()
-          event.preventDefault()
-          return false
-        }
-        */
-        /*
-        event.stopPropagation()
-        event.preventDefault()
-        event.cancelBubble()
-        return false
-        */
-        
         this.enableDragScroll = true
       });
-      //draggable.on('drag:move', () => {
-      //  console.log('drag:move')
-      //});
       draggable.on('drag:stop', () => {
-        //console.log('drag:stop')
         this.enableDragScroll = false
         this.initPopup()
       });
-      
-      //$(this.$refs.AppList).find('.launchpad-item.empty').removeAttr('tabindex')
     },
     getTabIndex: function (item) {
       if (item === null) {
@@ -162,20 +125,6 @@ let VueControllerConfig = {
       else {
         return 0
       }
-    },
-    initREDIPS: function () {
-      
-      return this
-      
-      this.lib.REDIPSHelper.init({
-        ondropped: (targetCell) => {
-          this.initPopup()
-          this.enableDragScroll = false
-        },
-        onmoved: () => {
-          this.enableDragScroll = true
-        }
-      })
     },
     initPopup: function () {
       
@@ -240,65 +189,8 @@ let VueControllerConfig = {
        
         let items = $(this.$refs.main).find('.launchpad-item:not(.empty)')
         items.popup(popupOptions)
-        items.click(function () {
-        })
-        /*
-        tippy('.redips-drag[data-order="3"]', {
-          content: `<div>
-  <div class="ui three column divided center aligned grid">
-    <div class="column">
-      <h4 class="ui header">Basic Plan</h4>
-      <p><b>2</b> projects, $10 a month</p>
-      <div class="ui button">Choose</div>
-    </div>
-    <div class="column">
-      <h4 class="ui header">Business Plan</h4>
-      <p><b>5</b> projects, $20 a month</p>
-      <div class="ui button">Choose</div>
-    </div>
-    <div class="column">
-      <h4 class="ui header">Premium Plan</h4>
-      <p><b>8</b> projects, $25 a month</p>
-      <div class="ui button">Choose</div>
-    </div>
-  </div>
-</div>`,
-        })
-        */
-      }, 100)
+      }, 0)
     },
-    /*
-    getTables: function () {
-      if (Array.isArray(this.shortcuts) === false) {
-        return []
-      }
-      
-      let tables = []
-      
-      let lastTable
-      let lastRow
-      let maxCols = 4
-      let maxRows = 4
-      
-      this.shortcuts.forEach((shortcut, i) => {
-        if (i % (maxCols * maxRows) === 0) {
-          lastTable = []
-          tables.push(lastTable)
-        }
-        
-        if (i % maxCols === 0) {
-          lastRow = []
-          lastTable.push(lastRow)
-        }
-        
-        lastRow.push(shortcut)
-      })
-      
-      //console.log(tables)
-      
-      return tables
-    }
-    */
     initHotKeys: function () {
       //console.log('i')
       window.addEventListener("wheel", event => {
@@ -326,7 +218,7 @@ let VueControllerConfig = {
     },
     scrollPage: function (isNext) {
       if (this.waitDragScroll === true) {
-        return
+        return this
       }
       
       //this.currentPage++
@@ -370,13 +262,13 @@ let VueControllerConfig = {
       }, 700)
     },
     addPage: function () {
-      console.log('addPage')
+      console.error('addPage')
     },
     removePage: function () {
       if (this.isPageRemovable === false) {
         return this
       }
-      console.log('addPage')
+      console.error('addPage')
     },
     displayDescription: function (item) {
       if (item === null || typeof(item.description) !== 'string') {
