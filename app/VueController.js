@@ -509,14 +509,20 @@ let VueControllerConfig = {
       
       // 嘗試移除16個格子吧
       let removedCount = 0
+      let isForward = true
       while (removedCount < itemCountInPage) {
-        if (anchorItem.next().length > 0) {
-          if (anchorItem.next().hasClass('empty')) {
-            anchorItem.next().remove()
-            removedCount++
+        if (isForward === true) {
+          if (anchorItem.next().length > 0) {
+            if (anchorItem.next().hasClass('empty')) {
+              anchorItem.next().remove()
+              removedCount++
+            }
+            else {
+              anchorItem = anchorItem.next()
+            }
           }
           else {
-            anchorItem = anchorItem.next()
+            isForward = false
           }
         }
         else {
