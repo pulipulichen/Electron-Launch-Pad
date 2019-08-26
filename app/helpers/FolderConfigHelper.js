@@ -42,6 +42,13 @@ let FolderConfigHelper = {
       if (typeof(key) === 'string') {
         return undefined
       }
+      else if (Array.isArray(key) === true) {
+        let result = {}
+        key.forEach(k => {
+          result[k] = undefined
+        })
+        return result
+      }
       else {
         return {}
       }
@@ -54,6 +61,13 @@ let FolderConfigHelper = {
     if (this.lib.ElectronFileHelper.existsSync(configPath) === false) {
       if (typeof(key) === 'string') {
         return undefined
+      }
+      else if (Array.isArray(key) === true) {
+        let result = {}
+        key.forEach(k => {
+          result[k] = undefined
+        })
+        return result
       }
       else {
         return {}
@@ -72,6 +86,13 @@ let FolderConfigHelper = {
     if (typeof(key) === 'string') {
       return configJSON[key]
     }
+    else if (Array.isArray(key) === true) {
+      let result = {}
+      key.forEach(k => {
+        result[k] = configJSON[k]
+      })
+      return result
+    }
     else {
       return configJSON
     }
@@ -80,16 +101,27 @@ let FolderConfigHelper = {
     this.init()
     
     let configJSON = this.read(folderPath)
-    configJSON[key] = value
+    
+    if (typeof(key) === 'string') {
+      configJSON[key] = value
+    }
+    else if (typeof(key) === 'object') {
+      for (let k in key) {
+        configJSON[k] = key[k]
+      }
+    }
     
     let configPath = this._getConfigPath(folderPath)
     let configText = JSON.stringify(configJSON, null, "\t")
     this.lib.ElectronFileHelper.writeFileSync(configPath, configText)
     return this
   },
-  writeMainItemsSort: function (folderPath, sorted) {
+  writeMainItemsSort: function (folderPath, sorted, itemsCount) {
     this.init()
-    return this.write(folderPath, 'mainItemsSorted', sorted)
+    return this.write(folderPath, {
+      'mainItemsSorted': sorted,
+      'itemsCount': itemsCount
+    })
   },
   writeSubItemsSort: function (folderPath, folderName, sorted) {
     this.init()

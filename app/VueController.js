@@ -82,13 +82,53 @@ let VueControllerConfig = {
   },
   computed: {
     getSortedShortcuts: function () {
-      let sortedShortcuts = [null]
-      this.shortcuts.forEach((shortcut, i) => {
-        if (i === 5) {
+      if (this.lib.FolderConfigHelper === null) {
+        return []
+      }
+      let {mainItemsSorted, itemsCount} = this.lib.FolderConfigHelper.read(this.shortcutsFolderPath, ['mainItemsSorted', 'itemsCount'])
+      //console.log(mainItemsSorted)
+      
+      let sortedShortcuts = []
+      if (typeof(itemsCount) === 'number') {
+        for (let i = 0; i < itemsCount; i++) {
           sortedShortcuts.push(null)
         }
-        sortedShortcuts.push(shortcut)
+      }
+      
+      
+      let notInSorted = []
+      this.shortcuts.forEach((shortcut, i) => {
+        //if (i === 5) {
+        //  sortedShortcuts.push(null)
+        //}
+        //sortedShortcuts.push(shortcut)
+        
+        // 檢查這個項目有沒有在sort裡面
+        let name = shortcut.name
+        if (typeof(mainItemsSorted[name]) === 'number') {
+          sortedShortcuts[mainItemsSorted[name]] = shortcut
+        }
+        else {
+          notInSorted.push(shortcut)
+        }
       })
+      
+      // 把未填滿的部分填滿
+      if (notInSorted.length > 0) {
+        for (let i = 0; i < sortedShortcuts.length; i++) {
+          if (sortedShortcuts[i] === null) {
+            sortedShortcuts[i] = notInSorted.shift()
+            if (notInSorted.length === 0) {
+              break;
+            }
+          }
+        }
+        
+        // 如果全部填滿了位置還是不夠，那就再新增吧
+        if (notInSorted.length > 0) {
+          sortedShortcuts = sortedShortcuts.concat(notInSorted)
+        }
+      }
       
       let pageItemCount = this.maxRows * this.maxCols
       while (sortedShortcuts.length % pageItemCount !== 0) {
@@ -99,7 +139,7 @@ let VueControllerConfig = {
       
       return sortedShortcuts
     },
-    isPageRemoable: function () {
+    isPageRemovable: function () {
       return false
     }
   },
@@ -412,7 +452,7 @@ let VueControllerConfig = {
         }
 
         //console.log(sorted)
-        this.lib.FolderConfigHelper.writeMainItemsSort(this.shortcutsFolderPath, sorted)
+        this.lib.FolderConfigHelper.writeMainItemsSort(this.shortcutsFolderPath, sorted, items.length)
       }, 100)
               
       return this
