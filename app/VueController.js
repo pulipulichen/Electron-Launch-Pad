@@ -10,6 +10,7 @@ let VueControllerConfig = {
     shortcuts: [],
     enableDragScroll: false,
     waitDragScroll: false,
+    shortcutsFolderPath: null,
     
     lib: {
       ElectronHelper: null,
@@ -18,6 +19,7 @@ let VueControllerConfig = {
       path: null,
       remote: null,
       mode: null,
+      win: null,
       //REDIPSHelper: null,
       ShortcutHelper: null
       /*
@@ -88,7 +90,7 @@ let VueControllerConfig = {
       return sortedShortcuts
     },
     isPageRemoable: function () {
-      return true
+      return false
     }
   },
   methods: {
@@ -379,6 +381,12 @@ let VueControllerConfig = {
       else {
         return item.description
       }
+    },
+    changeFolder: function () {
+      console.error('change folder')
+    },
+    exit: function () {
+      this.lib.win.close()
     }
   }
 }

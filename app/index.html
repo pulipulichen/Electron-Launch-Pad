@@ -75,8 +75,20 @@
        v-on:click.stop="">
     <button class="ui icon button" 
             type="button"
+            v-on:click.stop="scrollPage(false)"
+            title="Scroll to previous page">
+      <i class="arrow up icon"></i>
+    </button>
+    <button class="ui icon button" 
+            type="button"
+            v-on:click.stop="scrollPage(true)"
+            title="Scroll to next page">
+      <i class="arrow down icon"></i>
+    </button>
+    <button class="ui icon button" 
+            type="button"
             v-on:click.stop="removePage"
-            v-if="isPageRemoable"
+            v-bind:class="{disabled: (isPageRemoable === false)}"
             title="add page">
       <i class="minus icon"></i>
     </button>
@@ -85,6 +97,18 @@
             v-on:click.stop="addPage"
             title="remove page">
       <i class="plus icon"></i>
+    </button>
+    <button class="ui icon button" 
+            type="button"
+            v-on:click.stop="changeFolder"
+            title="Change shortcuts folder">
+      <i class="folder open outline icon"></i>
+    </button>
+    <button class="ui icon button" 
+            type="button"
+            v-on:click.stop="exit"
+            title="Exit">
+      <i class="close icon"></i>
     </button>
   </div>
   
@@ -143,5 +167,8 @@
       
   </div>
   <script src="./VueController.js"></script>
+  
+ <!-- ------------------------------------------- --> 
+ 
   </body>
 </html>
