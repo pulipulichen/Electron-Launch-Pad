@@ -263,13 +263,13 @@ let VueControllerConfig = {
         this.mainItemsDraggable.destroy()
       }
       
-      const draggable = new this.lib.Draggable.Sortable(document.getElementById('AppList'), {
+      const draggable = new this.lib.Draggable.Sortable(this.$refs.AppList, {
         draggable: 'div.launchpad-item',
         scrollable: {
           speed: 0
         },
         delay: this.dragDelay,
-        handle: 'div.launchpad-item:not(.empty)'
+        handle: 'div.launchpad-item:not(.empty):not(.sub-item)'
       });
       
       draggable.on('drag:start', (event) => {
@@ -282,14 +282,14 @@ let VueControllerConfig = {
       });
       this.mainItemsDraggable = draggable
       setTimeout(() => {
-        this.initLaunchPadKeyEvents($(this.$refs.AppList))
+        this.setupMainItemsKeyEvents($(this.$refs.AppList))
       }, 100)
       return this
     },
     getPageByItemIndex: function (index) {
       return Math.floor(index / this.pageItemCount)
     },
-    scrollAndFocusItem: function (searchItem) {
+    scrollAndFocusMainItem: function (searchItem) {
       if (searchItem.length > 0) {
         searchItemPage = this.getPageByItemIndex(searchItem.index())
         this.scrollPage(searchItemPage, 100, () => {
@@ -298,7 +298,44 @@ let VueControllerConfig = {
       } 
       return this
     },
-    initLaunchPadKeyEvents: function (container) {
+    setupMainItemsKeyEvents: function (container) {
+      let options = {
+        focus: this.scrollAndFocusMainItem,
+        maxCols: this.maxCols,
+        pageItemCount: this.pageItemCount,
+        exit: () => {
+          this.exit()
+        },
+        exec: (item) => {
+          item.find('.item-wrapper:first').click()
+        }
+      }
+      return this.setupItemsKeyEvents(container, options)
+    },
+    setupSubItemsKeyEvents: function (container) {
+      let size = container.attr('data-grid-size')
+      size = parseInt(size, 10)
+      
+      let options = {
+        focus: (searchItem) => {
+          if (searchItem.length > 0) {
+            searchItem.focus()
+          }
+        },
+        maxCols: size,
+        pageItemCount: size * size,
+        exit: () => {
+          
+          //this.exit()
+          console.log('有辦法關閉popup嗎？')
+        },
+        exec: (item) => {
+          item.click()
+        }
+      }
+      return this.setupItemsKeyEvents(container, options)
+    },
+    setupItemsKeyEvents: function (container, options) {
       container.find('.launchpad-item').bind('keydown', (event) => {
         //console.log(event)
         let item = $(event.target)
@@ -314,92 +351,96 @@ let VueControllerConfig = {
           case 37: // left
             // 搜尋前一個不是empty的item
             searchItem = item.prevAll('.launchpad-item:not(.empty):first')
-            this.scrollAndFocusItem(searchItem)
+            options.focus(searchItem)
             break;
           case 39: // right
             searchItem = item.nextAll('.launchpad-item:not(.empty):first')
-            this.scrollAndFocusItem(searchItem)
+            options.focus(searchItem)
             break;
           case 38: // up
             //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
-            if (index <= 3) {
+            if (index <= options.maxCols) {
               return this
             }
-            searchItem = item.prevAll('.launchpad-item:eq(3):first')
+            searchItem = item.prevAll(`.launchpad-item:eq(${options.maxCols-1}):first`)
             if (searchItem.hasClass('empty')) {
               searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
             }
             if (searchItem.length === 0) {
               searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
             }
-            this.scrollAndFocusItem(searchItem)
+            options.focus(searchItem)
             break;
           case 40: // down
             //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
             itemsCount = parent.find('.launchpad-item').length
-            if (index >= (itemsCount - this.maxCols) ) {
+            if (index >= (itemsCount - options.maxCols) ) {
               // @TODO 這裡可能會有錯
               return this
             }
-            searchItem = item.nextAll(`.launchpad-item:eq(${this.maxCols-1}):first`)
+            searchItem = item.nextAll(`.launchpad-item:eq(${options.maxCols-1}):first`)
             if (searchItem.hasClass('empty')) {
               searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
             }
             if (searchItem.length === 0) {
               searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
             }
-            this.scrollAndFocusItem(searchItem)
+            options.focus(searchItem)
             break;
           case 33: // page up
             //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
-            if (index <= this.pageItemCount) {
+            if (index < options.pageItemCount) {
               return this
             }
-            searchItem = item.prevAll(`.launchpad-item:eq(${this.pageItemCount-1}):first`)
+            searchItem = item.prevAll(`.launchpad-item:eq(${options.pageItemCount-1}):first`)
             if (searchItem.hasClass('empty')) {
               searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
             }
             if (searchItem.length === 0) {
               searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
             }
-            this.scrollAndFocusItem(searchItem)
+            options.focus(searchItem)
             break;
           case 34: // page down
             //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
             itemsCount = parent.find('.launchpad-item').length
-            if (index >= (itemsCount - this.pageItemCount) ) {
+            if (index > (itemsCount - options.pageItemCount) ) {
               // @TODO 這裡可能會有錯
               return this
             }
-            searchItem = item.nextAll(`.launchpad-item:eq(${this.pageItemCount-1}):first`)
+            searchItem = item.nextAll(`.launchpad-item:eq(${options.pageItemCount-1}):first`)
             if (searchItem.hasClass('empty')) {
               searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
             }
             if (searchItem.length === 0) {
               searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
             }
-            this.scrollAndFocusItem(searchItem)
+            options.focus(searchItem)
             break;
           case 36: // home
             searchItem = parent.children('.launchpad-item:not(.empty):first')
-            this.scrollAndFocusItem(searchItem)
+            options.focus(searchItem)
             break;
           case 35: // end
             searchItem = parent.children('.launchpad-item:not(.empty):last')
-            this.scrollAndFocusItem(searchItem)
+            options.focus(searchItem)
             break;
           case 13: // enter
           case 32: // space
             //console.log(item.hasClass('folder'))
             //if (item.hasClass('folder') === false) {
-            item.find('.item-wrapper:first').click()
+            options.exec(item)
             break;
+          case 27: // esc
+          case 8: // backspace
+            options.exit()
+            break
         }
       })
       //console.log(container.find('.launchpad-item').length)
       return this
     },
-    getTabIndex: function (item) {
+    attrTabIndex: function (item) {
       if (item === null) {
         return -1
       }
@@ -410,7 +451,7 @@ let VueControllerConfig = {
     initPopup: function () {
       
       // https://semantic-ui.com/modules/popup.html
-      let html = $(`<div class="popup-panel" style="overflow: auto;"></div>`)
+      let html = $(`<div class="popup-panel"></div>`)
       //html = $('#AAA')
       
       let popupOptions = {
@@ -442,10 +483,7 @@ let VueControllerConfig = {
           // 先做比較簡單的形式吧
           html.html(this.buildSubItems(folderName, subItems))
           
-          let size = Math.ceil(Math.sqrt(subItems.length))
-          if (size > 4) {
-            size = ">4"
-          }
+          let size = this.calcPopupSize(subItems)
           html.attr('data-grid-size', size)
           //html.find('.launchpad-item:first').focus()
           //html.html('AAA')
@@ -455,7 +493,7 @@ let VueControllerConfig = {
           //console.log(2)
           //console.log(this)
           //$('#redips-drag').css('pointer-events', 'none')
-
+          /*
           setTimeout(() => {
             let popupPanel = $('.popup-panel:visible:first > .launchpad-items-container')
             //let popupPanel = $('.popup-panel:visible:first')[0]
@@ -472,6 +510,7 @@ let VueControllerConfig = {
               //popupPanel.find('.launchpad-item:first').focus()
             }, 0)
           }, 300)
+          */
         },
         /*
         onHide: () => {
@@ -509,16 +548,27 @@ let VueControllerConfig = {
         items.popup(popupOptions)
       }, 0)
     },
+    calcPopupSize: function (subItems) {
+      let size = Math.ceil(Math.sqrt(subItems.length))
+      if (size > 4) {
+        size = "4"
+      }
+      return size
+    },
     buildSubItems: function (folderName, shortcuts) {
       let _this = this
       let container = $('<div class="launchpad-items-container"></div>')
       container.attr('data-folder-name', folderName)
+      
+      let size = this.calcPopupSize(shortcuts)
+      container.attr('data-grid-size', size)
+      
       if (Array.isArray(shortcuts)) {
         shortcuts = this.getSortedSubItems(folderName, shortcuts)
         
         shortcuts.forEach((shortcut) => {
           let item = $(`
-            <div class="launchpad-item" 
+            <div class="launchpad-item sub-item" 
                  title="${shortcut.description}"
                  data-exec="${shortcut.exec}">
               <img class="icon" draggable="false"
@@ -537,8 +587,9 @@ let VueControllerConfig = {
         })
         
         const draggable = new this.lib.Draggable.Sortable(container[0], {
-          draggable: 'div.launchpad-item'
-        });
+          draggable: 'div.launchpad-item',
+          delay: this.dragDelay
+        })
         
         /*
         setTimeout(() => {
@@ -551,6 +602,7 @@ let VueControllerConfig = {
         //draggable.on('drag:start', (event) => {
         //  console.log('folder item drag:start')
         //});
+        
         draggable.on('drag:stop', (event) => {
           //console.log(event.)
           let container = event.sourceContainer
@@ -558,7 +610,12 @@ let VueControllerConfig = {
           
           this.onSubItemDropped(folderName, container)
           //console.log('folder item drag:stop')
-        });
+        })
+        
+        setTimeout(() => {
+          container.find('.launchpad-item:first').focus()
+          this.setupSubItemsKeyEvents(container)
+        }, 50)
       }
       
       return container
