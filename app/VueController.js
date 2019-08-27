@@ -1,13 +1,16 @@
 let VueControllerConfig = {
   el: '#app',
   data: {
+    popupHideDelay: 1000 * 60,
+    dragDelay: 100,
+    maxRows: 4,
+    maxCols: 4,
+    
     searchKeyword: "",
     currentSearchResultPage: 0,
     
     currentPage: 0,
-    maxPages: 3,
-    maxRows: 4,
-    maxCols: 4,
+    maxPages: 99,
     shortcutDirPath: null,
     shortcuts: [],
     enableDragScroll: false,
@@ -15,8 +18,7 @@ let VueControllerConfig = {
     waitDragScroll: false,
     shortcutsFolderPath: 'folder-path-for-test',
     mainItemsDraggable: null,
-    popupHideDelay: 1000 * 60,
-    dragDelay: 100,
+    currentPopupTrigger: null,
     
     cache: {
       subItemsSorted: {}
@@ -47,6 +49,7 @@ let VueControllerConfig = {
       */
     },
     debug: {
+      enableExit: false,
       enableClick: false,
       enableSortPersist: true,
     }
@@ -327,7 +330,12 @@ let VueControllerConfig = {
         exit: () => {
           
           //this.exit()
-          console.log('有辦法關閉popup嗎？')
+          //console.log('有辦法關閉popup嗎？')
+          if (this.currentPopupTrigger !== null) {
+            let trigger = $(this.currentPopupTrigger)
+            trigger.click()
+            trigger.parents('.launchpad-item:first').focus()
+          }
         },
         exec: (item) => {
           item.click()
@@ -471,6 +479,7 @@ let VueControllerConfig = {
         html  : html,  
         onShow: (trigger) => {
           this.isPopupVisiable = true
+          this.currentPopupTrigger = trigger
           let index = trigger.getAttribute('data-shortcut-index')
           index = parseInt(index, 10)
           //console.log(index)
@@ -489,7 +498,7 @@ let VueControllerConfig = {
           //html.html('AAA')
         },
         onVisible: () => {
-          this.isPopupVisiable = true
+          //this.isPopupVisiable = true
           //console.log(2)
           //console.log(this)
           //$('#redips-drag').css('pointer-events', 'none')
@@ -527,6 +536,7 @@ let VueControllerConfig = {
           //$('#redips-drag').css('pointer-events', 'all')
           if ($('.popup-panel:visible').length === 0) {
             this.isPopupVisiable = false
+            this.currentPopupTrigger = null
           }
           //console.log('onHidden')
         }
@@ -888,6 +898,10 @@ let VueControllerConfig = {
       console.error('change folder')
     },
     exit: function () {
+      if (this.debug.enableExit === false) {
+        console.log('debug: exit()')
+        return this
+      }
       this.lib.win.close()
       return this
     },
