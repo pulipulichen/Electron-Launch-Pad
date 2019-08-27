@@ -19,6 +19,9 @@ Last merge: 2019/08/27 13:29
 # Draggable.js
 - https://github.com/Shopify/draggable/tree/master/src/Draggable
 
+# Hotkey.js
+- https://github.com/jaywcjlove/hotkeys
+
 ----
 
 # NPM
