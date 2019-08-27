@@ -2,6 +2,9 @@ let ShortcutHelper = {
   inited: false,
   lib: {
     path: null,
+    iconExtractor: null,
+    ElectronFileHelper: null,
+    FolderConfigHelper: null,
   },
   init: function () {
     if (this.inited === true) {
@@ -10,6 +13,9 @@ let ShortcutHelper = {
     // -------------
     
     this.lib.path = RequireHelper.require('path')
+    this.lib.iconExtractor = RequireHelper.require('icon-extractor')
+    this.lib.ElectronFileHelper = RequireHelper.require('helpers/electron/ElectronFileHelper')
+    this.lib.FolderConfigHelper = RequireHelper.require('helpers/FolderConfigHelper')
     
     // -------------
     this.inited = true
@@ -104,7 +110,9 @@ fs.readdir(directoryPath, (err, files) => {
               icon = data.target
             }
             if (icon.endsWith('.exe')) {
-              this.getIconFromEXE(icon)
+              this.getIconFromEXE(icon, (iconPath) => {
+                console.log(iconPath)
+              })
             }
           });
  
@@ -116,16 +124,38 @@ fs.readdir(directoryPath, (err, files) => {
     return []
   },
   getIconFromEXE: function (filepath, callback) {
-    var iconExtractor = require('icon-extractor');
+    let iconFilename = filepath
+    if (iconFilename.endsWith('.exe')) {
+      iconFilename = iconFilename.slice(0, -4)
+    }
+    let lengthLimit = 150
+    if (iconFilename.length > lengthLimit) {
+      iconFilename = iconFilename.slice(-1 * lengthLimit)
+    }
+    iconFilename = escape(iconFilename) + '.ico'
+    let iconFilepath = this.lib.ElectronFileHelper.resolve('cache/icon/' + iconFilename)
+    
+    if (this.lib.ElectronFileHelper.existsSync(iconFilepath)) {
+      if (typeof(callback) === 'function') {
+        callback(iconFilepath)
+      }
+      return this
+    }
+    
+    //var iconExtractor = require('icon-extractor');
 
-    iconExtractor.emitter.on('icon', function (data) {
+    this.lib.iconExtractor.emitter.on('icon', (data) => {
       //console.log('Here is my context: ' + data.Context);
       //console.log('Here is the path it was for: ' + data.Path);
-      var icon = data.Base64ImageData;
-      console.log(icon)
+      let icon = data.Base64ImageData;
+      //console.log(icon)
+      this.lib.ElectronFileHelper.writeFileBase64Sync(iconFilepath, icon)
+      if (typeof(callback) === 'function') {
+        callback(iconFilepath)
+      }
     });
 
-    iconExtractor.getIcon('ANY_TEXT', filepath);
+    this.lib.iconExtractor.getIcon('ANY_TEXT', filepath);
   },
   getShortcutsOnLinux: function (dirPath) {
     console.error('getShortcutsOnLinux');

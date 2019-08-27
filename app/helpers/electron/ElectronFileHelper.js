@@ -50,6 +50,9 @@ let ElectronFileHelper = {
   writeFileSync: function (filepath, content) {
     return this.lib.fs.writeFileSync(filepath, content, 'utf8')
   },
+  writeFileBase64Sync: function (filepath, content) {
+    return this.lib.fs.writeFileSync(filepath, content, 'base64')
+  },
   getBasePath: function () {
     this.init()
     
