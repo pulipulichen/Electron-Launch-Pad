@@ -157,6 +157,9 @@
              v-on:click="exec(item.exec)"
              v-bind:data-shortcut-index="i"
              v-bind:title="displayDescription(item)">
+          <div class="hotkey-label">
+            <span>1</span>
+          </div>
           <template v-if="item === null">
             <img class="icon"
                  draggable="false" />
@@ -207,6 +210,9 @@
              v-on:click="exec(item.exec)"
              v-bind:data-shortcut-index="i"
              v-bind:title="displayDescription(item)">
+          <div class="hotkey-label">
+            <span>1</span>
+          </div>
           <template v-if="item === null">
             <img class="icon"
                  draggable="false"/>

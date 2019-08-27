@@ -62,6 +62,18 @@
       padding-right: 1rem;
       padding-top: 0.5rem;
       cursor: pointer;
+      
+      .hotkey-label {
+        position: relative;
+        left: calc((((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 7px) / 2 * -1);
+        
+        span {
+          font-size: 1rem;
+          background-color: rgb(255,255,255);
+          color: black;
+          position: absolute;
+        }
+      }
     }
     
     .name {

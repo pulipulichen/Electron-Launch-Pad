@@ -967,7 +967,7 @@ let VueControllerConfig = {
         return this
       }
       if (this.debug.enableClick === false) {
-        console.log(execCommand)
+        console.log(`Degub: ${execCommand}`)
         return this
       }
       
