@@ -10,6 +10,7 @@ let VueControllerConfig = {
     searchKeyword: "",
     currentSearchResultPage: 0,
     
+    mainItemsInited: false,
     currentPage: 0,
     maxPages: 99,
     shortcutDirPath: null,
@@ -257,16 +258,26 @@ let VueControllerConfig = {
       this.initDraggable()
       this.initPopup()
       this.initHotKeys()
-      this.initCurrentPage()
+      this.initCurrentPage(() => {
+        this.mainItemsInited = true
+      })
     },
-    initCurrentPage: function () {
+    initCurrentPage: function (callback) {
       if (this.debug.enableSortPersist === false) {
         return this
       }
       
       let currentPage = this.lib.FolderConfigHelper.read(this.shortcutsFolderPath, 'currentPage')
       if (typeof(currentPage) === 'number') {
-        this.scrollPage(currentPage, false)
+        //console.log(['initCurrentPage', currentPage])
+        setTimeout(() => {
+          this.scrollPage(currentPage, false, callback)
+        }, 0)
+      }
+      else {
+        if (typeof(callback) === 'function') {
+          callback()
+        }
       }
     },
     initDraggable: function () {

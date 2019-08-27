@@ -83,7 +83,8 @@
   <div class="pager"
        v-on:wheel.stop=""
        ref="pager"
-       v-if="isSearchMode === false">
+       v-if="isSearchMode === false"
+       v-bind:class="{'hidden': (mainItemsInited === false)}">
     <div v-for="i in maxPages"
          class="item"
          v-bind:class="{'current': ((i-1) === currentPage), 'disabled': waitDragScroll}"
@@ -94,7 +95,8 @@
   <div class="pager"
        v-on:wheel.stop=""
        ref="searchResultPager"
-       v-if="isSearchMode === true">
+       v-if="isSearchMode === true"
+       v-bind:class="{'hidden': (mainItemsInited === false)}">
     <div v-for="i in searchResultPageLength"
          class="item"
          v-bind:class="{'current': ((i-1) === currentSearchResultPage), 'disabled': waitDragScroll}"
@@ -145,7 +147,7 @@
   <div class="app-list"
          id="AppList"
          v-bind:data-page="currentPage"
-         v-bind:class="{'disabled': waitDragScroll, 'is-dragging': enableDragScroll}"
+         v-bind:class="{'disabled': waitDragScroll, 'is-dragging': enableDragScroll, 'hidden': (mainItemsInited === false)}"
          ref="AppList"
          tabindex="-1"
          v-if="isSearchMode === false">
@@ -200,7 +202,7 @@
   <div class="app-list search-result-list"
          id="SearchResultList"
          v-bind:data-page="currentSearchResultPage"
-         v-bind:class="{'disabled': waitDragScroll}"
+         v-bind:class="{'disabled': waitDragScroll, 'hidden': (mainItemsInited === false)}"
          ref="SearchResultList"
          tabindex="-1"
          v-if="isSearchMode === true">
