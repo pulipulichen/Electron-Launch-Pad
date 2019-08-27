@@ -20,7 +20,7 @@ let ShortcutHelper = {
       icon: this.lib.path.join(__dirname, '/imgs/icons8-app-symbol-256.png'),
       name: `${i} APP`,
       //exec: `C:\\Windows\\notepad.exe "APP ${i}.txt"`,p
-      exec: '"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" --ignore-certificate-errors --app=https://blog.pulipuli.info',
+      exec: `"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" --ignore-certificate-errors --app=https://blog.pulipuli.info --test APP${i}`,
       description: 'description',
       order: i
     }

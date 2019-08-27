@@ -513,132 +513,41 @@ let VueControllerConfig = {
             options.exit()
             break
         }
+        event.preventDefault()
+        event.stopPropagation()
       }
       
       container.find('.launchpad-item').each((i, ele) => {
         hotkeys('left, right, up, down, pageup, pagedown, home, end, enter, space, esc, backspace', {
           element: ele,
         }, hotkeysHandler)
+        //$(ele).addClass('hotkeys-inited')
       })
-        
-      /*
-      container.find('.launchpad-item').bind('keydown', (event) => {
-        //console.log(event)
-        let item = $(event.target)
-        let index = item.index()
-        let parent = item.parent()
-        //console.log()
-        //console.log(item.find('.name:first').text(), event.keyCode)
-        let keyCode = event.keyCode
-        let searchItem
-        let itemsCount
-        
-        switch (keyCode) {
-          case 37: // left
-            // 搜尋前一個不是empty的item
-            searchItem = item.prevAll('.launchpad-item:not(.empty):first')
-            options.focus(searchItem)
-            break;
-          case 39: // right
-            searchItem = item.nextAll('.launchpad-item:not(.empty):first')
-            options.focus(searchItem)
-            break;
-          case 38: // up
-            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
-            if (index <= options.maxCols) {
-              return this
-            }
-            searchItem = item.prevAll(`.launchpad-item:eq(${options.maxCols-1}):first`)
-            if (searchItem.hasClass('empty')) {
-              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
-            }
-            if (searchItem.length === 0) {
-              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
-            }
-            options.focus(searchItem)
-            break;
-          case 40: // down
-            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
-            itemsCount = parent.find('.launchpad-item').length
-            if (index >= (itemsCount - options.maxCols) ) {
-              // @TODO 這裡可能會有錯
-              return this
-            }
-            searchItem = item.nextAll(`.launchpad-item:eq(${options.maxCols-1}):first`)
-            if (searchItem.hasClass('empty')) {
-              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
-            }
-            if (searchItem.length === 0) {
-              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
-            }
-            options.focus(searchItem)
-            break;
-          case 33: // page up
-            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
-            if (index < options.pageItemCount) {
-              return this
-            }
-            searchItem = item.prevAll(`.launchpad-item:eq(${options.pageItemCount-1}):first`)
-            if (searchItem.hasClass('empty')) {
-              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
-            }
-            if (searchItem.length === 0) {
-              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
-            }
-            options.focus(searchItem)
-            break;
-          case 34: // page down
-            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
-            itemsCount = parent.find('.launchpad-item').length
-            if (index > (itemsCount - options.pageItemCount) ) {
-              // @TODO 這裡可能會有錯
-              return this
-            }
-            searchItem = item.nextAll(`.launchpad-item:eq(${options.pageItemCount-1}):first`)
-            if (searchItem.hasClass('empty')) {
-              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
-            }
-            if (searchItem.length === 0) {
-              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
-            }
-            options.focus(searchItem)
-            break;
-          case 36: // home
-            searchItem = parent.children('.launchpad-item:not(.empty):first')
-            options.focus(searchItem)
-            break;
-          case 35: // end
-            searchItem = parent.children('.launchpad-item:not(.empty):last')
-            options.focus(searchItem)
-            break;
-          case 13: // enter
-          case 32: // space
-            //console.log(item.hasClass('folder'))
-            //if (item.hasClass('folder') === false) {
-            options.exec(item)
-            break;
-          case 27: // esc
-          case 8: // backspace
-            options.exit()
-            break
-        }
-      })
-      */
+      
       //console.log(container.find('.launchpad-item').length)
       return this
     },
-    onSearchInputKeyDown: function (keyCode) {
+    onSearchInputFocus: function (event) {
+      this.isSearchInputFocused = true
+      $(this.visibleListElement).find('.launchpad-item.visible-in-current-page.item:first').addClass('search-open-candidate')
+    },
+    onSearchInputBlur: function (event) {
+      this.isSearchInputFocused = false
+      $(this.visibleListElement).find('.search-open-candidate').removeClass('search-open-candidate')
+    },
+    onSearchInputKeyDown: function (event) {
+      let keyCode = event.keyCode
       let options = {
-        focus: (item) => {
-          if (item.length > 0) {
-            item.focus()
-          }
-        },
+        focus: this.scrollAndFocusMainItem,
         exit: () => {
           if (this.searchKeyword !== '') {
             this.searchKeyword = ''
+            event.preventDefault()
+            event.stopPropagation()
           }
           else {
+            event.preventDefault()
+            event.stopPropagation()
             this.exit()
           }
         },
@@ -657,6 +566,8 @@ let VueControllerConfig = {
         },
         exec: (item) => {
           if (item.length > 0) {
+            event.preventDefault()
+            event.stopPropagation()
             item.find('.item-wrapper:first').click()
           }
         }
@@ -696,10 +607,14 @@ let VueControllerConfig = {
           options.focus(selectedItem)
           break
         case 34: // pagedown
-          this.scrollPage(true)
+          this.scrollPage(true, () => {
+            this.onSearchInputFocus()
+          })
           break
         case 33: // pageup
-          this.scrollPage(false)
+          this.scrollPage(false, () => {
+            this.onSearchInputFocus()
+          })
           break
         case 27: // esc
         case 8: // backspace
