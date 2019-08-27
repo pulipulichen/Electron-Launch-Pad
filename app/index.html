@@ -145,7 +145,7 @@
   <div class="app-list"
          id="AppList"
          v-bind:data-page="currentPage"
-         v-bind:class="{'disabled': waitDragScroll}"
+         v-bind:class="{'disabled': waitDragScroll, 'is-dragging': enableDragScroll}"
          ref="AppList"
          tabindex="-1"
          v-if="isSearchMode === false">
@@ -157,8 +157,10 @@
              v-on:click="exec(item.exec)"
              v-bind:data-shortcut-index="i"
              v-bind:title="displayDescription(item)">
-          <div class="hotkey-label">
-            <span>1</span>
+          <div class="hotkey-label"
+               v-bind:class="{'hide': (mainItemHotkeyLabelInited === false || enableDragScroll)}">
+            <span class="background"></span>
+            <span class="hotkey">1</span>
           </div>
           <template v-if="item === null">
             <img class="icon"
@@ -210,8 +212,10 @@
              v-on:click="exec(item.exec)"
              v-bind:data-shortcut-index="i"
              v-bind:title="displayDescription(item)">
-          <div class="hotkey-label">
-            <span>1</span>
+          <div class="hotkey-label"
+               v-bind:class="{'hide': (mainItemHotkeyLabelInited === false || enableDragScroll)}">
+            <span class="background"></span>
+            <span class="hotkey">1</span>
           </div>
           <template v-if="item === null">
             <img class="icon"

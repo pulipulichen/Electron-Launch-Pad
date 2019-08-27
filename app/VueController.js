@@ -5,6 +5,7 @@ let VueControllerConfig = {
     dragDelay: 100,
     maxRows: 4,
     maxCols: 4,
+    hotkeyConfig: [1,2,3,4,'q','w','e','r','a','s','d','f','z','x','c','v'],
     
     searchKeyword: "",
     currentSearchResultPage: 0,
@@ -19,6 +20,7 @@ let VueControllerConfig = {
     shortcutsFolderPath: 'folder-path-for-test',
     mainItemsDraggable: null,
     currentPopupTrigger: null,
+    mainItemHotkeyLabelInited: false,
     
     cache: {
       subItemsSorted: {}
@@ -672,7 +674,11 @@ let VueControllerConfig = {
         if (this.waitDragScroll === false) {
           this.scrollPage((event.deltaY > 0))
         }
-      });
+      })
+      
+      setTimeout(() => {
+        this.setupMainItemHoykeyLabel()
+      }, 100)
     },
     scrollPaddingDragUpEnter: function (event) {
       if (this.enableDragScroll === true 
@@ -931,6 +937,8 @@ let VueControllerConfig = {
 
         //console.log(sorted)
         this.lib.FolderConfigHelper.writeMainItemsSort(this.shortcutsFolderPath, sorted, items.length)
+        
+        this.setupMainItemHoykeyLabel()
       }, 100)
               
       return this
@@ -1010,6 +1018,34 @@ let VueControllerConfig = {
       
       return markedName
     },
+    setupMainItemHoykeyLabel: function () {
+      let container
+      if (this.isSearchMode === false) {
+        container = $(this.$refs.AppList)
+      }
+      else if (this.isSearchMode === true) {
+        container = $(this.$refs.SearchResultList)
+      }
+      //console.log(container.children('.launchpad-item').length)
+      container.children('.launchpad-item').each((i, item) => {
+        let key = this.calcHotKeyFromItemIndex(i)
+        let label = $(item).find('.hotkey-label .hotkey')
+        label.text(key)
+      })
+      
+      setTimeout(() => {
+        this.mainItemHotkeyLabelInited = true
+      }, 500)
+    },
+    calcHotKeyFromItemIndex: function (i) {
+      let keyIndex = i % this.pageItemCount
+      if (typeof(this.hotkeyConfig[keyIndex]) !== 'undefined') {
+        return this.hotkeyConfig[keyIndex]
+      }
+      else {
+        return ''
+      }
+    }
   }
 }
 
