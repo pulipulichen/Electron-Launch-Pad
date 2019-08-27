@@ -21,6 +21,7 @@ Last merge: 2019/08/27 13:29
 
 # Hotkey.js
 - https://github.com/jaywcjlove/hotkeys
+- https://github.com/jaywcjlove/hotkeys/blob/44283e7c1ea679cf5041a215d3266f19334ed1d3/src/var.js
 
 ----
 

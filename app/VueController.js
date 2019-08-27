@@ -257,7 +257,7 @@ let VueControllerConfig = {
       this.shortcuts = this.lib.ShortcutHelper.get(this.shortcutDirPath)
       this.initDraggable()
       this.initPopup()
-      this.initHotKeys()
+      this.initMouseWheelKeys()
       this.initCurrentPage(() => {
         this.mainItemsInited = true
       })
@@ -364,6 +364,122 @@ let VueControllerConfig = {
       return this.setupItemsKeyEvents(container, options)
     },
     setupItemsKeyEvents: function (container, options) {
+      // https://github.com/jaywcjlove/hotkeys
+      
+      let hotkeysHandler = (event, handler) => { 
+        //console.log(handler.key)
+        //console.log(event)
+        let item = $(event.target)
+        let index = item.index()
+        let parent = item.parent()
+        //console.log()
+        //console.log(item.find('.name:first').text(), event.keyCode)
+        //let keyCode = event.keyCode
+        let searchItem
+        let itemsCount
+        
+        switch (handler.key) {
+          case 'left': // left
+            // 搜尋前一個不是empty的item
+            searchItem = item.prevAll('.launchpad-item:not(.empty):first')
+            options.focus(searchItem)
+            break
+          case 'right': // right
+            searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            options.focus(searchItem)
+            break
+          case 'up': // up
+            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            if (index <= options.maxCols) {
+              return this
+            }
+            searchItem = item.prevAll(`.launchpad-item:eq(${options.maxCols-1}):first`)
+            if (searchItem.hasClass('empty')) {
+              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length === 0) {
+              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
+            }
+            options.focus(searchItem)
+            break
+          case 'down': // down
+            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            itemsCount = parent.find('.launchpad-item').length
+            if (index >= (itemsCount - options.maxCols) ) {
+              // @TODO 這裡可能會有錯
+              return this
+            }
+            searchItem = item.nextAll(`.launchpad-item:eq(${options.maxCols-1}):first`)
+            if (searchItem.hasClass('empty')) {
+              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length === 0) {
+              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
+            }
+            options.focus(searchItem)
+            break
+          case 'pageup': // page up
+            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            if (index < options.pageItemCount) {
+              searchItem = parent.children('.launchpad-item:not(.empty):first')
+              options.focus(searchItem)
+              return this
+            }
+            searchItem = item.prevAll(`.launchpad-item:eq(${options.pageItemCount-1}):first`)
+            if (searchItem.hasClass('empty')) {
+              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length === 0) {
+              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
+            }
+            options.focus(searchItem)
+            break
+          case 'pagedown': // page down
+            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            itemsCount = parent.find('.launchpad-item').length
+            if (index > (itemsCount - options.pageItemCount) ) {
+              // @TODO 這裡可能會有錯
+              searchItem = parent.children('.launchpad-item:not(.empty):last')
+              options.focus(searchItem)
+              return this
+            }
+            searchItem = item.nextAll(`.launchpad-item:eq(${options.pageItemCount-1}):first`)
+            if (searchItem.hasClass('empty')) {
+              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length === 0) {
+              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
+            }
+            options.focus(searchItem)
+            break
+          case 'home': // home
+            searchItem = parent.children('.launchpad-item:not(.empty):first')
+            options.focus(searchItem)
+            break
+          case 'end': // end
+            searchItem = parent.children('.launchpad-item:not(.empty):last')
+            options.focus(searchItem)
+            break
+          case 'enter': // enter
+          case 'space': // space
+            //console.log(item.hasClass('folder'))
+            //if (item.hasClass('folder') === false) {
+            options.exec(item)
+            break
+          case 'esc': // esc
+          case 'backspace': // backspace
+            options.exit()
+            break
+        }
+      }
+      
+      container.find('.launchpad-item').each((i, ele) => {
+        hotkeys('left, right, up, down, pageup, pagedown, home, end, enter, space, esc, backspace', {
+          element: ele,
+        }, hotkeysHandler)
+      })
+        
+      /*
       container.find('.launchpad-item').bind('keydown', (event) => {
         //console.log(event)
         let item = $(event.target)
@@ -465,6 +581,7 @@ let VueControllerConfig = {
             break
         }
       })
+      */
       //console.log(container.find('.launchpad-item').length)
       return this
     },
@@ -686,7 +803,7 @@ let VueControllerConfig = {
       
       return sorted
     },
-    initHotKeys: function () {
+    initMouseWheelKeys: function () {
       //console.log('i')
       window.addEventListener("wheel", event => {
         if (this.waitDragScroll === false) {
