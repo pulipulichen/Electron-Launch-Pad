@@ -54,9 +54,13 @@
     <div class="ui search fluid" 
          v-on:click.stop="">
       <div class="ui icon fluid input">
-        <input class="prompt" type="text" 
+        <input type="text" 
                placeholder="Search APP..."
-               v-model="searchKeyword">
+               v-model="searchKeyword"
+               ref='SearchInput'
+               v-on:keydown="onSearchInputKeyDown(event.keyCode)"
+               v-on:focus="isSearchInputFocus = true"
+               v-on:blur="isSearchInputFocus = false">
         <i class="search icon"
            v-if="isSearchMode === false"></i>
         <i class="close icon reset"

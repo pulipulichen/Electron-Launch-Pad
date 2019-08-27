@@ -22,6 +22,7 @@ let VueControllerConfig = {
     mainItemsDraggable: null,
     currentPopupTrigger: null,
     mainItemHotkeyLabelInited: false,
+    isSearchInputFocus: false,
     
     cache: {
       subItemsSorted: {}
@@ -250,6 +251,30 @@ let VueControllerConfig = {
       let items = $(this.$refs.AppList).find('.launchpad-item:not(.empty)').length
       
       return (items <= minItems)
+    },
+    visibleCurrentPage: function () {
+      if (this.isSearchMode === false) {
+        return this.currentPage
+      }
+      else {
+        return this.currentSearchResultPage
+      }
+    },
+    visibleCurrentFirstItemIndex: function () {
+      let page = this.visibleCurrentPage
+      return page * this.pageItemCount
+    },
+    visibleCurrentLastItemIndex: function () {
+      let page = this.visibleCurrentPage
+      return ((page + 1) * this.pageItemCount - 1)
+    },
+    visibleListElement: function () {
+      if (this.isSearchMode === false) {
+        return this.$refs.AppList
+      }
+      else {
+        return this.$refs.SearchResultList
+      }
     }
   },
   methods: {
@@ -260,6 +285,8 @@ let VueControllerConfig = {
       this.initMouseWheelKeys()
       this.initCurrentPage(() => {
         this.mainItemsInited = true
+        //this.setupSearchInputKeyEvents()
+        this.$refs.SearchInput.focus()
       })
     },
     initCurrentPage: function (callback) {
@@ -327,10 +354,13 @@ let VueControllerConfig = {
         maxCols: this.maxCols,
         pageItemCount: this.pageItemCount,
         exit: () => {
-          this.exit()
+          //this.exit()
+          this.$refs.SearchInput.focus()
         },
         exec: (item) => {
-          item.find('.item-wrapper:first').click()
+          if (item.length > 0) {
+            item.find('.item-wrapper:first').click()
+          }
         }
       }
       return this.setupItemsKeyEvents(container, options)
@@ -367,7 +397,7 @@ let VueControllerConfig = {
       // https://github.com/jaywcjlove/hotkeys
       
       let hotkeysHandler = (event, handler) => { 
-        //console.log(handler.key)
+        console.log(handler.key)
         //console.log(event)
         let item = $(event.target)
         let index = item.index()
@@ -584,6 +614,84 @@ let VueControllerConfig = {
       */
       //console.log(container.find('.launchpad-item').length)
       return this
+    },
+    onSearchInputKeyDown: function (keyCode) {
+      let options = {
+        focus: (item) => {
+          if (item.length > 0) {
+            item.focus()
+          }
+        },
+        exit: () => {
+          if (this.searchKeyword !== '') {
+            this.searchKeyword = ''
+          }
+          else {
+            this.exit()
+          }
+        },
+        getFirstItem: (container) => {
+          // 選擇現在這一頁來focus
+          itemIndex = this.visibleCurrentFirstItemIndex
+          //console.log(itemIndex)
+          selectedItem = container.children(`.launchpad-item:eq(${itemIndex})`)
+          if (selectedItem.hasClass('empty')) {
+            selectedItem = selectedItem.nextAll('.launchpad-item:not(.empty):first')
+          }
+          if (selectedItem.length === 0) {
+            selectedItem = selectedItem.prevAll('.launchpad-item:not(.empty):first')
+          }
+          return selectedItem
+        },
+        exec: (item) => {
+          if (item.length > 0) {
+            item.find('.item-wrapper:first').click()
+          }
+        }
+      }
+      
+      //console.log(keyCode)
+      let itemIndex
+      let container = $(this.visibleListElement)
+      let selectedItem
+
+      switch (keyCode) {
+        case 40: // down
+          // 選擇現在這一頁來focus
+          selectedItem = options.getFirstItem(container)
+          options.focus(selectedItem)
+          break
+        case 38: // down
+          // 選擇現在這一頁來focus
+          itemIndex = this.visibleCurrentLastItemIndex
+          //console.log(itemIndex)
+          selectedItem = container.children(`.launchpad-item:eq(${itemIndex})`)
+          if (selectedItem.hasClass('empty')) {
+            selectedItem = selectedItem.prevAll('.launchpad-item:not(.empty):first')
+          }
+          if (selectedItem.length === 0) {
+            selectedItem = selectedItem.nextAll('.launchpad-item:not(.empty):first')
+          }
+          options.focus(selectedItem)
+          break
+        case 34: // pagedown
+          this.scrollPage(true)
+          break
+        case 33: // pageup
+          this.scrollPage(false)
+          break
+        case 27: // esc
+        case 8: // backspace
+          options.exit()
+          break
+        case 13: // enter
+        case 32: // 32
+          // open first item
+          selectedItem = options.getFirstItem(container)
+          console.log(selectedItem.length)
+          options.exec(selectedItem)
+          break
+      }
     },
     attrTabIndex: function (item) {
       if (item === null) {
