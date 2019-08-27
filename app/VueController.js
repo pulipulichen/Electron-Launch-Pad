@@ -16,6 +16,10 @@ let VueControllerConfig = {
     shortcutsFolderPath: 'folder-path-for-test',
     mainItemsDraggable: null,
     
+    cache: {
+      subItemsSorted: {}
+    },
+    
     lib: {
       ElectronHelper: null,
       FolderConfigHelper: null,
@@ -42,7 +46,7 @@ let VueControllerConfig = {
     },
     debug: {
       enableClick: false,
-      enableSortPersist: false,
+      enableSortPersist: true,
     }
   },
   mounted: function () {
@@ -180,7 +184,7 @@ let VueControllerConfig = {
         if (Array.isArray(item.subItems) === false) {
           keywords.forEach(keyword => {
             if (keyword === '') {
-              return
+              return false
             }
             if ((item.name.toLowerCase().indexOf(keyword) > -1)
                     || (typeof(item.description) === 'string' && item.description.toLowerCase().indexOf(keyword) > -1)
@@ -191,10 +195,16 @@ let VueControllerConfig = {
         }
         else {
           let folderName = item.name
-          item.subItems.forEach(item => {
+          let subItems = item.subItems
+          
+          if (Array.isArray(this.cache.subItemsSorted[folderName])) {
+            subItems = this.cache.subItemsSorted[folderName]
+          }
+          
+          subItems.forEach(item => {
             keywords.forEach(keyword => {
               if (keyword === '') {
-                return
+                return false
               }
               if ((item.name.toLowerCase().indexOf(keyword) > -1)
                       || (typeof(item.description) === 'string' && item.description.toLowerCase().indexOf(keyword) > -1)
@@ -422,7 +432,12 @@ let VueControllerConfig = {
     getSortedSubItems: function (folderName, shortcuts) {
       let subItemsSorted = this.lib.FolderConfigHelper.readSubItemSort(this.shortcutsFolderPath, folderName)
       if (subItemsSorted === undefined) {
+        this.cache.subItemsSorted[folderName] = shortcuts
         return shortcuts
+      }
+      
+      if (Array.isArray(this.cache.subItemsSorted[folderName])) {
+        return this.cache.subItemsSorted[folderName]
       }
       
       let sorted = []
@@ -445,6 +460,8 @@ let VueControllerConfig = {
       sorted = sorted.filter(item => (item !== undefined))
       
       //console.log(subItemsSorted)
+      
+      this.cache.subItemsSorted[folderName] = sorted
       
       return sorted
     },
@@ -715,6 +732,7 @@ let VueControllerConfig = {
 
         //console.log(sorted)
         this.lib.FolderConfigHelper.writeSubItemsSort(this.shortcutsFolderPath, folderName, sorted)
+        delete this.cache.subItemsSorted[folderName]
       }, 100)
 
       return this
