@@ -19,16 +19,13 @@ let ShortcutHelper = {
     return {
       icon: this.lib.path.join(__dirname, '/imgs/icons8-app-symbol-256.png'),
       name: `${i} APP`,
-      exec: `C:\\Windows\\notepad.exe "APP ${i}.txt"`,
+      //exec: `C:\\Windows\\notepad.exe "APP ${i}.txt"`,p
+      exec: '"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" --ignore-certificate-errors --app=https://blog.pulipuli.info',
       description: 'description',
       order: i
     }
   },
-  get: function (dirPath) {
-    this.init()
-    
-    // 先做mock
-    
+  createMockShortcuts: function () {
     let shortcuts = []
     
     for (let i = 0; i < 23; i++) {
@@ -74,6 +71,29 @@ let ShortcutHelper = {
       else {
         shortcuts.push(this.buildMockShortcut(i))
       }
+    }
+    return shortcuts
+  },
+  getShortcutsOnWindows: function (dirPath) {
+    console.error('getShortcutsOnWindows');
+    return []
+  },
+  getShortcutsOnLinux: function (dirPath) {
+    console.error('getShortcutsOnLinux');
+    return []
+  },
+  get: function (dirPath) {
+    this.init()
+    
+    // 先做mock
+    let shortcuts
+    return this.createMockShortcuts()
+    
+    if (process.platform === 'win32') {
+      shortcuts = this.getShortcutsOnWindows(dirPath)
+    }
+    else if (process.platform === 'linux') {
+      shortcuts = this.getShortcutsOnLinux(dirPath)
     }
     
     //console.log(shortcuts)

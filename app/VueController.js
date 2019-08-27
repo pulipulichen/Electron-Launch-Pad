@@ -28,6 +28,7 @@ let VueControllerConfig = {
     
     lib: {
       ElectronHelper: null,
+      ElectronFileHelper: null,
       FolderConfigHelper: null,
       electron: null,
       ipc: null,
@@ -51,13 +52,14 @@ let VueControllerConfig = {
       */
     },
     debug: {
-      enableExit: false,
-      enableClick: false,
+      enableExit: true,
+      enableClick: true,
       enableSortPersist: true,
     }
   },
   mounted: function () {
     this.lib.ElectronHelper = RequireHelper.require('./helpers/electron/ElectronHelper')
+    this.lib.ElectronFileHelper = RequireHelper.require('./helpers/electron/ElectronFileHelper')
     this.lib.FolderConfigHelper = RequireHelper.require('./helpers/FolderConfigHelper')
     this.lib.electron = RequireHelper.require('electron')
     this.lib.remote = this.lib.electron.remote
@@ -101,7 +103,8 @@ let VueControllerConfig = {
       return (keyword !== "")
     },
     sortedMainItems: function () {
-      if (this.lib.FolderConfigHelper === null) {
+      if (this.lib.FolderConfigHelper === null
+              || Array.isArray(this.shortcuts) === false) {
         return []
       }
       let {mainItemsSorted, itemsCount} = this.lib.FolderConfigHelper.read(this.shortcutsFolderPath, ['mainItemsSorted', 'itemsCount'])
@@ -981,14 +984,24 @@ let VueControllerConfig = {
       
       //let parameters = []
       this.lib.win.hide()
-      this.lib.execFile(execCommand, (err, data) => {
+      if (process.platform === 'win32') {
+        execCommand = '"' + this.lib.ElectronFileHelper.resolve('exec/exec.exe') + '" ' + execCommand
+        console.log(execCommand)
+      }
+      
+      /*
+      this.lib.exec(execCommand, (err, data) => {
         //console.log(err)
         //console.log(data.toString());
         
         return this.exit()
       })
-      //const { shell } = require('electron')
-      //shell.openExternal(execCommand)
+       */
+      const exec = require('child_process').exec
+      exec(execCommand, () => {
+        return this.exit()
+      })
+      
       //fork(exec)
     },
     displaySearchNameMatch: function (name) {
