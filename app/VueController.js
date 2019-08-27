@@ -52,8 +52,8 @@ let VueControllerConfig = {
       */
     },
     debug: {
-      enableExit: true,
-      enableClick: true,
+      enableExit: false,
+      enableClick: false,
       enableSortPersist: true,
     }
   },
@@ -984,25 +984,10 @@ let VueControllerConfig = {
       
       //let parameters = []
       this.lib.win.hide()
-      if (process.platform === 'win32') {
-        execCommand = '"' + this.lib.ElectronFileHelper.resolve('exec/exec.exe') + '" ' + execCommand
-        console.log(execCommand)
-      }
-      
-      /*
-      this.lib.exec(execCommand, (err, data) => {
-        //console.log(err)
-        //console.log(data.toString());
-        
+      this.lib.ElectronFileHelper.execExternalCommand(execCommand,() => {
         return this.exit()
       })
-       */
-      const exec = require('child_process').exec
-      exec(execCommand, () => {
-        return this.exit()
-      })
-      
-      //fork(exec)
+      return this
     },
     displaySearchNameMatch: function (name) {
       let keywords = this.searchKeyword.trim()

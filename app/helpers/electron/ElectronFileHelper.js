@@ -5,6 +5,7 @@ let ElectronFileHelper = {
     fileType: null,
     path: null,
     fs: null,
+    exec: null,
   },
   init: function () {
     if (this.inited === true) {
@@ -15,6 +16,7 @@ let ElectronFileHelper = {
     this.lib.fileType = RequireHelper.require('file-type')
     this.lib.path = RequireHelper.require('path')
     this.lib.fs = RequireHelper.require('fs')
+    this.lib.exec = RequireHelper.require('child_process').exec
     
     this.inited = true
   },
@@ -110,6 +112,14 @@ let ElectronFileHelper = {
     }
     */
   },
+  execExternalCommand: function (execCommand, callback) {
+    if (process.platform === 'win32') {
+      execCommand = '"' + this.resolve('exec/exec.exe') + '" ' + execCommand
+      console.log(execCommand)
+    }
+    //const exec = require('child_process').exec
+    this.lib.exec(execCommand, callback)
+  }
 }
 
 //ElectronFileHelper.init()
