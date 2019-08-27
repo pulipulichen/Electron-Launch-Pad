@@ -23,6 +23,7 @@ let VueControllerConfig = {
     currentPopupTrigger: null,
     mainItemHotkeyLabelInited: false,
     isSearchInputFocused: false,
+    lastFocusIndex: null,
     
     cache: {
       subItemsSorted: {}
@@ -176,6 +177,7 @@ let VueControllerConfig = {
     },
     searchResultList: function () {
       let keywords = this.searchKeyword.trim().toLowerCase()
+      this.lastFocusIndex = null
       if (keywords === '') {
         return []
       }
@@ -348,14 +350,21 @@ let VueControllerConfig = {
       } 
       return this
     },
+    setLastFocus: function (event) {
+      let item = $(event.target)
+      let index = item.index()
+      this.lastFocusIndex = index
+      return this
+    },
     setupMainItemsKeyEvents: function (container) {
       let options = {
         focus: this.scrollAndFocusMainItem,
         maxCols: this.maxCols,
         pageItemCount: this.pageItemCount,
-        exit: (event) => {
+        exit: (index) => {
           //this.exit()
-          console.log('exit')
+          //console.log('exit')
+          //this.lastFocusIndex = index
           this.$refs.SearchInput.focus()
           //console.log(this.$refs.SearchInput)
           /*
@@ -418,9 +427,12 @@ let VueControllerConfig = {
       }
       */
       
-      let hotkeysHandler = (event, handler) => { 
+      let hotkeysHandler = (event) => { 
         //console.log(handler.key)
-        console.log(event.srcElement)
+        //console.log(event.srcElement)
+        let keyCode = event.keyCode
+        //console.log(keyCode)
+        
         let item = $(event.target)
         let index = item.index()
         let parent = item.parent()
@@ -430,20 +442,20 @@ let VueControllerConfig = {
         let searchItem
         let itemsCount
         
-        switch (handler.key) {
-          case 'left': // left
+        switch (keyCode) {
+          case 37: // left
             // 搜尋前一個不是empty的item
             searchItem = item.prevAll('.launchpad-item:not(.empty):first')
             options.focus(searchItem)
             break
-          case 'right': // right
+          case 39: // right
             searchItem = item.nextAll('.launchpad-item:not(.empty):first')
             options.focus(searchItem)
             break
-          case 'up': // up
+          case 38: // up
             //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
             if (index < options.maxCols) {
-              options.exit(event)
+              options.exit(index)
               return this
             }
             searchItem = item.prevAll(`.launchpad-item:eq(${options.maxCols-1}):first`)
@@ -455,7 +467,7 @@ let VueControllerConfig = {
             }
             options.focus(searchItem)
             break
-          case 'down': // down
+          case 40: // down
             //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
             itemsCount = parent.find('.launchpad-item').length
             if (index > (itemsCount - options.maxCols) ) {
@@ -471,7 +483,7 @@ let VueControllerConfig = {
             }
             options.focus(searchItem)
             break
-          case 'pageup': // page up
+          case 33: // page up
             //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
             if (index < options.pageItemCount) {
               searchItem = parent.children('.launchpad-item:not(.empty):first')
@@ -487,7 +499,7 @@ let VueControllerConfig = {
             }
             options.focus(searchItem)
             break
-          case 'pagedown': // page down
+          case 34: // page down
             //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
             itemsCount = parent.find('.launchpad-item').length
             if (index > (itemsCount - options.pageItemCount) ) {
@@ -505,49 +517,61 @@ let VueControllerConfig = {
             }
             options.focus(searchItem)
             break
-          case 'home': // home
+          case 36: // home
             searchItem = parent.children('.launchpad-item:not(.empty):first')
             options.focus(searchItem)
             break
-          case 'end': // end
+          case 35: // end
             searchItem = parent.children('.launchpad-item:not(.empty):last')
             options.focus(searchItem)
             break
-          case 'enter': // enter
-          case 'space': // space
+          case 13: // enter
+          case 32: // space
             //console.log(item.hasClass('folder'))
             //if (item.hasClass('folder') === false) {
             options.exec(item)
             break
-          case 'esc': // esc
-          case 'backspace': // backspace
-            options.exit()
+          case 27: // esc
+          case 45: // backspace
+            options.exit(index)
             break
         }
         event.preventDefault()
         event.stopPropagation()
       }
       
-      console.log(container.children('.launchpad-item').length)
-      container.children('.launchpad-item').each((i, ele) => {
+      //console.log(container.children('.launchpad-item').length)
+      //container.children('.launchpad-item').each((i, ele) => {
+      /*
+      let ele = container.children('.launchpad-item:not(.empty)')
+      console.log(ele)
         hotkeys('left, right, up, down, pageup, pagedown, home, end, enter, space, esc, backspace', {
           element: ele,
         }, hotkeysHandler)
         //$(ele).addClass('hotkeys-inited')
-      })
+      //})
+      */
+      container.children('.launchpad-item:not(.empty)').keydown(hotkeysHandler)
       
       //console.log(container.find('.launchpad-item').length)
       return this
     },
     onSearchInputFocus: function (event) {
       this.isSearchInputFocused = true
-      $(this.visibleListElement).find('.launchpad-item.visible-in-current-page.item:first').addClass('search-open-candidate')
+      let selector = '.launchpad-item.visible-in-current-page.item:first'
+      if (typeof(this.lastFocusIndex) === 'number') {
+        selector = `.launchpad-item:eq(${this.lastFocusIndex})`
+      }
+      //console.log(['focus', selector, $(this.visibleListElement).find(selector).length])
+      $(this.visibleListElement).find('.search-open-candidate').removeClass('search-open-candidate')
+      $(this.visibleListElement).find(selector).addClass('search-open-candidate')
     },
     onSearchInputBlur: function (event) {
       this.isSearchInputFocused = false
       $(this.visibleListElement).find('.search-open-candidate').removeClass('search-open-candidate')
     },
     onSearchInputKeyDown: function (event) {
+      
       let keyCode = event.keyCode
       let options = {
         focus: this.scrollAndFocusMainItem,
@@ -563,11 +587,20 @@ let VueControllerConfig = {
             this.exit()
           }
         },
-        getFirstItem: (container) => {
+        getLastFocusItem: (container) => {
           // 選擇現在這一頁來focus
-          itemIndex = this.visibleCurrentFirstItemIndex
+          let itemIndex = this.visibleCurrentFirstItemIndex
+          if (this.lastFocusIndex !== null) {
+            itemIndex = this.lastFocusIndex
+          }
+          
           //console.log(itemIndex)
           selectedItem = container.children(`.launchpad-item:eq(${itemIndex})`)
+          if (selectedItem.hasClass('visible-in-current-page') === false) {
+            itemIndex = this.visibleCurrentFirstItemIndex
+            selectedItem = container.children(`.launchpad-item:eq(${itemIndex})`)
+          }
+          
           if (selectedItem.hasClass('empty')) {
             selectedItem = selectedItem.nextAll('.launchpad-item:not(.empty):first')
           }
@@ -594,7 +627,7 @@ let VueControllerConfig = {
         case 40: // down
         case 9:  // tab
           // 選擇現在這一頁來focus
-          selectedItem = options.getFirstItem(container)
+          selectedItem = options.getLastFocusItem(container)
           /*
           if (selectedItem.length > 0) {
             let tmp = selectedItem.nextAll('.launchpad-item:not(.empty):first')
@@ -619,27 +652,35 @@ let VueControllerConfig = {
           options.focus(selectedItem)
           break
         case 34: // pagedown
+          this.lastFocusIndex = null
           this.scrollPage(true, () => {
             this.onSearchInputFocus()
           })
           break
         case 33: // pageup
+          this.lastFocusIndex = null
           this.scrollPage(false, () => {
             this.onSearchInputFocus()
           })
           break
         case 27: // esc
-        case 8: // backspace
+        //case 8: // backspace
           options.exit()
           break
         case 13: // enter
-        case 32: // 32
+        //case 32: // space
           // open first item
-          selectedItem = options.getFirstItem(container)
-          console.log(selectedItem.length)
+          selectedItem = options.getLastFocusItem(container)
+          //console.log(selectedItem.length)
           options.exec(selectedItem)
           break
+        default:
+          setTimeout(() => {
+            this.onSearchInputFocus()
+          })
+          break
       }
+      
     },
     attrTabIndex: function (item) {
       if (item === null) {
@@ -866,7 +907,26 @@ let VueControllerConfig = {
       //console.log('i')
       window.addEventListener("wheel", event => {
         if (this.waitDragScroll === false) {
-          this.scrollPage((event.deltaY > 0))
+          this.scrollPage((event.deltaY > 0), () => {
+            if (this.isSearchInputFocused === true) {
+              this.lastFocusIndex = null
+              this.onSearchInputFocus()
+            }
+            else if (typeof(this.lastFocusIndex) === 'number') {
+              let container = $(this.visibleListElement)
+              let itemIndex = this.visibleCurrentFirstItemIndex
+              selectedItem = container.children(`.launchpad-item:eq(${itemIndex})`)
+              if (selectedItem.hasClass('empty')) {
+                selectedItem = selectedItem.nextAll('.launchpad-item:not(.empty):first')
+              }
+              if (selectedItem.length === 0) {
+                selectedItem = selectedItem.prevAll('.launchpad-item:not(.empty):first')
+              }
+              if (selectedItem.length > 0) {
+                selectedItem.focus()
+              }
+            }
+          })
         }
       })
       

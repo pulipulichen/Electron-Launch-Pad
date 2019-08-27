@@ -156,7 +156,7 @@
             'disabled': waitDragScroll, 
             'is-dragging': enableDragScroll, 
             'hidden': (mainItemsInited === false),
-            'search-input-focused': isSearchInputFocused,
+            'search-input-focused': isSearchInputFocused
          }"
          ref="AppList"
          tabindex="-1"
@@ -169,7 +169,8 @@
               'folder': (item !== null && Array.isArray(item.subItems) === true),
               'visible-in-current-page': isVisibleInCurrentPage(i)
             }"
-           v-bind:tabindex="attrTabIndex(item)">
+           v-bind:tabindex="attrTabIndex(item)"
+           v-on:focus="setLastFocus">
         <div class="item-wrapper"
              v-on:click="exec(item.exec)"
              v-bind:data-shortcut-index="i"
@@ -217,7 +218,11 @@
   <div class="app-list search-result-list"
          id="SearchResultList"
          v-bind:data-page="currentSearchResultPage"
-         v-bind:class="{'disabled': waitDragScroll, 'hidden': (mainItemsInited === false)}"
+         v-bind:class="{
+          'disabled': waitDragScroll, 
+          'hidden': (mainItemsInited === false),
+          'search-input-focused': isSearchInputFocused,
+         }"
          ref="SearchResultList"
          tabindex="-1"
          v-if="isSearchMode === true">
@@ -226,8 +231,10 @@
            v-bind:class="{
             'empty': (item === null),
             'item': (item !== null), 
+            'visible-in-current-page': isVisibleInCurrentPage(i)
            }"
-           v-bind:tabindex="attrTabIndex(item)">
+           v-bind:tabindex="attrTabIndex(item)"
+           v-on:focus="setLastFocus">
         <div class="item-wrapper"
              v-on:click="exec(item.exec)"
              v-bind:data-shortcut-index="i"
