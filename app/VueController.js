@@ -22,7 +22,7 @@ let VueControllerConfig = {
     mainItemsDraggable: null,
     currentPopupTrigger: null,
     mainItemHotkeyLabelInited: false,
-    isSearchInputFocus: false,
+    isSearchInputFocused: false,
     
     cache: {
       subItemsSorted: {}
@@ -396,8 +396,19 @@ let VueControllerConfig = {
     setupItemsKeyEvents: function (container, options) {
       // https://github.com/jaywcjlove/hotkeys
       
+      /*
+      let homeEvent = (parent) => {
+        searchItem = parent.children('.launchpad-item:not(.empty):first')
+        options.focus(searchItem)
+      }
+      let endEvent = (parent) => {
+        searchItem = parent.children('.launchpad-item:not(.empty):first')
+        options.focus(searchItem)
+      }
+      */
+      
       let hotkeysHandler = (event, handler) => { 
-        console.log(handler.key)
+        //console.log(handler.key)
         //console.log(event)
         let item = $(event.target)
         let index = item.index()
@@ -420,7 +431,8 @@ let VueControllerConfig = {
             break
           case 'up': // up
             //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
-            if (index <= options.maxCols) {
+            if (index < options.maxCols) {
+              options.exit()
               return this
             }
             searchItem = item.prevAll(`.launchpad-item:eq(${options.maxCols-1}):first`)
@@ -435,7 +447,7 @@ let VueControllerConfig = {
           case 'down': // down
             //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
             itemsCount = parent.find('.launchpad-item').length
-            if (index >= (itemsCount - options.maxCols) ) {
+            if (index > (itemsCount - options.maxCols) ) {
               // @TODO 這裡可能會有錯
               return this
             }
@@ -657,8 +669,17 @@ let VueControllerConfig = {
 
       switch (keyCode) {
         case 40: // down
+        case 9:  // tab
           // 選擇現在這一頁來focus
           selectedItem = options.getFirstItem(container)
+          /*
+          if (selectedItem.length > 0) {
+            let tmp = selectedItem.nextAll('.launchpad-item:not(.empty):first')
+            if (tmp.length > 0) {
+              selectedItem = tmp
+            }
+          }
+          */
           options.focus(selectedItem)
           break
         case 38: // down
@@ -700,6 +721,9 @@ let VueControllerConfig = {
       else {
         return 0
       }
+    },
+    isVisibleInCurrentPage: function (index) {
+      return (index >= this.visibleCurrentFirstItemIndex && index <= this.visibleCurrentLastItemIndex)
     },
     initPopup: function () {
       

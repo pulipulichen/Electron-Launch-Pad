@@ -54,13 +54,13 @@
     <div class="ui search fluid" 
          v-on:click.stop="">
       <div class="ui icon fluid input">
-        <input type="text" 
+        <input type="text" class="prompt"
                placeholder="Search APP..."
                v-model="searchKeyword"
                ref='SearchInput'
                v-on:keydown="onSearchInputKeyDown(event.keyCode)"
-               v-on:focus="isSearchInputFocus = true"
-               v-on:blur="isSearchInputFocus = false">
+               v-on:focus="isSearchInputFocused = true"
+               v-on:blur="isSearchInputFocused = false">
         <i class="search icon"
            v-if="isSearchMode === false"></i>
         <i class="close icon reset"
@@ -152,13 +152,22 @@
   <div class="app-list"
          id="AppList"
          v-bind:data-page="currentPage"
-         v-bind:class="{'disabled': waitDragScroll, 'is-dragging': enableDragScroll, 'hidden': (mainItemsInited === false)}"
+         v-bind:class="{
+            'disabled': waitDragScroll, 
+            'is-dragging': enableDragScroll, 
+            'hidden': (mainItemsInited === false),
+            'search-input-focused': isSearchInputFocused,
+         }"
          ref="AppList"
          tabindex="-1"
          v-if="isSearchMode === false">
       <div v-for="(item, i) in sortedMainItems"
            class="launchpad-item"
-           v-bind:class="{'empty': (item === null), 'folder': (item !== null && Array.isArray(item.subItems) === true)}"
+           v-bind:class="{
+              'empty': (item === null), 
+              'folder': (item !== null && Array.isArray(item.subItems) === true),
+              'visible-in-current-page': isVisibleInCurrentPage(i)
+            }"
            v-bind:tabindex="attrTabIndex(item)">
         <div class="item-wrapper"
              v-on:click="exec(item.exec)"
