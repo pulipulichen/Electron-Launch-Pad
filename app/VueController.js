@@ -15,6 +15,8 @@ let VueControllerConfig = {
     waitDragScroll: false,
     shortcutsFolderPath: 'folder-path-for-test',
     mainItemsDraggable: null,
+    popupHideDelay: 1000 * 60,
+    dragDelay: 100,
     
     cache: {
       subItemsSorted: {}
@@ -150,7 +152,7 @@ let VueControllerConfig = {
         sortedShortcuts = this.shortcuts
       }
       
-      let pageItemCount = this.maxRows * this.maxCols
+      let pageItemCount = this.pageItemCount
       while (sortedShortcuts.length % pageItemCount !== 0) {
         sortedShortcuts.push(null)
       }
@@ -158,6 +160,9 @@ let VueControllerConfig = {
       this.maxPages = sortedShortcuts.length / pageItemCount
       
       return sortedShortcuts
+    },
+    pageItemCount: function () {
+      return this.maxRows * this.maxCols
     },
     searchResultList: function () {
       let keywords = this.searchKeyword.trim().toLowerCase()
@@ -221,12 +226,12 @@ let VueControllerConfig = {
       return searchResult
     },
     searchResultPageLength: function () {
-      let pageItemCount = this.maxRows * this.maxCols
+      let pageItemCount = this.pageItemCount
       return Math.ceil(this.searchResultList.length / pageItemCount)
     },
     isPageRemovable: function () {
       // 計算現在頁面數量跟格子數量
-      let pageItemCount = this.maxRows * this.maxCols
+      let pageItemCount = this.pageItemCount
       let minItems = pageItemCount * (this.maxPages - 1)
       
       let items = $(this.$refs.AppList).find('.launchpad-item:not(.empty)').length
@@ -263,7 +268,7 @@ let VueControllerConfig = {
         scrollable: {
           speed: 0
         },
-        delay: 100,
+        delay: this.dragDelay,
         handle: 'div.launchpad-item:not(.empty)'
       });
       
@@ -281,29 +286,39 @@ let VueControllerConfig = {
       }, 100)
       return this
     },
+    getPageByItemIndex: function (index) {
+      return Math.floor(index / this.pageItemCount)
+    },
+    scrollAndFocusItem: function (searchItem) {
+      if (searchItem.length > 0) {
+        searchItemPage = this.getPageByItemIndex(searchItem.index())
+        this.scrollPage(searchItemPage, 100, () => {
+          searchItem.focus()
+        })
+      } 
+      return this
+    },
     initLaunchPadKeyEvents: function (container) {
-      container.find('.launchpad-item').bind('keydown', function (event) {
-        let item = $(this)
+      container.find('.launchpad-item').bind('keydown', (event) => {
+        //console.log(event)
+        let item = $(event.target)
         let index = item.index()
         let parent = item.parent()
         //console.log()
         //console.log(item.find('.name:first').text(), event.keyCode)
         let keyCode = event.keyCode
         let searchItem
+        let itemsCount
         
         switch (keyCode) {
           case 37: // left
             // 搜尋前一個不是empty的item
             searchItem = item.prevAll('.launchpad-item:not(.empty):first')
-            if (searchItem.length > 0) {
-              searchItem.focus()
-            } 
+            this.scrollAndFocusItem(searchItem)
             break;
           case 39: // right
             searchItem = item.nextAll('.launchpad-item:not(.empty):first')
-            if (searchItem.length > 0) {
-              searchItem.focus()
-            }
+            this.scrollAndFocusItem(searchItem)
             break;
           case 38: // up
             //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
@@ -317,39 +332,67 @@ let VueControllerConfig = {
             if (searchItem.length === 0) {
               searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
             }
-            if (searchItem.length > 0) {
-              searchItem.focus()
-            }
+            this.scrollAndFocusItem(searchItem)
             break;
           case 40: // down
             //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
-            let itemsCount = parent.find('.launchpad-item').length
-            if (index >= (itemsCount - 4) ) {
+            itemsCount = parent.find('.launchpad-item').length
+            if (index >= (itemsCount - this.maxCols) ) {
               // @TODO 這裡可能會有錯
               return this
             }
-            searchItem = item.nextAll('.launchpad-item:eq(3):first')
+            searchItem = item.nextAll(`.launchpad-item:eq(${this.maxCols-1}):first`)
             if (searchItem.hasClass('empty')) {
               searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
             }
             if (searchItem.length === 0) {
               searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
             }
-            if (searchItem.length > 0) {
-              searchItem.focus()
-            }
-            break;
-            break;
-          case 36: // home
-            break;
-          case 35: // end
+            this.scrollAndFocusItem(searchItem)
             break;
           case 33: // page up
+            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            if (index <= this.pageItemCount) {
+              return this
+            }
+            searchItem = item.prevAll(`.launchpad-item:eq(${this.pageItemCount-1}):first`)
+            if (searchItem.hasClass('empty')) {
+              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length === 0) {
+              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
+            }
+            this.scrollAndFocusItem(searchItem)
             break;
           case 34: // page down
+            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            itemsCount = parent.find('.launchpad-item').length
+            if (index >= (itemsCount - this.pageItemCount) ) {
+              // @TODO 這裡可能會有錯
+              return this
+            }
+            searchItem = item.nextAll(`.launchpad-item:eq(${this.pageItemCount-1}):first`)
+            if (searchItem.hasClass('empty')) {
+              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length === 0) {
+              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
+            }
+            this.scrollAndFocusItem(searchItem)
+            break;
+          case 36: // home
+            searchItem = parent.children('.launchpad-item:not(.empty):first')
+            this.scrollAndFocusItem(searchItem)
+            break;
+          case 35: // end
+            searchItem = parent.children('.launchpad-item:not(.empty):last')
+            this.scrollAndFocusItem(searchItem)
             break;
           case 13: // enter
-          case 32: // enter
+          case 32: // space
+            //console.log(item.hasClass('folder'))
+            //if (item.hasClass('folder') === false) {
+            item.find('.item-wrapper:first').click()
             break;
         }
       })
@@ -379,7 +422,7 @@ let VueControllerConfig = {
         //hoverable: true, 
         delay: {
           //show: 50,
-          hide: 1000 * 30
+          hide: this.popupHideDelay
         },
         exclusive: true,
         movePopup: false,
@@ -404,6 +447,7 @@ let VueControllerConfig = {
             size = ">4"
           }
           html.attr('data-grid-size', size)
+          //html.find('.launchpad-item:first').focus()
           //html.html('AAA')
         },
         onVisible: () => {
@@ -413,11 +457,20 @@ let VueControllerConfig = {
           //$('#redips-drag').css('pointer-events', 'none')
 
           setTimeout(() => {
-            let popupContent = $('.popup-content:visible:first')[0]
+            let popupPanel = $('.popup-panel:visible:first > .launchpad-items-container')
+            //let popupPanel = $('.popup-panel:visible:first')[0]
             //console.log(popupContent)
-            const draggable = new this.lib.Draggable.Sortable(popupContent, {
-              draggable: 'div'
-            });
+            console.log(popupPanel[0])
+            const draggable = new this.lib.Draggable.Sortable(popupPanel[0], {
+              draggable: 'div',
+              delay: this.dragDelay,
+              
+            })
+            
+            setTimeout(() => {
+              //console.log('focus')
+              //popupPanel.find('.launchpad-item:first').focus()
+            }, 0)
           }, 300)
         },
         /*
@@ -487,10 +540,12 @@ let VueControllerConfig = {
           draggable: 'div.launchpad-item'
         });
         
+        /*
         setTimeout(() => {
           container.find('[tabindex="0"]').prop('tabindex', '-1')
           container.prop('tabindex', '-1')
         }, 100)
+         */
         
         
         //draggable.on('drag:start', (event) => {
@@ -569,13 +624,31 @@ let VueControllerConfig = {
         this.scrollPage(true)
       }
     },
-    scrollPage: function (isNext, doTransition) {
+    scrollPage: function (isNext, doTransition, callback) {
       if (this.waitDragScroll === true || this.isPopupVisiable === true) {
         return this
       }
       
+      if (typeof(doTransition) === 'function' && callback === undefined) {
+        callback = doTransition
+        doTransition = true
+      }
+      
+      if (typeof(isNext) === 'number') {
+        if ( (this.isSearchMode === false && isNext === this.currentPage) 
+                || (this.isSearchMode === true && isNext === this.currentSearchResultPage)) {
+          if (typeof(callback) === 'function') {
+            callback(isNext)
+          }
+          return this
+        }
+      }
+      
       let duration = 700
-      if (doTransition === false) {
+      if (typeof(doTransition) === 'number') {
+        duration = doTransition
+      }
+      else if (doTransition === false) {
         duration = 10
       }
       
@@ -620,7 +693,9 @@ let VueControllerConfig = {
       
       appList.animate({
         scrollTop: (appList.height() * page)
-      }, duration);
+      }, duration)
+              .promise()
+              .done(callback);
       
       let pager
       if (this.isSearchMode === false) {
@@ -693,7 +768,7 @@ let VueControllerConfig = {
       }
       //console.error('removePage')
       
-      let itemCountInPage = this.maxCols * this.maxRows
+      let itemCountInPage = this.pageItemCount
       
       let anchorIndex = (this.currentPage * itemCountInPage) - 1
       let anchorItem = $(this.$refs.AppList).children(`.launchpad-item:eq(${anchorIndex})`)
@@ -821,6 +896,7 @@ let VueControllerConfig = {
         return this
       }
       if (this.debug.enableClick === false) {
+        console.log(execCommand)
         return this
       }
       
