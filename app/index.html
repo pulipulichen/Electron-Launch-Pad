@@ -140,6 +140,8 @@
     </button>
   </div>
   
+  <!-- --------------------------------------------------- -->
+  
   <div class="app-list"
          id="AppList"
          v-bind:data-page="currentPage"
@@ -157,7 +159,7 @@
              v-bind:title="displayDescription(item)">
           <template v-if="item === null">
             <img class="icon"
-                 draggable="false"/>
+                 draggable="false" />
             <div class="name">
               (NULL)
             </div>
@@ -186,8 +188,10 @@
           v-on:mouseover="scrollPaddingDragDownEnter"
           v-on:click="scrollPage(true)">
       </div>
-      
   </div>
+  
+  <!-- --------------------------------------------------- -->
+  
   <div class="app-list search-result-list"
          id="SearchResultList"
          v-bind:data-page="currentSearchResultPage"

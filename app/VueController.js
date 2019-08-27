@@ -276,6 +276,85 @@ let VueControllerConfig = {
         this.onMainItemDropped()
       });
       this.mainItemsDraggable = draggable
+      setTimeout(() => {
+        this.initLaunchPadKeyEvents($(this.$refs.AppList))
+      }, 100)
+      return this
+    },
+    initLaunchPadKeyEvents: function (container) {
+      container.find('.launchpad-item').bind('keydown', function (event) {
+        let item = $(this)
+        let index = item.index()
+        let parent = item.parent()
+        //console.log()
+        //console.log(item.find('.name:first').text(), event.keyCode)
+        let keyCode = event.keyCode
+        let searchItem
+        
+        switch (keyCode) {
+          case 37: // left
+            // 搜尋前一個不是empty的item
+            searchItem = item.prevAll('.launchpad-item:not(.empty):first')
+            if (searchItem.length > 0) {
+              searchItem.focus()
+            } 
+            break;
+          case 39: // right
+            searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            if (searchItem.length > 0) {
+              searchItem.focus()
+            }
+            break;
+          case 38: // up
+            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            if (index <= 3) {
+              return this
+            }
+            searchItem = item.prevAll('.launchpad-item:eq(3):first')
+            if (searchItem.hasClass('empty')) {
+              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length === 0) {
+              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length > 0) {
+              searchItem.focus()
+            }
+            break;
+          case 40: // down
+            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            let itemsCount = parent.find('.launchpad-item').length
+            if (index >= (itemsCount - 4) ) {
+              // @TODO 這裡可能會有錯
+              return this
+            }
+            searchItem = item.nextAll('.launchpad-item:eq(3):first')
+            if (searchItem.hasClass('empty')) {
+              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length === 0) {
+              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length > 0) {
+              searchItem.focus()
+            }
+            break;
+            break;
+          case 36: // home
+            break;
+          case 35: // end
+            break;
+          case 33: // page up
+            break;
+          case 34: // page down
+            break;
+          case 13: // enter
+          case 32: // enter
+            break;
+        }
+      })
+      //console.log(container.find('.launchpad-item').length)
+      return this
     },
     getTabIndex: function (item) {
       if (item === null) {
@@ -783,7 +862,7 @@ let VueControllerConfig = {
       //})
       
       return markedName
-    }
+    },
   }
 }
 
