@@ -353,9 +353,20 @@ let VueControllerConfig = {
         focus: this.scrollAndFocusMainItem,
         maxCols: this.maxCols,
         pageItemCount: this.pageItemCount,
-        exit: () => {
+        exit: (event) => {
           //this.exit()
+          console.log('exit')
           this.$refs.SearchInput.focus()
+          //console.log(this.$refs.SearchInput)
+          /*
+          this.$refs.SearchInput.click()
+          setTimeout(() => {
+            console.log('focused')
+            this.$refs.SearchInput.focus()
+          }, 50)
+          event.preventDefault()
+          event.stopPropagation()
+          */
         },
         exec: (item) => {
           if (item.length > 0) {
@@ -409,7 +420,7 @@ let VueControllerConfig = {
       
       let hotkeysHandler = (event, handler) => { 
         //console.log(handler.key)
-        //console.log(event)
+        console.log(event.srcElement)
         let item = $(event.target)
         let index = item.index()
         let parent = item.parent()
@@ -432,7 +443,7 @@ let VueControllerConfig = {
           case 'up': // up
             //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
             if (index < options.maxCols) {
-              options.exit()
+              options.exit(event)
               return this
             }
             searchItem = item.prevAll(`.launchpad-item:eq(${options.maxCols-1}):first`)
@@ -517,7 +528,8 @@ let VueControllerConfig = {
         event.stopPropagation()
       }
       
-      container.find('.launchpad-item').each((i, ele) => {
+      console.log(container.children('.launchpad-item').length)
+      container.children('.launchpad-item').each((i, ele) => {
         hotkeys('left, right, up, down, pageup, pagedown, home, end, enter, space, esc, backspace', {
           element: ele,
         }, hotkeysHandler)
