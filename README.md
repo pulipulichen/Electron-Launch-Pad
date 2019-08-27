@@ -1,7 +1,7 @@
 # Electron-Launch-Pad
 A Mac style launch pad with Electron.js
 
-Last update: 2019/08/26 14:42
+Last merge: 2019/08/27 13:29
 
 - Project: https://github.com/pulipulichen/Electron-Launch-Pad
 - Issues: https://github.com/pulipulichen/Electron-Launch-Pad/issues
