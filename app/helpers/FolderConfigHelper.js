@@ -32,7 +32,7 @@ let FolderConfigHelper = {
   },
   _getConfigPath: function (folderPath) {
     let configName = this._getConfigName(folderPath)
-    let configPath = this.lib.ElectronFileHelper.resolve('config/' + configName)
+    let configPath = this.lib.ElectronFileHelper.resolve('cache/config/' + configName)
     //console.log(configPath)
     return configPath
   },
