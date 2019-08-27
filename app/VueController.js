@@ -1021,6 +1021,9 @@ let VueControllerConfig = {
       return markedName
     },
     setupMainItemHoykeyLabel: function () {
+      // 我現在不想要用這個功能了，關掉它吧
+      return this;
+      
       let container
       if (this.isSearchMode === false) {
         container = $(this.$refs.AppList)
@@ -1030,7 +1033,7 @@ let VueControllerConfig = {
       }
       //console.log(container.children('.launchpad-item').length)
       container.children('.launchpad-item').each((i, item) => {
-        let key = this.calcHotKeyFromItemIndex(i)
+        let key = 'alt+' + this.calcHotKeyFromItemIndex(i)
         let label = $(item).find('.hotkey-label .hotkey')
         label.text(key)
       })
@@ -1038,6 +1041,7 @@ let VueControllerConfig = {
       setTimeout(() => {
         this.mainItemHotkeyLabelInited = true
       }, 500)
+      return this
     },
     calcHotKeyFromItemIndex: function (i) {
       let keyIndex = i % this.pageItemCount
