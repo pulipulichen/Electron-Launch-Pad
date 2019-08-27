@@ -22,6 +22,10 @@
     max-height: calc(100vh - (@searchbar-height * 2));
     overflow-y: auto;
     
+    &.hidden {
+      visibility: hidden;
+    }
+    
     .item {
       //margin-bottom: 1rem;
       height: calc((100vh - (@searchbar-height * 2)) / 20);

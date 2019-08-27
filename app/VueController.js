@@ -1,23 +1,37 @@
 let VueControllerConfig = {
   el: '#app',
   data: {
-    searchKeyword: "",
-    currentSearchResultPage: 0,
-    
-    currentPage: 0,
-    maxPages: 3,
+    popupHideDelay: 1000 * 60,
+    dragDelay: 100,
     maxRows: 4,
     maxCols: 4,
+    hotkeyConfig: [1,2,3,4,'q','w','e','r','a','s','d','f','z','x','c','v'],
+    
+    searchKeyword: "",
+    currentSearchResultPage: 0,
     shortcutDirPath: null,
+    
+    mainItemsInited: false,
+    currentPage: 0,
+    maxPages: 99,
     shortcuts: [],
     enableDragScroll: false,
     isPopupVisiable: false,
     waitDragScroll: false,
     shortcutsFolderPath: 'folder-path-for-test',
     mainItemsDraggable: null,
+    currentPopupTrigger: null,
+    mainItemHotkeyLabelInited: false,
+    isSearchInputFocused: false,
+    lastFocusIndex: null,
+    
+    cache: {
+      subItemsSorted: {}
+    },
     
     lib: {
       ElectronHelper: null,
+      ElectronFileHelper: null,
       FolderConfigHelper: null,
       electron: null,
       ipc: null,
@@ -41,12 +55,14 @@ let VueControllerConfig = {
       */
     },
     debug: {
+      enableExit: false,
       enableClick: false,
-      enableSortPersist: false,
+      enableSortPersist: true,
     }
   },
   mounted: function () {
     this.lib.ElectronHelper = RequireHelper.require('./helpers/electron/ElectronHelper')
+    this.lib.ElectronFileHelper = RequireHelper.require('./helpers/electron/ElectronFileHelper')
     this.lib.FolderConfigHelper = RequireHelper.require('./helpers/FolderConfigHelper')
     this.lib.electron = RequireHelper.require('electron')
     this.lib.remote = this.lib.electron.remote
@@ -90,7 +106,9 @@ let VueControllerConfig = {
       return (keyword !== "")
     },
     sortedMainItems: function () {
-      if (this.lib.FolderConfigHelper === null) {
+      if (this.lib.FolderConfigHelper === null
+              || Array.isArray(this.shortcuts) === false) {
+        this.maxPages = 1
         return []
       }
       let {mainItemsSorted, itemsCount} = this.lib.FolderConfigHelper.read(this.shortcutsFolderPath, ['mainItemsSorted', 'itemsCount'])
@@ -141,22 +159,39 @@ let VueControllerConfig = {
             sortedShortcuts = sortedShortcuts.concat(notInSorted)
           }
         }
+        
+        // 移除最後是null的部分
+        while (sortedShortcuts[(sortedShortcuts.length - 1)] === null) {
+          sortedShortcuts.pop()
+        }
       }
       else {
         sortedShortcuts = this.shortcuts
       }
       
-      let pageItemCount = this.maxRows * this.maxCols
-      while (sortedShortcuts.length % pageItemCount !== 0) {
-        sortedShortcuts.push(null)
+      let pageItemCount = this.pageItemCount
+      if (sortedShortcuts.length > 0) {
+        while (sortedShortcuts.length % pageItemCount !== 0) {
+          sortedShortcuts.push(null)
+        }
+        this.maxPages = sortedShortcuts.length / pageItemCount
       }
-      
-      this.maxPages = sortedShortcuts.length / pageItemCount
+      else {
+        for (let i = 0; i < pageItemCount; i++) {
+          sortedShortcuts.push(null)
+        }
+        this.maxPages = 1
+      }
+      //console.log(sortedShortcuts)
       
       return sortedShortcuts
     },
+    pageItemCount: function () {
+      return this.maxRows * this.maxCols
+    },
     searchResultList: function () {
       let keywords = this.searchKeyword.trim().toLowerCase()
+      this.lastFocusIndex = null
       if (keywords === '') {
         return []
       }
@@ -180,7 +215,7 @@ let VueControllerConfig = {
         if (Array.isArray(item.subItems) === false) {
           keywords.forEach(keyword => {
             if (keyword === '') {
-              return
+              return false
             }
             if ((item.name.toLowerCase().indexOf(keyword) > -1)
                     || (typeof(item.description) === 'string' && item.description.toLowerCase().indexOf(keyword) > -1)
@@ -191,10 +226,16 @@ let VueControllerConfig = {
         }
         else {
           let folderName = item.name
-          item.subItems.forEach(item => {
+          let subItems = item.subItems
+          
+          if (Array.isArray(this.cache.subItemsSorted[folderName])) {
+            subItems = this.cache.subItemsSorted[folderName]
+          }
+          
+          subItems.forEach(item => {
             keywords.forEach(keyword => {
               if (keyword === '') {
-                return
+                return false
               }
               if ((item.name.toLowerCase().indexOf(keyword) > -1)
                       || (typeof(item.description) === 'string' && item.description.toLowerCase().indexOf(keyword) > -1)
@@ -208,20 +249,48 @@ let VueControllerConfig = {
         }
       })
       
+      setTimeout(() => {
+        this.setupMainItemsKeyEvents($(this.$refs.SearchResultList))
+      }, 100)
+      
       return searchResult
     },
     searchResultPageLength: function () {
-      let pageItemCount = this.maxRows * this.maxCols
+      let pageItemCount = this.pageItemCount
       return Math.ceil(this.searchResultList.length / pageItemCount)
     },
     isPageRemovable: function () {
       // 計算現在頁面數量跟格子數量
-      let pageItemCount = this.maxRows * this.maxCols
+      let pageItemCount = this.pageItemCount
       let minItems = pageItemCount * (this.maxPages - 1)
       
       let items = $(this.$refs.AppList).find('.launchpad-item:not(.empty)').length
       
       return (items <= minItems)
+    },
+    visibleCurrentPage: function () {
+      if (this.isSearchMode === false) {
+        return this.currentPage
+      }
+      else {
+        return this.currentSearchResultPage
+      }
+    },
+    visibleCurrentFirstItemIndex: function () {
+      let page = this.visibleCurrentPage
+      return page * this.pageItemCount
+    },
+    visibleCurrentLastItemIndex: function () {
+      let page = this.visibleCurrentPage
+      return ((page + 1) * this.pageItemCount - 1)
+    },
+    visibleListElement: function () {
+      if (this.isSearchMode === false) {
+        return this.$refs.AppList
+      }
+      else {
+        return this.$refs.SearchResultList
+      }
     }
   },
   methods: {
@@ -229,17 +298,29 @@ let VueControllerConfig = {
       this.shortcuts = this.lib.ShortcutHelper.get(this.shortcutDirPath)
       this.initDraggable()
       this.initPopup()
-      this.initHotKeys()
-      this.initCurrentPage()
+      this.initMouseWheelKeys()
+      this.initCurrentPage(() => {
+        this.mainItemsInited = true
+        //this.setupSearchInputKeyEvents()
+        this.$refs.SearchInput.focus()
+      })
     },
-    initCurrentPage: function () {
+    initCurrentPage: function (callback) {
       if (this.debug.enableSortPersist === false) {
         return this
       }
       
       let currentPage = this.lib.FolderConfigHelper.read(this.shortcutsFolderPath, 'currentPage')
       if (typeof(currentPage) === 'number') {
-        this.scrollPage(currentPage, false)
+        //console.log(['initCurrentPage', currentPage])
+        setTimeout(() => {
+          this.scrollPage(currentPage, false, callback)
+        }, 0)
+      }
+      else {
+        if (typeof(callback) === 'function') {
+          callback()
+        }
       }
     },
     initDraggable: function () {
@@ -248,13 +329,13 @@ let VueControllerConfig = {
         this.mainItemsDraggable.destroy()
       }
       
-      const draggable = new this.lib.Draggable.Sortable(document.getElementById('AppList'), {
+      const draggable = new this.lib.Draggable.Sortable(this.$refs.AppList, {
         draggable: 'div.launchpad-item',
         scrollable: {
           speed: 0
         },
-        delay: 100,
-        handle: 'div.launchpad-item:not(.empty)'
+        delay: this.dragDelay,
+        handle: 'div.launchpad-item:not(.empty):not(.sub-item)'
       });
       
       draggable.on('drag:start', (event) => {
@@ -266,8 +347,356 @@ let VueControllerConfig = {
         this.onMainItemDropped()
       });
       this.mainItemsDraggable = draggable
+      setTimeout(() => {
+        this.setupMainItemsKeyEvents($(this.$refs.AppList))
+      }, 100)
+      return this
     },
-    getTabIndex: function (item) {
+    getPageByItemIndex: function (index) {
+      return Math.floor(index / this.pageItemCount)
+    },
+    scrollAndFocusMainItem: function (searchItem) {
+      if (searchItem.length > 0) {
+        searchItemPage = this.getPageByItemIndex(searchItem.index())
+        this.scrollPage(searchItemPage, 100, () => {
+          searchItem.focus()
+        })
+      } 
+      return this
+    },
+    setLastFocus: function (event) {
+      let item = $(event.target)
+      let index = item.index()
+      this.lastFocusIndex = index
+      return this
+    },
+    setupMainItemsKeyEvents: function (container) {
+      let options = {
+        focus: this.scrollAndFocusMainItem,
+        maxCols: this.maxCols,
+        pageItemCount: this.pageItemCount,
+        exit: (index) => {
+          //this.exit()
+          //console.log('exit')
+          //this.lastFocusIndex = index
+          this.$refs.SearchInput.focus()
+          //console.log(this.$refs.SearchInput)
+          /*
+          this.$refs.SearchInput.click()
+          setTimeout(() => {
+            console.log('focused')
+            this.$refs.SearchInput.focus()
+          }, 50)
+          event.preventDefault()
+          event.stopPropagation()
+          */
+        },
+        exec: (item) => {
+          if (item.length > 0) {
+            item.find('.item-wrapper:first').click()
+          }
+        }
+      }
+      return this.setupItemsKeyEvents(container, options)
+    },
+    setupSubItemsKeyEvents: function (container) {
+      let size = container.attr('data-grid-size')
+      size = parseInt(size, 10)
+      
+      let options = {
+        focus: (searchItem) => {
+          if (searchItem.length > 0) {
+            searchItem.focus()
+          }
+        },
+        maxCols: size,
+        pageItemCount: size * size,
+        exit: () => {
+          
+          //this.exit()
+          //console.log('有辦法關閉popup嗎？')
+          if (this.currentPopupTrigger !== null) {
+            let trigger = $(this.currentPopupTrigger)
+            trigger.click()
+            trigger.parents('.launchpad-item:first').focus()
+          }
+        },
+        exec: (item) => {
+          item.click()
+        }
+      }
+      return this.setupItemsKeyEvents(container, options)
+    },
+    setupItemsKeyEvents: function (container, options) {
+      // https://github.com/jaywcjlove/hotkeys
+      
+      /*
+      let homeEvent = (parent) => {
+        searchItem = parent.children('.launchpad-item:not(.empty):first')
+        options.focus(searchItem)
+      }
+      let endEvent = (parent) => {
+        searchItem = parent.children('.launchpad-item:not(.empty):first')
+        options.focus(searchItem)
+      }
+      */
+      
+      let hotkeysHandler = (event) => { 
+        //console.log(handler.key)
+        //console.log(event.srcElement)
+        let keyCode = event.keyCode
+        //console.log(keyCode)
+        
+        let item = $(event.target)
+        let index = item.index()
+        let parent = item.parent()
+        //console.log()
+        //console.log(item.find('.name:first').text(), event.keyCode)
+        //let keyCode = event.keyCode
+        let searchItem
+        let itemsCount
+        
+        switch (keyCode) {
+          case 37: // left
+            // 搜尋前一個不是empty的item
+            searchItem = item.prevAll('.launchpad-item:not(.empty):first')
+            options.focus(searchItem)
+            break
+          case 39: // right
+            searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            options.focus(searchItem)
+            break
+          case 38: // up
+            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            if (index < options.maxCols) {
+              options.exit(index)
+              return this
+            }
+            searchItem = item.prevAll(`.launchpad-item:eq(${options.maxCols-1}):first`)
+            if (searchItem.hasClass('empty')) {
+              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length === 0) {
+              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
+            }
+            options.focus(searchItem)
+            break
+          case 40: // down
+            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            itemsCount = parent.find('.launchpad-item').length
+            if (index > (itemsCount - options.maxCols) ) {
+              // @TODO 這裡可能會有錯
+              return this
+            }
+            searchItem = item.nextAll(`.launchpad-item:eq(${options.maxCols-1}):first`)
+            if (searchItem.hasClass('empty')) {
+              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length === 0) {
+              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
+            }
+            options.focus(searchItem)
+            break
+          case 33: // page up
+            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            if (index < options.pageItemCount) {
+              searchItem = parent.children('.launchpad-item:not(.empty):first')
+              options.focus(searchItem)
+              return this
+            }
+            searchItem = item.prevAll(`.launchpad-item:eq(${options.pageItemCount-1}):first`)
+            if (searchItem.hasClass('empty')) {
+              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length === 0) {
+              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
+            }
+            options.focus(searchItem)
+            break
+          case 34: // page down
+            //let searchItem = item.nextAll('.launchpad-item:not(.empty):first')
+            itemsCount = parent.find('.launchpad-item').length
+            if (index > (itemsCount - options.pageItemCount) ) {
+              // @TODO 這裡可能會有錯
+              searchItem = parent.children('.launchpad-item:not(.empty):last')
+              options.focus(searchItem)
+              return this
+            }
+            searchItem = item.nextAll(`.launchpad-item:eq(${options.pageItemCount-1}):first`)
+            if (searchItem.hasClass('empty')) {
+              searchItem = searchItem.nextAll('.launchpad-item:not(.empty):first')
+            }
+            if (searchItem.length === 0) {
+              searchItem = searchItem.prevAll('.launchpad-item:not(.empty):first')
+            }
+            options.focus(searchItem)
+            break
+          case 36: // home
+            searchItem = parent.children('.launchpad-item:not(.empty):first')
+            options.focus(searchItem)
+            break
+          case 35: // end
+            searchItem = parent.children('.launchpad-item:not(.empty):last')
+            options.focus(searchItem)
+            break
+          case 13: // enter
+          case 32: // space
+            //console.log(item.hasClass('folder'))
+            //if (item.hasClass('folder') === false) {
+            options.exec(item)
+            break
+          case 27: // esc
+          case 45: // backspace
+            options.exit(index)
+            break
+        }
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      
+      //console.log(container.children('.launchpad-item').length)
+      //container.children('.launchpad-item').each((i, ele) => {
+      /*
+      let ele = container.children('.launchpad-item:not(.empty)')
+      console.log(ele)
+        hotkeys('left, right, up, down, pageup, pagedown, home, end, enter, space, esc, backspace', {
+          element: ele,
+        }, hotkeysHandler)
+        //$(ele).addClass('hotkeys-inited')
+      //})
+      */
+      container.children('.launchpad-item:not(.empty)').keydown(hotkeysHandler)
+      
+      //console.log(container.find('.launchpad-item').length)
+      return this
+    },
+    onSearchInputFocus: function (event) {
+      this.isSearchInputFocused = true
+      let selector = '.launchpad-item.visible-in-current-page.item:first'
+      if (typeof(this.lastFocusIndex) === 'number') {
+        selector = `.launchpad-item:eq(${this.lastFocusIndex})`
+      }
+      //console.log(['focus', selector, $(this.visibleListElement).find(selector).length])
+      $(this.visibleListElement).find('.search-open-candidate').removeClass('search-open-candidate')
+      $(this.visibleListElement).find(selector).addClass('search-open-candidate')
+    },
+    onSearchInputBlur: function (event) {
+      this.isSearchInputFocused = false
+      $(this.visibleListElement).find('.search-open-candidate').removeClass('search-open-candidate')
+    },
+    onSearchInputKeyDown: function (event) {
+      
+      let keyCode = event.keyCode
+      let options = {
+        focus: this.scrollAndFocusMainItem,
+        exit: () => {
+          if (this.searchKeyword !== '') {
+            this.searchKeyword = ''
+            event.preventDefault()
+            event.stopPropagation()
+          }
+          else {
+            event.preventDefault()
+            event.stopPropagation()
+            this.exit()
+          }
+        },
+        getLastFocusItem: (container) => {
+          // 選擇現在這一頁來focus
+          let itemIndex = this.visibleCurrentFirstItemIndex
+          if (this.lastFocusIndex !== null) {
+            itemIndex = this.lastFocusIndex
+          }
+          
+          //console.log(itemIndex)
+          selectedItem = container.children(`.launchpad-item:eq(${itemIndex})`)
+          if (selectedItem.hasClass('visible-in-current-page') === false) {
+            itemIndex = this.visibleCurrentFirstItemIndex
+            selectedItem = container.children(`.launchpad-item:eq(${itemIndex})`)
+          }
+          
+          if (selectedItem.hasClass('empty')) {
+            selectedItem = selectedItem.nextAll('.launchpad-item:not(.empty):first')
+          }
+          if (selectedItem.length === 0) {
+            selectedItem = selectedItem.prevAll('.launchpad-item:not(.empty):first')
+          }
+          return selectedItem
+        },
+        exec: (item) => {
+          if (item.length > 0) {
+            event.preventDefault()
+            event.stopPropagation()
+            item.find('.item-wrapper:first').click()
+          }
+        }
+      }
+      
+      //console.log(keyCode)
+      let itemIndex
+      let container = $(this.visibleListElement)
+      let selectedItem
+
+      switch (keyCode) {
+        case 40: // down
+        case 9:  // tab
+          // 選擇現在這一頁來focus
+          selectedItem = options.getLastFocusItem(container)
+          /*
+          if (selectedItem.length > 0) {
+            let tmp = selectedItem.nextAll('.launchpad-item:not(.empty):first')
+            if (tmp.length > 0) {
+              selectedItem = tmp
+            }
+          }
+          */
+          options.focus(selectedItem)
+          break
+        case 38: // down
+          // 選擇現在這一頁來focus
+          itemIndex = this.visibleCurrentLastItemIndex
+          //console.log(itemIndex)
+          selectedItem = container.children(`.launchpad-item:eq(${itemIndex})`)
+          if (selectedItem.hasClass('empty')) {
+            selectedItem = selectedItem.prevAll('.launchpad-item:not(.empty):first')
+          }
+          if (selectedItem.length === 0) {
+            selectedItem = selectedItem.nextAll('.launchpad-item:not(.empty):first')
+          }
+          options.focus(selectedItem)
+          break
+        case 34: // pagedown
+          this.lastFocusIndex = null
+          this.scrollPage(true, () => {
+            this.onSearchInputFocus()
+          })
+          break
+        case 33: // pageup
+          this.lastFocusIndex = null
+          this.scrollPage(false, () => {
+            this.onSearchInputFocus()
+          })
+          break
+        case 27: // esc
+        //case 8: // backspace
+          options.exit()
+          break
+        case 13: // enter
+        //case 32: // space
+          // open first item
+          selectedItem = options.getLastFocusItem(container)
+          //console.log(selectedItem.length)
+          options.exec(selectedItem)
+          break
+        default:
+          setTimeout(() => {
+            this.onSearchInputFocus()
+          })
+          break
+      }
+      
+    },
+    attrTabIndex: function (item) {
       if (item === null) {
         return -1
       }
@@ -275,10 +704,13 @@ let VueControllerConfig = {
         return 0
       }
     },
+    isVisibleInCurrentPage: function (index) {
+      return (index >= this.visibleCurrentFirstItemIndex && index <= this.visibleCurrentLastItemIndex)
+    },
     initPopup: function () {
       
       // https://semantic-ui.com/modules/popup.html
-      let html = $(`<div class="popup-panel" style="overflow: auto;"></div>`)
+      let html = $(`<div class="popup-panel"></div>`)
       //html = $('#AAA')
       
       let popupOptions = {
@@ -290,7 +722,7 @@ let VueControllerConfig = {
         //hoverable: true, 
         delay: {
           //show: 50,
-          hide: 1000 * 30
+          hide: this.popupHideDelay
         },
         exclusive: true,
         movePopup: false,
@@ -298,6 +730,7 @@ let VueControllerConfig = {
         html  : html,  
         onShow: (trigger) => {
           this.isPopupVisiable = true
+          this.currentPopupTrigger = trigger
           let index = trigger.getAttribute('data-shortcut-index')
           index = parseInt(index, 10)
           //console.log(index)
@@ -310,26 +743,34 @@ let VueControllerConfig = {
           // 先做比較簡單的形式吧
           html.html(this.buildSubItems(folderName, subItems))
           
-          let size = Math.ceil(Math.sqrt(subItems.length))
-          if (size > 4) {
-            size = ">4"
-          }
+          let size = this.calcPopupSize(subItems)
           html.attr('data-grid-size', size)
+          //html.find('.launchpad-item:first').focus()
           //html.html('AAA')
         },
         onVisible: () => {
-          this.isPopupVisiable = true
+          //this.isPopupVisiable = true
           //console.log(2)
           //console.log(this)
           //$('#redips-drag').css('pointer-events', 'none')
-
+          /*
           setTimeout(() => {
-            let popupContent = $('.popup-content:visible:first')[0]
+            let popupPanel = $('.popup-panel:visible:first > .launchpad-items-container')
+            //let popupPanel = $('.popup-panel:visible:first')[0]
             //console.log(popupContent)
-            const draggable = new this.lib.Draggable.Sortable(popupContent, {
-              draggable: 'div'
-            });
+            console.log(popupPanel[0])
+            const draggable = new this.lib.Draggable.Sortable(popupPanel[0], {
+              draggable: 'div',
+              delay: this.dragDelay,
+              
+            })
+            
+            setTimeout(() => {
+              //console.log('focus')
+              //popupPanel.find('.launchpad-item:first').focus()
+            }, 0)
           }, 300)
+          */
         },
         /*
         onHide: () => {
@@ -346,6 +787,7 @@ let VueControllerConfig = {
           //$('#redips-drag').css('pointer-events', 'all')
           if ($('.popup-panel:visible').length === 0) {
             this.isPopupVisiable = false
+            this.currentPopupTrigger = null
           }
           //console.log('onHidden')
         }
@@ -367,16 +809,27 @@ let VueControllerConfig = {
         items.popup(popupOptions)
       }, 0)
     },
+    calcPopupSize: function (subItems) {
+      let size = Math.ceil(Math.sqrt(subItems.length))
+      if (size > 4) {
+        size = "4"
+      }
+      return size
+    },
     buildSubItems: function (folderName, shortcuts) {
       let _this = this
       let container = $('<div class="launchpad-items-container"></div>')
       container.attr('data-folder-name', folderName)
+      
+      let size = this.calcPopupSize(shortcuts)
+      container.attr('data-grid-size', size)
+      
       if (Array.isArray(shortcuts)) {
         shortcuts = this.getSortedSubItems(folderName, shortcuts)
         
         shortcuts.forEach((shortcut) => {
           let item = $(`
-            <div class="launchpad-item" 
+            <div class="launchpad-item sub-item" 
                  title="${shortcut.description}"
                  data-exec="${shortcut.exec}">
               <img class="icon" draggable="false"
@@ -395,18 +848,22 @@ let VueControllerConfig = {
         })
         
         const draggable = new this.lib.Draggable.Sortable(container[0], {
-          draggable: 'div.launchpad-item'
-        });
+          draggable: 'div.launchpad-item',
+          delay: this.dragDelay
+        })
         
+        /*
         setTimeout(() => {
           container.find('[tabindex="0"]').prop('tabindex', '-1')
           container.prop('tabindex', '-1')
         }, 100)
+         */
         
         
         //draggable.on('drag:start', (event) => {
         //  console.log('folder item drag:start')
         //});
+        
         draggable.on('drag:stop', (event) => {
           //console.log(event.)
           let container = event.sourceContainer
@@ -414,7 +871,12 @@ let VueControllerConfig = {
           
           this.onSubItemDropped(folderName, container)
           //console.log('folder item drag:stop')
-        });
+        })
+        
+        setTimeout(() => {
+          container.find('.launchpad-item:first').focus()
+          this.setupSubItemsKeyEvents(container)
+        }, 50)
       }
       
       return container
@@ -422,7 +884,12 @@ let VueControllerConfig = {
     getSortedSubItems: function (folderName, shortcuts) {
       let subItemsSorted = this.lib.FolderConfigHelper.readSubItemSort(this.shortcutsFolderPath, folderName)
       if (subItemsSorted === undefined) {
+        this.cache.subItemsSorted[folderName] = shortcuts
         return shortcuts
+      }
+      
+      if (Array.isArray(this.cache.subItemsSorted[folderName])) {
+        return this.cache.subItemsSorted[folderName]
       }
       
       let sorted = []
@@ -446,15 +913,40 @@ let VueControllerConfig = {
       
       //console.log(subItemsSorted)
       
+      this.cache.subItemsSorted[folderName] = sorted
+      
       return sorted
     },
-    initHotKeys: function () {
+    initMouseWheelKeys: function () {
       //console.log('i')
       window.addEventListener("wheel", event => {
         if (this.waitDragScroll === false) {
-          this.scrollPage((event.deltaY > 0))
+          this.scrollPage((event.deltaY > 0), () => {
+            if (this.isSearchInputFocused === true) {
+              this.lastFocusIndex = null
+              this.onSearchInputFocus()
+            }
+            else if (typeof(this.lastFocusIndex) === 'number') {
+              let container = $(this.visibleListElement)
+              let itemIndex = this.visibleCurrentFirstItemIndex
+              selectedItem = container.children(`.launchpad-item:eq(${itemIndex})`)
+              if (selectedItem.hasClass('empty')) {
+                selectedItem = selectedItem.nextAll('.launchpad-item:not(.empty):first')
+              }
+              if (selectedItem.length === 0) {
+                selectedItem = selectedItem.prevAll('.launchpad-item:not(.empty):first')
+              }
+              if (selectedItem.length > 0) {
+                selectedItem.focus()
+              }
+            }
+          })
         }
-      });
+      })
+      
+      setTimeout(() => {
+        this.setupMainItemHoykeyLabel()
+      }, 100)
     },
     scrollPaddingDragUpEnter: function (event) {
       if (this.enableDragScroll === true 
@@ -473,13 +965,31 @@ let VueControllerConfig = {
         this.scrollPage(true)
       }
     },
-    scrollPage: function (isNext, doTransition) {
+    scrollPage: function (isNext, doTransition, callback) {
       if (this.waitDragScroll === true || this.isPopupVisiable === true) {
         return this
       }
       
+      if (typeof(doTransition) === 'function' && callback === undefined) {
+        callback = doTransition
+        doTransition = true
+      }
+      
+      if (typeof(isNext) === 'number') {
+        if ( (this.isSearchMode === false && isNext === this.currentPage) 
+                || (this.isSearchMode === true && isNext === this.currentSearchResultPage)) {
+          if (typeof(callback) === 'function') {
+            callback(isNext)
+          }
+          return this
+        }
+      }
+      
       let duration = 700
-      if (doTransition === false) {
+      if (typeof(doTransition) === 'number') {
+        duration = doTransition
+      }
+      else if (doTransition === false) {
         duration = 10
       }
       
@@ -524,7 +1034,9 @@ let VueControllerConfig = {
       
       appList.animate({
         scrollTop: (appList.height() * page)
-      }, duration);
+      }, duration)
+              .promise()
+              .done(callback);
       
       let pager
       if (this.isSearchMode === false) {
@@ -597,7 +1109,7 @@ let VueControllerConfig = {
       }
       //console.error('removePage')
       
-      let itemCountInPage = this.maxCols * this.maxRows
+      let itemCountInPage = this.pageItemCount
       
       let anchorIndex = (this.currentPage * itemCountInPage) - 1
       let anchorItem = $(this.$refs.AppList).children(`.launchpad-item:eq(${anchorIndex})`)
@@ -660,6 +1172,10 @@ let VueControllerConfig = {
       console.error('change folder')
     },
     exit: function () {
+      if (this.debug.enableExit === false) {
+        console.log('debug: exit()')
+        return this
+      }
       this.lib.win.close()
       return this
     },
@@ -689,6 +1205,8 @@ let VueControllerConfig = {
 
         //console.log(sorted)
         this.lib.FolderConfigHelper.writeMainItemsSort(this.shortcutsFolderPath, sorted, items.length)
+        
+        this.setupMainItemHoykeyLabel()
       }, 100)
               
       return this
@@ -715,6 +1233,7 @@ let VueControllerConfig = {
 
         //console.log(sorted)
         this.lib.FolderConfigHelper.writeSubItemsSort(this.shortcutsFolderPath, folderName, sorted)
+        delete this.cache.subItemsSorted[folderName]
       }, 100)
 
       return this
@@ -724,20 +1243,16 @@ let VueControllerConfig = {
         return this
       }
       if (this.debug.enableClick === false) {
+        console.log(`Degub: ${execCommand}`)
         return this
       }
       
       //let parameters = []
       this.lib.win.hide()
-      this.lib.execFile(execCommand, (err, data) => {
-        //console.log(err)
-        //console.log(data.toString());
-        
+      this.lib.ElectronFileHelper.execExternalCommand(execCommand,() => {
         return this.exit()
       })
-      //const { shell } = require('electron')
-      //shell.openExternal(execCommand)
-      //fork(exec)
+      return this
     },
     displaySearchNameMatch: function (name) {
       let keywords = this.searchKeyword.trim()
@@ -765,6 +1280,38 @@ let VueControllerConfig = {
       //})
       
       return markedName
+    },
+    setupMainItemHoykeyLabel: function () {
+      // 我現在不想要用這個功能了，關掉它吧
+      return this;
+      
+      let container
+      if (this.isSearchMode === false) {
+        container = $(this.$refs.AppList)
+      }
+      else if (this.isSearchMode === true) {
+        container = $(this.$refs.SearchResultList)
+      }
+      //console.log(container.children('.launchpad-item').length)
+      container.children('.launchpad-item').each((i, item) => {
+        let key = 'alt+' + this.calcHotKeyFromItemIndex(i)
+        let label = $(item).find('.hotkey-label .hotkey')
+        label.text(key)
+      })
+      
+      setTimeout(() => {
+        this.mainItemHotkeyLabelInited = true
+      }, 500)
+      return this
+    },
+    calcHotKeyFromItemIndex: function (i) {
+      let keyIndex = i % this.pageItemCount
+      if (typeof(this.hotkeyConfig[keyIndex]) !== 'undefined') {
+        return this.hotkeyConfig[keyIndex]
+      }
+      else {
+        return ''
+      }
     }
   }
 }

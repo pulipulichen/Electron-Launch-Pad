@@ -38,6 +38,7 @@
 <script src="./vendors/draggable/draggable.bundle.js"></script>
 <script src="./vendors/draggable/sortable.js"></script>
 
+<script src="vendors/hotkeys/hotkeys.min.js" ></script>
 
   </head>
   <body>
@@ -53,9 +54,13 @@
     <div class="ui search fluid" 
          v-on:click.stop="">
       <div class="ui icon fluid input">
-        <input class="prompt" type="text" 
+        <input type="text" class="prompt"
                placeholder="Search APP..."
-               v-model="searchKeyword">
+               v-model="searchKeyword"
+               ref='SearchInput'
+               v-on:keydown="onSearchInputKeyDown(event)"
+               v-on:focus="onSearchInputFocus"
+               v-on:blur="onSearchInputBlur">
         <i class="search icon"
            v-if="isSearchMode === false"></i>
         <i class="close icon reset"
@@ -83,7 +88,8 @@
   <div class="pager"
        v-on:wheel.stop=""
        ref="pager"
-       v-if="isSearchMode === false">
+       v-if="isSearchMode === false"
+       v-bind:class="{'hidden': (mainItemsInited === false)}">
     <div v-for="i in maxPages"
          class="item"
          v-bind:class="{'current': ((i-1) === currentPage), 'disabled': waitDragScroll}"
@@ -94,7 +100,8 @@
   <div class="pager"
        v-on:wheel.stop=""
        ref="searchResultPager"
-       v-if="isSearchMode === true">
+       v-if="isSearchMode === true"
+       v-bind:class="{'hidden': (mainItemsInited === false)}">
     <div v-for="i in searchResultPageLength"
          class="item"
          v-bind:class="{'current': ((i-1) === currentSearchResultPage), 'disabled': waitDragScroll}"
@@ -140,24 +147,42 @@
     </button>
   </div>
   
+  <!-- --------------------------------------------------- -->
+  
   <div class="app-list"
          id="AppList"
          v-bind:data-page="currentPage"
-         v-bind:class="{'disabled': waitDragScroll}"
+         v-bind:class="{
+            'disabled': waitDragScroll, 
+            'is-dragging': enableDragScroll, 
+            'hidden': (mainItemsInited === false),
+            'search-input-focused': isSearchInputFocused
+         }"
          ref="AppList"
          tabindex="-1"
          v-if="isSearchMode === false">
       <div v-for="(item, i) in sortedMainItems"
            class="launchpad-item"
-           v-bind:class="{'empty': (item === null), 'folder': (item !== null && Array.isArray(item.subItems) === true)}"
-           v-bind:tabindex="getTabIndex(item)">
+           v-bind:class="{
+              'empty': (item === null), 
+              'item': (item !== null), 
+              'folder': (item !== null && Array.isArray(item.subItems) === true),
+              'visible-in-current-page': isVisibleInCurrentPage(i)
+            }"
+           v-bind:tabindex="attrTabIndex(item)"
+           v-on:focus="setLastFocus">
         <div class="item-wrapper"
              v-on:click="exec(item.exec)"
              v-bind:data-shortcut-index="i"
              v-bind:title="displayDescription(item)">
+          <div class="hotkey-label"
+               v-bind:class="{'hide': (mainItemHotkeyLabelInited === false || enableDragScroll)}">
+            <span class="background"></span>
+            <span class="hotkey">1</span>
+          </div>
           <template v-if="item === null">
             <img class="icon"
-                 draggable="false"/>
+                 draggable="false" />
             <div class="name">
               (NULL)
             </div>
@@ -186,23 +211,39 @@
           v-on:mouseover="scrollPaddingDragDownEnter"
           v-on:click="scrollPage(true)">
       </div>
-      
   </div>
+  
+  <!-- --------------------------------------------------- -->
+  
   <div class="app-list search-result-list"
          id="SearchResultList"
          v-bind:data-page="currentSearchResultPage"
-         v-bind:class="{'disabled': waitDragScroll}"
+         v-bind:class="{
+          'disabled': waitDragScroll, 
+          'hidden': (mainItemsInited === false),
+          'search-input-focused': isSearchInputFocused,
+         }"
          ref="SearchResultList"
          tabindex="-1"
          v-if="isSearchMode === true">
       <div v-for="(item, i) in searchResultList"
            class="launchpad-item"
-           v-bind:class="{'empty': (item === null)}"
-           v-bind:tabindex="getTabIndex(item)">
+           v-bind:class="{
+            'empty': (item === null),
+            'item': (item !== null), 
+            'visible-in-current-page': isVisibleInCurrentPage(i)
+           }"
+           v-bind:tabindex="attrTabIndex(item)"
+           v-on:focus="setLastFocus">
         <div class="item-wrapper"
              v-on:click="exec(item.exec)"
              v-bind:data-shortcut-index="i"
              v-bind:title="displayDescription(item)">
+          <div class="hotkey-label"
+               v-bind:class="{'hide': (mainItemHotkeyLabelInited === false || enableDragScroll)}">
+            <span class="background"></span>
+            <span class="hotkey">1</span>
+          </div>
           <template v-if="item === null">
             <img class="icon"
                  draggable="false"/>
