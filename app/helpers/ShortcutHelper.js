@@ -19,7 +19,7 @@ let ShortcutHelper = {
     return {
       icon: this.lib.path.join(__dirname, '/imgs/icons8-app-symbol-256.png'),
       name: `${i} APP`,
-      exec: `C:\\Windows\\notepad.exe`,
+      exec: `C:\\Windows\\notepad.exe "APP ${i}.txt"`,
       description: 'description',
       order: i
     }
