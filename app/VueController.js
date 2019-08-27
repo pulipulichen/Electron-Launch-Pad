@@ -231,6 +231,10 @@ let VueControllerConfig = {
         }
       })
       
+      setTimeout(() => {
+        this.setupMainItemsKeyEvents($(this.$refs.SearchResultList))
+      }, 100)
+      
       return searchResult
     },
     searchResultPageLength: function () {
