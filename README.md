@@ -24,6 +24,9 @@ Last merge: 2019/08/27 13:29
 - https://github.com/jaywcjlove/hotkeys/blob/44283e7c1ea679cf5041a215d3266f19334ed1d3/src/var.js
 - https://keycode.info/
 
+# windows-shortcuts
+- https://www.npmjs.com/package/windows-shortcuts
+
 ----
 
 # NPM

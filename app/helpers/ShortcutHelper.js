@@ -75,8 +75,57 @@ let ShortcutHelper = {
     return shortcuts
   },
   getShortcutsOnWindows: function (dirPath) {
+    dirPath = 'D:/xampp/htdocs/projects-electron/Electron-Launch-Pad/demo-shortcuts/win32'
+    
+const path = require('path');
+const fs = require('fs');
+//joining path of directory 
+const directoryPath = dirPath
+//passsing directoryPath and callback function
+fs.readdir(directoryPath, (err, files) => {
+    //handling error
+    if (err) {
+        return console.log('Unable to scan directory: ' + err);
+    } 
+    //listing all files using forEach
+    files.forEach((file) => {
+        // Do whatever you want to do with the file
+        let filepath = path.join(dirPath, file)
+        let isDir = fs.lstatSync(filepath).isDirectory()
+        console.log(file, isDir); 
+        
+        if (file.endsWith('.lnk')) {
+          var ws = require('windows-shortcuts');
+          ws.query(filepath, (err, data) => {
+            console.log(data)
+            
+            let icon = data.icon
+            if (icon === '') {
+              icon = data.target
+            }
+            if (icon.endsWith('.exe')) {
+              this.getIconFromEXE(icon)
+            }
+          });
+ 
+        }
+    });
+});
+    
     console.error('getShortcutsOnWindows');
     return []
+  },
+  getIconFromEXE: function (filepath, callback) {
+    var iconExtractor = require('icon-extractor');
+
+    iconExtractor.emitter.on('icon', function (data) {
+      //console.log('Here is my context: ' + data.Context);
+      //console.log('Here is the path it was for: ' + data.Path);
+      var icon = data.Base64ImageData;
+      console.log(icon)
+    });
+
+    iconExtractor.getIcon('ANY_TEXT', filepath);
   },
   getShortcutsOnLinux: function (dirPath) {
     console.error('getShortcutsOnLinux');
@@ -87,7 +136,7 @@ let ShortcutHelper = {
     
     // 先做mock
     let shortcuts
-    return this.createMockShortcuts()
+    //return this.createMockShortcuts()
     
     if (process.platform === 'win32') {
       shortcuts = this.getShortcutsOnWindows(dirPath)

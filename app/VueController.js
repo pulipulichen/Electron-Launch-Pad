@@ -9,11 +9,11 @@ let VueControllerConfig = {
     
     searchKeyword: "",
     currentSearchResultPage: 0,
+    shortcutDirPath: null,
     
     mainItemsInited: false,
     currentPage: 0,
     maxPages: 99,
-    shortcutDirPath: null,
     shortcuts: [],
     enableDragScroll: false,
     isPopupVisiable: false,
@@ -108,6 +108,7 @@ let VueControllerConfig = {
     sortedMainItems: function () {
       if (this.lib.FolderConfigHelper === null
               || Array.isArray(this.shortcuts) === false) {
+        this.maxPages = 1
         return []
       }
       let {mainItemsSorted, itemsCount} = this.lib.FolderConfigHelper.read(this.shortcutsFolderPath, ['mainItemsSorted', 'itemsCount'])
@@ -158,17 +159,30 @@ let VueControllerConfig = {
             sortedShortcuts = sortedShortcuts.concat(notInSorted)
           }
         }
+        
+        // 移除最後是null的部分
+        while (sortedShortcuts[(sortedShortcuts.length - 1)] === null) {
+          sortedShortcuts.pop()
+        }
       }
       else {
         sortedShortcuts = this.shortcuts
       }
       
       let pageItemCount = this.pageItemCount
-      while (sortedShortcuts.length % pageItemCount !== 0) {
-        sortedShortcuts.push(null)
+      if (sortedShortcuts.length > 0) {
+        while (sortedShortcuts.length % pageItemCount !== 0) {
+          sortedShortcuts.push(null)
+        }
+        this.maxPages = sortedShortcuts.length / pageItemCount
       }
-      
-      this.maxPages = sortedShortcuts.length / pageItemCount
+      else {
+        for (let i = 0; i < pageItemCount; i++) {
+          sortedShortcuts.push(null)
+        }
+        this.maxPages = 1
+      }
+      //console.log(sortedShortcuts)
       
       return sortedShortcuts
     },
