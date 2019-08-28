@@ -1,3 +1,5 @@
+/* global __dirname */
+
 let ElectronFileHelper = {
   inited: false,
   lib: {
@@ -9,7 +11,7 @@ let ElectronFileHelper = {
   },
   init: function () {
     if (this.inited === true) {
-      return
+      return this
     }
     
     this.lib.readChunk = RequireHelper.require('read-chunk')
@@ -45,10 +47,63 @@ let ElectronFileHelper = {
     return this.lib.fs.existsSync(filepath)
   },
   readFileSync: function (filepath) {
+    this.init()
     return this.lib.fs.readFileSync(filepath, 'utf8')
   },
   writeFileSync: function (filepath, content) {
-    return this.lib.fs.writeFileSync(filepath, content, 'utf8')
+    this.init()
+    this.lib.fs.writeFileSync(filepath, content, 'utf8')
+    return filepath
+  },
+  writeFileAsync: function (filepath, content, callback) {
+    this.init()
+    this.lib.fs.writeFile(filepath, content, 'utf8', () => {
+      if (typeof(callback) === 'function') {
+        callback(filepath, content)
+      }
+    })
+    return this
+  },
+  writeFileDelayTimer: {},
+  /**
+   * 
+   * @param {type} filepath
+   * @param {type} content
+   * @param {type} delaySec 延遲時間，預設是1秒
+   * @param {type} callback
+   * @returns {unresolved}
+   */
+  writeFileDelay: function (filepath, content, delaySec, callback) {
+    this.init()
+    if (typeof(delaySec) === 'function') {
+      callback = delaySec
+      delaySec = 1000
+    }
+    if (typeof(callback) !== 'function') {
+      callback = () => {}
+    }
+    
+    if (this.writeFileDelayTimer[filepath] !== null) {
+      clearTimeout(this.writeFileDelayTimer[filepath])
+      this.writeFileDelayTimer[filepath] = null
+    }
+    
+    this.writeFileDelayTimer[filepath] = setTimeout(() => {
+      this.writeFileAsync(filepath, content, () => {
+        this.writeFileDelayTimer[filepath] = null
+        
+        if (typeof(callback) === 'function') {
+          callback(filepath)
+        }
+      })
+    }, delaySec * 1000)
+    
+    return this
+  },
+  writeFileBase64Sync: function (filepath, base64) {
+    this.init()
+    this.lib.fs.writeFileSync(filepath, base64, 'base64')
+    return this
   },
   getBasePath: function () {
     this.init()

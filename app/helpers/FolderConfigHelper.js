@@ -5,6 +5,7 @@ let FolderConfigHelper = {
     ElectronFileHelper: null,
     path: null
   },
+  cache: {},
   init: function () {
     if (this.inited === true) {
       return this
@@ -32,7 +33,7 @@ let FolderConfigHelper = {
   },
   _getConfigPath: function (folderPath) {
     let configName = this._getConfigName(folderPath)
-    let configPath = this.lib.ElectronFileHelper.resolve('config/' + configName)
+    let configPath = this.lib.ElectronFileHelper.resolve('cache/config/' + configName)
     //console.log(configPath)
     return configPath
   },
@@ -56,34 +57,40 @@ let FolderConfigHelper = {
     
     this.init()
     
-    let configPath = this._getConfigPath(folderPath)
-    
-    if (this.lib.ElectronFileHelper.existsSync(configPath) === false) {
-      if (typeof(key) === 'string') {
-        return undefined
-      }
-      else if (Array.isArray(key) === true) {
-        let result = {}
-        key.forEach(k => {
-          result[k] = undefined
-        })
-        return result
-      }
-      else {
-        return {}
-      }
-    }
-    
-    let configText = this.lib.ElectronFileHelper.readFileSync(configPath)
     let configJSON = {}
-    try {
-      configText = configText.trim()
-      if (configText !== '' && configText.startsWith('{') && configText.endsWith('}')) {
-        configJSON = JSON.parse(configText)
+    if (typeof(this.cache[folderPath]) === 'undefined') {
+
+      let configPath = this._getConfigPath(folderPath)
+
+      if (this.lib.ElectronFileHelper.existsSync(configPath) === false) {
+        if (typeof(key) === 'string') {
+          return undefined
+        }
+        else if (Array.isArray(key) === true) {
+          let result = {}
+          key.forEach(k => {
+            result[k] = undefined
+          })
+          return result
+        }
+        else {
+          return {}
+        }
+      }
+
+      let configText = this.lib.ElectronFileHelper.readFileSync(configPath)
+      try {
+        configText = configText.trim()
+        if (configText !== '' && configText.startsWith('{') && configText.endsWith('}')) {
+          configJSON = JSON.parse(configText)
+        }
+      }
+      catch (e) {
+        console.error(e)
       }
     }
-    catch (e) {
-      console.error(e)
+    else {
+      configJSON = this.cache[folderPath]
     }
     
     if (typeof(key) === 'string') {
@@ -141,7 +148,7 @@ let FolderConfigHelper = {
     
     let configPath = this._getConfigPath(folderPath)
     let configText = JSON.stringify(configJSON, null, "\t")
-    this.lib.ElectronFileHelper.writeFileSync(configPath, configText)
+    this.lib.ElectronFileHelper.writeFileDelay(configPath, configText)
     return this
   },
   writeMainItemsSort: function (folderPath, sorted, itemsCount) {
