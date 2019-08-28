@@ -1,3 +1,5 @@
+/* global __dirname */
+
 let ElectronFileHelper = {
   inited: false,
   lib: {
@@ -6,10 +8,12 @@ let ElectronFileHelper = {
     path: null,
     fs: null,
     exec: null,
+    shell: null,
+    electron: null,
   },
   init: function () {
     if (this.inited === true) {
-      return
+      return this
     }
     
     this.lib.readChunk = RequireHelper.require('read-chunk')
@@ -17,6 +21,9 @@ let ElectronFileHelper = {
     this.lib.path = RequireHelper.require('path')
     this.lib.fs = RequireHelper.require('fs')
     this.lib.exec = RequireHelper.require('child_process').exec
+    
+    this.lib.electron = RequireHelper.require('electron')
+    this.lib.shell = this.lib.electron.shell
     
     this.inited = true
   },
@@ -44,11 +51,74 @@ let ElectronFileHelper = {
     this.init()
     return this.lib.fs.existsSync(filepath)
   },
+  isDirSync: function (dirpath) {
+    this.init()
+    if (this.existsSync(dirpath)) {
+      
+      return this.lib.fs.lstatSync(dirpath).isDirectory()
+    }
+    else {
+      return false
+    }
+  },
   readFileSync: function (filepath) {
+    this.init()
     return this.lib.fs.readFileSync(filepath, 'utf8')
   },
   writeFileSync: function (filepath, content) {
-    return this.lib.fs.writeFileSync(filepath, content, 'utf8')
+    this.init()
+    this.lib.fs.writeFileSync(filepath, content, 'utf8')
+    return filepath
+  },
+  writeFileAsync: function (filepath, content, callback) {
+    this.init()
+    this.lib.fs.writeFile(filepath, content, 'utf8', () => {
+      if (typeof(callback) === 'function') {
+        callback(filepath, content)
+      }
+    })
+    return this
+  },
+  writeFileDelayTimer: {},
+  /**
+   * 
+   * @param {type} filepath
+   * @param {type} content
+   * @param {type} delaySec 延遲時間，預設是1秒
+   * @param {type} callback
+   * @returns {unresolved}
+   */
+  writeFileDelay: function (filepath, content, delaySec, callback) {
+    this.init()
+    if (typeof(delaySec) === 'function') {
+      callback = delaySec
+      delaySec = 1000
+    }
+    if (typeof(callback) !== 'function') {
+      callback = () => {}
+    }
+    
+    if (this.writeFileDelayTimer[filepath] !== null) {
+      clearTimeout(this.writeFileDelayTimer[filepath])
+      this.writeFileDelayTimer[filepath] = null
+    }
+    
+    this.writeFileDelayTimer[filepath] = setTimeout(() => {
+      this.writeFileAsync(filepath, content, () => {
+        this.writeFileDelayTimer[filepath] = null
+        
+        if (typeof(callback) === 'function') {
+          callback(filepath)
+        }
+      })
+    }, delaySec * 1000)
+    
+    return this
+  },
+  writeFileBase64Sync: function (filepath, base64) {
+    this.init()
+    this.lib.fs.writeFileSync(filepath, base64, 'base64')
+    return this
   },
   writeFileBase64Sync: function (filepath, content) {
     return this.lib.fs.writeFileSync(filepath, content, 'base64')
@@ -122,6 +192,12 @@ let ElectronFileHelper = {
     }
     //const exec = require('child_process').exec
     this.lib.exec(execCommand, callback)
+  },
+  showInFolder: function (path) {
+    if (this.existsSync(path)) {
+      this.lib.shell.openExternal(path)
+    }
+    return this
   }
 }
 

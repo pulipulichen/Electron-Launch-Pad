@@ -9,7 +9,7 @@ let VueControllerConfig = {
     
     searchKeyword: "",
     currentSearchResultPage: 0,
-    shortcutDirPath: null,
+    shortcutsDirPath: null,
     
     mainItemsInited: false,
     currentPage: 0,
@@ -55,6 +55,7 @@ let VueControllerConfig = {
       */
     },
     debug: {
+      enableAskDirPath: false,
       enableExit: false,
       enableClick: false,
       enableSortPersist: true,
@@ -70,6 +71,7 @@ let VueControllerConfig = {
     this.lib.win = this.lib.remote.getCurrentWindow()
     this.lib.mode = this.lib.win.mode
     this.lib.shortcutDirPath = this.lib.win.shortcutDirPath
+    this.lib.ipc = this.lib.electron.ipcRenderer
     
     //this.lib.REDIPSHelper = RequireHelper.require('./helpers/REDIPSHelper')
     this.lib.ShortcutHelper = RequireHelper.require('./helpers/ShortcutHelper')
@@ -299,10 +301,16 @@ let VueControllerConfig = {
       this.initDraggable()
       this.initPopup()
       this.initMouseWheelKeys()
+      this.initIPCEvent()
       this.initCurrentPage(() => {
         this.mainItemsInited = true
         //this.setupSearchInputKeyEvents()
         this.$refs.SearchInput.focus()
+        
+        if (this.debug.enableAskDirPath === true 
+                && this.lib.ElectronFileHelper.isDirSync(this.shortcutsDirPath) === false) {
+          this.changeFolder()
+        }
       })
     },
     initCurrentPage: function (callback) {
@@ -351,6 +359,14 @@ let VueControllerConfig = {
         this.setupMainItemsKeyEvents($(this.$refs.AppList))
       }, 100)
       return this
+    },
+    initIPCEvent: function () {
+      //this.lib.ipc.send('select-folder', filepath)
+      
+      this.lib.ipc.on('change-folder-callback', (event, path) => {
+        //console.log(['[', path, ']'])
+        this.changeFolderCallback(path)
+      })
     },
     getPageByItemIndex: function (index) {
       return Math.floor(index / this.pageItemCount)
@@ -1166,10 +1182,29 @@ let VueControllerConfig = {
       }
     },
     openFolder: function () {
-      console.error('open folder')
+      //console.error('openFolder folder')
+      let dirpath = this.shortcutsDirPath
+      if (typeof(dirpath) === 'string'
+              && this.lib.ElectronFileHelper.isDirSync(dirpath)) {
+        //console.log(dirpath)
+        this.lib.ElectronFileHelper.showInFolder(dirpath)
+        this.exit()
+      }
+      return this
     },
     changeFolder: function () {
-      console.error('change folder')
+      //console.error('change folder')
+      //this.lib.ipc.send
+      this.lib.ipc.send('change-folder', this.shortcutsDirPath)
+      return this
+    },
+    changeFolderCallback: function (dirpath) {
+      if (typeof(dirpath) === 'string'
+              && this.lib.ElectronFileHelper.isDirSync(dirpath)) {
+        //console.log(dirpath)
+        this.shortcutsDirPath = dirpath
+      }
+      return this
     },
     exit: function () {
       if (this.debug.enableExit === false) {

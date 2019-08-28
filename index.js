@@ -40,4 +40,5 @@ app.on('ready', () => {
 
 const createWindow = require('./electron-shell/CreateWindow')
 
-require('./electron-shell/IpcEventManager')
+const IPCEventManager = require('./electron-shell/IpcEventManager')
+IPCEventManager()
