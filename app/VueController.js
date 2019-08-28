@@ -1165,8 +1165,14 @@ let VueControllerConfig = {
         return item.description
       }
     },
+    openFolderTrigger: function () {
+      this.$refs.FolderSelectInput.click()
+      return this
+    },
     openFolder: function () {
-      console.error('open folder')
+      let folderPath = this.$refs.FolderSelectInput.value
+      console.error(folderPath)
+      this.$refs.FolderSelectInput.value = ''
     },
     changeFolder: function () {
       console.error('change folder')
