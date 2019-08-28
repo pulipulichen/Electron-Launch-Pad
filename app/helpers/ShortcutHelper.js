@@ -136,7 +136,7 @@ fs.readdir(directoryPath, (err, files) => {
     
     // 先做mock
     let shortcuts
-    //return this.createMockShortcuts()
+    return this.createMockShortcuts()
     
     if (process.platform === 'win32') {
       shortcuts = this.getShortcutsOnWindows(dirPath)
