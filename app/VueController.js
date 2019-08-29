@@ -852,13 +852,14 @@ let VueControllerConfig = {
         shortcuts.forEach((shortcut) => {
           let item = $(`
             <div class="launchpad-item sub-item" 
-                 title="${shortcut.description}"
-                 data-exec="${shortcut.exec}">
+                 title="${shortcut.description}">
               <img class="icon" draggable="false" />
               <div class="name">
                 ${shortcut.name}
               </div>
             </div>`)
+          
+          item.attr('data-exec', shortcut.exec)
           
           if (typeof(shortcut.icon) === 'string') {
             item.find('img.icon').attr('src', shortcut.icon)

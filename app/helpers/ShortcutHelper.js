@@ -1,8 +1,8 @@
 let ShortcutHelper = {
   debug: {
-    enableShortcutCache: false,
-    enableIconCache: false,
-    useTextDir: false,
+    enableShortcutCache: true,
+    enableIconCache: true,
+    useTestDir: false,
   },
   inited: false,
   lib: {

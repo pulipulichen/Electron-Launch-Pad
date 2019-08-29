@@ -202,7 +202,7 @@ let ElectronFileHelper = {
         }
       }
       else {
-        execCommand = '"' + this.resolve('win32-helpers/exec-external/exec-external.exe') + '" "' + execCommand + '"'
+        execCommand = '"' + this.resolve('win32-helpers/exec-external/exec-external.exe') + '" ' + execCommand
         console.log(execCommand)
 
         //const exec = require('child_process').exec
