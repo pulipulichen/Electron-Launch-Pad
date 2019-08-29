@@ -9,6 +9,7 @@ let ElectronFileHelper = {
     fs: null,
     exec: null,
     shell: null,
+    spawn: null,
     electron: null,
   },
   init: function () {
@@ -20,7 +21,9 @@ let ElectronFileHelper = {
     this.lib.fileType = RequireHelper.require('file-type')
     this.lib.path = RequireHelper.require('path')
     this.lib.fs = RequireHelper.require('fs')
-    this.lib.exec = RequireHelper.require('child_process').exec
+    const child_process = RequireHelper.require('child_process')
+    this.lib.exec = child_process.exec
+    this.lib.spawn = child_process.spawn
     
     this.lib.electron = RequireHelper.require('electron')
     this.lib.shell = this.lib.electron.shell
@@ -90,9 +93,12 @@ let ElectronFileHelper = {
    */
   writeFileDelay: function (filepath, content, delaySec, callback) {
     this.init()
+    //console.log(filepath)
+    //return this.writeFileSync(filepath, content)
+    
     if (typeof(delaySec) === 'function') {
       callback = delaySec
-      delaySec = 1000
+      delaySec = 1
     }
     if (typeof(callback) !== 'function') {
       callback = () => {}
@@ -103,8 +109,9 @@ let ElectronFileHelper = {
       this.writeFileDelayTimer[filepath] = null
     }
     
+    //console.log('writeFile', filepath)
     this.writeFileDelayTimer[filepath] = setTimeout(() => {
-      this.writeFileAsync(filepath, content, () => {
+      this.writeFileSync(filepath, content, () => {
         this.writeFileDelayTimer[filepath] = null
         
         if (typeof(callback) === 'function') {
@@ -186,14 +193,84 @@ let ElectronFileHelper = {
     if (process.platform === 'win32') {
       execCommand = '"' + this.resolve('exec/exec.exe') + '" ' + execCommand
       console.log(execCommand)
+      
+      //const exec = require('child_process').exec
+      this.lib.exec(execCommand, callback)
     }
-    //const exec = require('child_process').exec
-    this.lib.exec(execCommand, callback)
+    else if (process.platform === 'linux') {
+      //execCommand = `nohup ${execCommand} &`
+      //console.log(execCommand)
+      
+      /*
+      let spawn = require('child_process').spawn
+      //spawn("gedit", {}, {shell: true})
+      // /opt/google/chrome/google-chrome --app=http://blog.pulipuli.info
+      spawn("/opt/google/chrome/google-chrome", [
+        '--app=http://blog.pulipuli.info'
+      ], {shell: true})
+       */
+      //let te= require('terminal-exec')
+      //te('/opt/google/chrome/google-chrome --app=http://blog.pulipuli.info')
+      //te('gedit')
+      
+      execCommand = `nohup /usr/bin/xfce4-terminal --command "${execCommand}" &`
+      
+      this.lib.exec(execCommand, callback)
+      //callback()
+      /*
+      this.lib.spawn('/usr/bin/xfce4-terminal', [
+        "--command",
+        "/opt/google/chrome/google-chrome --app=http://blog.pulipuli.info"
+      ])
+      //callback()
+      */
+    }
   },
   showInFolder: function (path) {
     if (this.existsSync(path)) {
       this.lib.shell.openExternal(path)
     }
+    return this
+  },
+  readDirectory: function (dirPath, callback) {
+    
+    let fileList = []
+    let dirList = []
+    
+    if (typeof(callback) !== 'function') {
+      return this
+    }
+    else if (this.isDirSync(dirPath) === false) {
+      callback({
+        file: fileList,
+        dir: dirList
+      })
+    }
+    
+    this.lib.fs.readdir(dirPath, (err, files) => {
+      //handling error
+      if (err) {
+        return console.error('Unable to scan directory: ' + dirPath + '\n' + err);
+      }
+      //listing all files using forEach
+      files.forEach((file) => {
+        // Do whatever you want to do with the file
+        let filepath = this.lib.path.join(dirPath, file)
+        let isDir = this.lib.fs.lstatSync(filepath).isDirectory()
+
+        if (isDir) {
+          dirList.push(filepath)
+        }
+        else {
+          fileList.push(filepath)
+        }
+      })
+
+      callback({
+        file: fileList.sort(),
+        dir: dirList.sort()
+      })
+    })
     return this
   }
 }

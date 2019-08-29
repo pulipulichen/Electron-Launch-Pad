@@ -56,8 +56,8 @@ let VueControllerConfig = {
     },
     debug: {
       enableAskDirPath: false,
-      enableExit: false,
-      enableClick: false,
+      enableExit: true,
+      enableClick: true,
       enableSortPersist: true,
     }
   },
@@ -96,6 +96,7 @@ let VueControllerConfig = {
     this.lib.DayjsHelper = RequireHelper.require('./DayjsHelper')
     this.lib.FileDragNDropHelper = RequireHelper.require('./FileDragNDropHelper')
     */
+    
     this.lib.ElectronHelper.mount(this, this.persistAttrs, () => {
       this._afterMounted()
     })
@@ -297,22 +298,26 @@ let VueControllerConfig = {
   },
   methods: {
     _afterMounted: function () {
-      this.shortcuts = this.lib.ShortcutHelper.get(this.shortcutDirPath)
-      this.initDraggable()
-      this.initPopup()
-      this.initMouseWheelKeys()
-      this.initIPCEvent()
-      this.initCurrentPage(() => {
-        this.mainItemsInited = true
-        //this.setupSearchInputKeyEvents()
-        this.$refs.SearchInput.focus()
+      this.lib.ShortcutHelper.get(this.shortcutDirPath, (shortcuts) => {
+        this.shortcuts = shortcuts
         
-        //console.log(this.shortcutsDirPath)
-        if (this.debug.enableAskDirPath === true 
-                && this.lib.ElectronFileHelper.isDirSync(this.shortcutsDirPath) === false) {
-          this.changeFolder()
-        }
-      })
+        this.initDraggable()
+        this.initPopup()
+        this.initMouseWheelKeys()
+        this.initIPCEvent()
+        this.initCurrentPage(() => {
+          this.mainItemsInited = true
+          //this.setupSearchInputKeyEvents()
+          this.$refs.SearchInput.focus()
+
+          //console.log(this.shortcutsDirPath)
+          if (this.debug.enableAskDirPath === true 
+                  && this.lib.ElectronFileHelper.isDirSync(this.shortcutsDirPath) === false) {
+            this.changeFolder()
+          }
+        })
+      })  // this.lib.ShortcutHelper.get(this.shortcutDirPath, (shortcuts) => {
+        
     },
     initCurrentPage: function (callback) {
       if (this.debug.enableSortPersist === false) {
@@ -849,12 +854,15 @@ let VueControllerConfig = {
             <div class="launchpad-item sub-item" 
                  title="${shortcut.description}"
                  data-exec="${shortcut.exec}">
-              <img class="icon" draggable="false"
-                   src="${shortcut.icon}" />
+              <img class="icon" draggable="false" />
               <div class="name">
                 ${shortcut.name}
               </div>
             </div>`)
+          
+          if (typeof(shortcut.icon) === 'string') {
+            item.find('img.icon').attr('src', shortcut.icon)
+          }
           
           item.click(function () {
             let exec = this.getAttribute('data-exec')
@@ -1284,7 +1292,7 @@ let VueControllerConfig = {
       }
       
       //let parameters = []
-      this.lib.win.hide()
+      //this.lib.win.hide()
       this.lib.ElectronFileHelper.execExternalCommand(execCommand,() => {
         return this.exit()
       })
@@ -1348,6 +1356,18 @@ let VueControllerConfig = {
       else {
         return ''
       }
+    },
+    getSubItemIcons: function (item) {
+      let list = []
+      if (Array.isArray(item.subItems)) {
+        for (let i = 0; i < item.subItems.length; i++) {
+          list.push(item.subItems[i])
+          if (list.length === 4) {
+            break
+          }
+        }
+      }
+      return list
     }
   }
 }

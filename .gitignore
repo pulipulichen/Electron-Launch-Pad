@@ -1,5 +1,2 @@
-/nbproject/
-/package-lock.json
+/nbproject/*
 /node_modules/
-/[[]document
-/debug.log

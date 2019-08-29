@@ -22,6 +22,8 @@ let FolderConfigHelper = {
       folderPath = 'folder-path-for-test'
     }
     
+    folderPath = folderPath.split('/').join('|')
+    
     if (folderPath.length > 30) {
       folderPath = folderPath.slice(-30)
     }
@@ -34,7 +36,7 @@ let FolderConfigHelper = {
   _getConfigPath: function (folderPath) {
     let configName = this._getConfigName(folderPath)
     let configPath = this.lib.ElectronFileHelper.resolve('cache/config/' + configName)
-    //console.log(configPath)
+    //console.log([folderPath, configPath])
     return configPath
   },
   read: function (folderPath, key) {
@@ -148,6 +150,7 @@ let FolderConfigHelper = {
     
     let configPath = this._getConfigPath(folderPath)
     let configText = JSON.stringify(configJSON, null, "\t")
+    //console.log(configPath)
     this.lib.ElectronFileHelper.writeFileDelay(configPath, configText)
     return this
   },
@@ -168,11 +171,43 @@ let FolderConfigHelper = {
     }
     configJSON[key][folderName] = sorted
     
+    return this.write(folderPath, configJSON)
+  },
+  readShortcutMetadata: function (folderPath, shortcutPath, key) {
+    this.init()
+    let shortcutMetadata = this.read(folderPath, 'ShortcutMetadata')
+    
+    if (typeof(shortcutMetadata) !== 'object') {
+      console.error('no config data :' + folderPath)
+      return
+    }
+    else {
+      let metadata = shortcutMetadata[shortcutPath]
+      if (typeof(key) === 'string' 
+              && typeof(metadata) === 'object' 
+              && typeof(metadata[key]) !== 'undefined' ) {
+        return metadata[key]
+      }
+      else {
+        return metadata
+      }
+    }
+  },
+  writeShortcutMetadata: function (folderPath, shortcutPath, data) {
+    //console.log('writeShortcutMetadata')
+    let configJSON = this.read(folderPath)
+    let key = 'ShortcutMetadata'
+    if (typeof(configJSON[key]) !== 'object') {
+      configJSON[key] = {}
+    }
+    configJSON[key][shortcutPath] = data
+    /*
     let configPath = this._getConfigPath(folderPath)
     let configText = JSON.stringify(configJSON, null, "\t")
     this.lib.ElectronFileHelper.writeFileSync(configPath, configText)
+    */
+    return this.write(folderPath, configJSON)
   }
-  
 }
 
 if (typeof(window) !== 'undefined') {

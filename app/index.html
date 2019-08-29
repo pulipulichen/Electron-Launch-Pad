@@ -38,7 +38,10 @@
 <script src="./vendors/draggable/draggable.bundle.js"></script>
 <script src="./vendors/draggable/sortable.js"></script>
 
+<!--
 <script src="vendors/hotkeys/hotkeys.min.js" ></script>
+-->
+<script src="./helpers/LinuxDesktopShortcutReader.js" ></script>
 
   </head>
   <body>
@@ -175,11 +178,13 @@
              v-on:click="exec(item.exec)"
              v-bind:data-shortcut-index="i"
              v-bind:title="displayDescription(item)">
+          <!--
           <div class="hotkey-label"
                v-bind:class="{'hide': (mainItemHotkeyLabelInited === false || enableDragScroll)}">
             <span class="background"></span>
             <span class="hotkey">1</span>
           </div>
+          -->
           <template v-if="item === null">
             <img class="icon"
                  draggable="false" />
@@ -188,14 +193,22 @@
             </div>
           </template>
           <template v-else>
-            <img class="icon"
-                 v-bind:src="item.icon" 
-                 draggable="false"
-                 v-if="Array.isArray(item.icon) === false"/>
+            <template v-if="Array.isArray(item.subItems) === false">
+              <template v-if="typeof(item.icon) === 'string'">
+                <img class="icon"
+                     v-bind:src="item.icon" 
+                     draggable="false"/>
+              </template>
+              <template v-else>
+                <img class="icon"
+                     draggable="false"/>
+              </template>
+            </template>
+              
             <div class="icon folder"
-                 v-if="Array.isArray(item.icon) === true">
-              <template v-for="path in item.icon">
-                <img v-bind:src="path"
+                 v-if="Array.isArray(item.subItems) === true">
+              <template v-for="subIconPath in getSubItemIcons(item)">
+                <img v-bind:src="subIconPath"
                      draggable="false" />
               </template>
             </div>
@@ -239,11 +252,13 @@
              v-on:click="exec(item.exec)"
              v-bind:data-shortcut-index="i"
              v-bind:title="displayDescription(item)">
+          <!--
           <div class="hotkey-label"
                v-bind:class="{'hide': (mainItemHotkeyLabelInited === false || enableDragScroll)}">
             <span class="background"></span>
             <span class="hotkey">1</span>
           </div>
+          -->
           <template v-if="item === null">
             <img class="icon"
                  draggable="false"/>
