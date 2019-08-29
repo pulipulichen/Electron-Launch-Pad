@@ -298,22 +298,26 @@ let VueControllerConfig = {
   },
   methods: {
     _afterMounted: function () {
-      this.shortcuts = this.lib.ShortcutHelper.get(this.shortcutDirPath)
-      this.initDraggable()
-      this.initPopup()
-      this.initMouseWheelKeys()
-      this.initIPCEvent()
-      this.initCurrentPage(() => {
-        this.mainItemsInited = true
-        //this.setupSearchInputKeyEvents()
-        this.$refs.SearchInput.focus()
+      this.lib.ShortcutHelper.get(this.shortcutDirPath, (shortcuts) => {
+        this.shortcuts = shortcuts
         
-        //console.log(this.shortcutsDirPath)
-        if (this.debug.enableAskDirPath === true 
-                && this.lib.ElectronFileHelper.isDirSync(this.shortcutsDirPath) === false) {
-          this.changeFolder()
-        }
-      })
+        this.initDraggable()
+        this.initPopup()
+        this.initMouseWheelKeys()
+        this.initIPCEvent()
+        this.initCurrentPage(() => {
+          this.mainItemsInited = true
+          //this.setupSearchInputKeyEvents()
+          this.$refs.SearchInput.focus()
+
+          //console.log(this.shortcutsDirPath)
+          if (this.debug.enableAskDirPath === true 
+                  && this.lib.ElectronFileHelper.isDirSync(this.shortcutsDirPath) === false) {
+            this.changeFolder()
+          }
+        })
+      })  // this.lib.ShortcutHelper.get(this.shortcutDirPath, (shortcuts) => {
+        
     },
     initCurrentPage: function (callback) {
       if (this.debug.enableSortPersist === false) {

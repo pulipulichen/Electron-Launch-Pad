@@ -156,10 +156,95 @@ fs.readdir(directoryPath, (err, files) => {
     console.error('getShortcutsOnWindows');
     return []
   },
-  getDirShortcutMetadata: function (dirPath, subDirPath, callback) {
+  getDirListShortcuts: function (baseDirPath, dirList, callback) {
+    this.init()
     
+    if (typeof(callback) !== 'function') {
+      return this
+    }
+    
+    let shortcutList = []
+    
+    let continueLoop = (i) => {
+      i++
+      loop(i)
+    }
+    
+    let loop = (i) => {
+      if (i < dirList.length) {
+        let dirPath = dirList[i]
+        this.getDirShortcutMetadata(baseDirPath, dirPath, (shortcut) => {
+          if (shortcut !== undefined && typeof(shortcut) === 'object') {
+            shortcutList.push(shortcut)
+          }
+          continueLoop(i)
+        })
+      }
+      else {
+        callback(shortcutList)
+      }
+      return this
+    }
+    
+    return loop(0)
   },
-  getFilesShortcutMatadata: function (dirPath, fileList, callback) {
+  getDirShortcutMetadata: function (baseDirPath, subDirPath, callback) {
+    this.init()
+    if (typeof(callback) !== 'function') {
+      return this
+    }
+    
+    if (typeof(subDirPath) !== 'string' 
+            || this.lib.ElectronFileHelper.isDirSync(subDirPath)) {
+      callback()
+      return this
+    }
+    
+    let shortcut = this.lib.FolderConfigHelper.readShortcutMetadata(baseDirPath, subDirPath)
+    if (typeof(shortcut) === 'object') {
+      callback(shortcut)
+      return this
+    }
+    
+    // -------------------------
+    let dirShortcut = {
+      name: this.lib.path.basename(subDirPath),
+      subItems: []
+    }
+    
+    this.lib.ElectronFileHelper.readDirectory(subDirPath, (list) => {
+      let files = list.file
+      
+      let continueLoop = (i) => {
+        i++
+        return loop(i)
+      }
+      
+      let loop = (i) => {
+        if (i < files.length) {
+          let file = files[i]
+          if (this.isShortcut(file) === false) {
+            return continueLoop(i)
+          }
+          
+          this.getShortcutMetadata(baseDirPath, file, (shortcut) => {
+            if (typeof(shortcut) === 'object') {
+              dirShortcut.subItems.push(shortcut)
+            }
+            continueLoop(i)
+          })
+        }
+        else {
+          callback(dirShortcut)
+        }
+        return true
+      }
+      
+      loop(0)
+    })
+    return this
+  },
+  getFileListShortcuts: function (baseDirPath, fileList, callback) {
     this.init()
     if (typeof(callback) !== 'function') {
       return this
@@ -175,8 +260,8 @@ fs.readdir(directoryPath, (err, files) => {
     let loop = (i) => {
       if (i < fileList.length) {
         let shortcutPath = fileList[i]
-        if (shortcutPath.endsWith('.lnk')) {
-          this.getShortcutMetadata(dirPath, shortcutPath, (metadata) => {
+        if (this.isShortcut(shortcutPath)) {
+          this.getShortcutMetadata(baseDirPath, shortcutPath, (metadata) => {
             if (typeof(metadata) === 'object') {
               result.push(metadata)
             }
@@ -193,6 +278,17 @@ fs.readdir(directoryPath, (err, files) => {
     }
     loop(0)
     return this
+  },
+  isShortcut: function (path) {
+    if (process.platform === 'win32') {
+      return path.endsWith('.lnk')
+    }
+    else if (process.platform === 'linux') {
+      return path.endsWith('.desktop')
+    }
+    else {
+      return false
+    }
   },
   getShortcutMetadata: function (baseDirPath, shorcutPath, callback) {
     if (process.platform === 'win32') {
@@ -271,7 +367,8 @@ fs.readdir(directoryPath, (err, files) => {
       return this
     }
     
-    if (typeof(shortcutPath) !== 'string' || shortcutPath.endsWith('.lnk') === false) {
+    if (typeof(shortcutPath) !== 'string' 
+            || shortcutPath.endsWith('.desktop') === false) {
       callback()
       return this
     }
@@ -340,23 +437,54 @@ fs.readdir(directoryPath, (err, files) => {
     //console.error('getShortcutsOnLinux');
     return this.createMockShortcuts()
   },
-  get: function (dirPath) {
+  get: function (dirPath, callback) {
     this.init()
     
-    // 先做mock
-    let shortcuts
-    //return this.createMockShortcuts()
+    if (typeof(callback) !== 'function') {
+      return
+    }
     
+    // 先做mock
+    //let shortcuts
+    //return callback(this.createMockShortcuts())
+    
+    /*
     if (process.platform === 'win32') {
       shortcuts = this.getShortcutsOnWindows(dirPath)
     }
     else if (process.platform === 'linux') {
       shortcuts = this.getShortcutsOnLinux(dirPath)
     }
+     */
+    
+    if (process.platform === 'linux') {
+      dirPath = '/home/pudding/.local/share/applications/facebook.desktop'
+    }
+    
+    
+    this.lib.ElectronFileHelper.readDirectory(dirPath, (list) => {
+      this.getDirListShortcuts(list.dir, (shortcuts) => {
+        let dirShortcuts = []
+        if (Array.isArray(shortcuts)) {
+          dirShortcuts = shortcuts
+        }
+        
+        this.getFileListShortcuts(list.file, (shortcuts) => {
+          let fileShortcus = []
+          if (Array.isArray(shortcuts)) {
+            fileShortcus = shortcuts
+          }
+          
+          let totalShortcuts = dirShortcuts.concat(fileShortcus)
+          callback(totalShortcuts)
+        })
+      })
+    })
+    
     
     //console.log(shortcuts)
     
-    return shortcuts
+    return this
   }
 }
 
