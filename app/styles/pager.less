@@ -1,0 +1,58 @@
+#app {
+  @pager-buttons-height: 100px;
+  .pager-buttons-panel {
+    position: fixed;
+    right: 0;
+    top: calc(@searchbar-height - 10px);
+    width: @pager-width;
+    
+    button {
+      margin-bottom: 0.5rem;
+    }
+  }
+  .pager {
+    position: fixed;
+    right: 0;
+    top: calc(@searchbar-height + @pager-buttons-height);
+    width: @pager-width;
+    //text-align: center;
+    color: white;
+    font-size: 3rem;
+    padding-left: 7px;
+    max-height: calc(100vh - (@searchbar-height * 2));
+    overflow-y: auto;
+    
+    &.hidden {
+      visibility: hidden;
+    }
+    
+    .item {
+      //margin-bottom: 1rem;
+      height: calc((100vh - (@searchbar-height * 2)) / 20);
+      
+      @circle-width: 20px;
+      
+      &::before {
+        content: "";
+        display: inline-block;
+        width: @circle-width;
+        height: @circle-width;
+        -moz-border-radius: calc(@circle-width / 2);
+        -webkit-border-radius: calc(@circle-width / 2);
+        border-radius: calc(@circle-width / 2);
+        background-color: #666;
+        cursor: pointer;
+      }
+      &.current::before {
+        background-color: white;
+      }
+      
+      &.disabled {
+        //pointer-events: none;
+        &::before {
+          cursor: wait;
+        }
+      }
+    }
+  }
+}
