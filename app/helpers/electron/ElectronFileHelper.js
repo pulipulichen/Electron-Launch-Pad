@@ -248,28 +248,28 @@ let ElectronFileHelper = {
     }
     
     this.lib.fs.readdir(dirPath, (err, files) => {
-        //handling error
-        if (err) {
-            return console.error('Unable to scan directory: ' + dirPath + '\n' + err);
-        } 
-        //listing all files using forEach
-        files.forEach((file) => {
-          // Do whatever you want to do with the file
-          let filepath = this.lib.path.join(dirPath, file)
-          let isDir = this.lib.fs.lstatSync(filepath).isDirectory()
+      //handling error
+      if (err) {
+        return console.error('Unable to scan directory: ' + dirPath + '\n' + err);
+      }
+      //listing all files using forEach
+      files.forEach((file) => {
+        // Do whatever you want to do with the file
+        let filepath = this.lib.path.join(dirPath, file)
+        let isDir = this.lib.fs.lstatSync(filepath).isDirectory()
 
-          if (isDir) {
-            dirList.push(filepath)
-          }
-          else {
-            fileList.push(filepath)
-          }
-        })
-        
-        callback({
-          file: fileList.sort(),
-          dir: dirList.sort()
-        })
+        if (isDir) {
+          dirList.push(filepath)
+        }
+        else {
+          fileList.push(filepath)
+        }
+      })
+
+      callback({
+        file: fileList.sort(),
+        dir: dirList.sort()
+      })
     })
     return this
   }
