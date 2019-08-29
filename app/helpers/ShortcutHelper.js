@@ -363,6 +363,11 @@ fs.readdir(directoryPath, (err, files) => {
     let shortcut = this.lib.FolderConfigHelper.readShortcutMetadata(dirPath, shortcutPath)
     if (typeof(shortcut) === 'object') {
       //console.log('有shortcut cache: ' + shortcutPath)
+      if (this.lib.ElectronFileHelper.existsSync(shortcut.icon) === false) {
+        this.extractIcon(shortcut, (iconPath) => {
+          callback(shortcut)
+        })
+      }
       callback(shortcut)
       return this
     }
@@ -391,33 +396,13 @@ fs.readdir(directoryPath, (err, files) => {
         //workingDir: data.workingDir,
         description: data.Comment
       }
-
-      let icon = data.Icon
-      if (icon === '' 
-              || this.lib.ElectronFileHelper.existsSync(icon) === false) {
-        if (this.lib.ElectronFileHelper.existsSync(data.Target) === true) {
-          icon = data.Target
-          if (this.lib.ElectronFileHelper.isDirSync(icon)) {
-            icon = this.lib.path.join(__dirname, '/imgs/folderopened_yellow.png')
-          }
-        }
-      }
       
-      //console.log(icon)
-      if (icon.endsWith('.exe')) {
-        this.getIconFromEXE(icon, (iconPath) => {
-          shortcut.icon = iconPath
-          //this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
-          callback(shortcut)
-          return true
-        })
-      }
-      else {
-        shortcut.icon = icon
+      this.extractIcon(data, (iconPath) => {
+        shortcut.icon = iconPath
         //this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
         callback(shortcut)
         return true
-      }
+      })
     })
     return this
   },
@@ -480,14 +465,34 @@ fs.readdir(directoryPath, (err, files) => {
     callback(shortcut)
     return true
   },
-  getIconFromEXE: function (filepath, callback) {
+  getIconFromEXE: function (data, callback) {
     this.init()
     
     if (typeof(callback) !== 'function') {
       return this
     }
     
-    let iconFilename = filepath
+    let icon = data.Icon
+    if (icon === undefined) {
+      icon = data.icon
+    }
+    if (icon === '' 
+            || this.lib.ElectronFileHelper.existsSync(icon) === false) {
+      if (this.lib.ElectronFileHelper.existsSync(data.Target) === true) {
+        icon = data.Target
+        if (this.lib.ElectronFileHelper.isDirSync(icon)) {
+          icon = this.lib.path.join(__dirname, '/imgs/folderopened_yellow.png')
+        }
+      }
+    }
+    
+    if (icon.endsWith('.exe') === false 
+            && this.lib.ElectronFileHelper.existsSync(icon) === true) {
+      // 就是這個icon了
+      return callback(icon)
+    }
+    
+    let iconFilename = icon
     if (iconFilename.endsWith('.exe')) {
       iconFilename = iconFilename.slice(0, -4)
     }
@@ -515,10 +520,10 @@ fs.readdir(directoryPath, (err, files) => {
     
     //var iconExtractor = require('icon-extractor');
 
-    console.log('Try to extract icon: ' + filepath)
+    console.log('Try to extract icon: ' + icon)
     //this.lib.iconExtractor = RequireHelper.require('icon-extractor')
     //this.lib.iconExtractor.emitter.once('icon', (data) => {
-    this.lib.IconExtractHelper.extract(filepath, iconFilename, (tmpPath) => {
+    this.lib.IconExtractHelper.extract(icon, iconFilename, (tmpPath) => {
       if (tmpPath !== undefined) {
         this.lib.ElectronFileHelper.move(tmpPath, iconFilepath)
         callback(iconFilepath)
