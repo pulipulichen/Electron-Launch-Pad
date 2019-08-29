@@ -295,6 +295,13 @@
       </div>
       
   </div>
+  
+  <div class="ui dimmer"
+       v-bind:class="{'active': (mainItemsInited === false)}">
+    <div class="ui massive text loader">Loading</div>
+  </div>
+  
+  
   <script src="./VueController.js"></script>
   
  <!-- ------------------------------------------- --> 

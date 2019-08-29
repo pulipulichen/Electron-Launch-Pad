@@ -1,7 +1,8 @@
 let ShortcutHelper = {
   debug: {
-    enableShortcutCache: true,
-    enableIconCache: true,
+    enableShortcutCache: false,
+    enableIconCache: false,
+    useTextDir: false,
   },
   inited: false,
   lib: {
@@ -257,7 +258,12 @@ fs.readdir(directoryPath, (err, files) => {
           })
         }
         else {
-          callback(dirShortcut)
+          if (dirShortcut.subItems.length > 0) {
+            callback(dirShortcut)
+          }
+          else {
+            callback()
+          }
         }
         return true
       }
@@ -387,7 +393,17 @@ fs.readdir(directoryPath, (err, files) => {
       }
 
       let icon = data.Icon
+      if (icon === '' 
+              || this.lib.ElectronFileHelper.existsSync(icon) === false) {
+        if (this.lib.ElectronFileHelper.existsSync(data.Target) === true) {
+          icon = data.Target
+          if (this.lib.ElectronFileHelper.isDirSync(icon)) {
+            icon = this.lib.path.join(__dirname, '/imgs/folderopened_yellow.png')
+          }
+        }
+      }
       
+      //console.log(icon)
       if (icon.endsWith('.exe')) {
         this.getIconFromEXE(icon, (iconPath) => {
           shortcut.icon = iconPath
@@ -499,7 +515,7 @@ fs.readdir(directoryPath, (err, files) => {
     
     //var iconExtractor = require('icon-extractor');
 
-    //console.log('Try to extract icon: ' + filepath)
+    console.log('Try to extract icon: ' + filepath)
     //this.lib.iconExtractor = RequireHelper.require('icon-extractor')
     //this.lib.iconExtractor.emitter.once('icon', (data) => {
     this.lib.IconExtractHelper.extract(filepath, iconFilename, (tmpPath) => {
@@ -524,7 +540,7 @@ fs.readdir(directoryPath, (err, files) => {
   */
   get: function (dirPath, callback) {
     this.init()
-    
+    //console.log(dirPath)
     if (typeof(callback) !== 'function') {
       return
     }
@@ -542,12 +558,14 @@ fs.readdir(directoryPath, (err, files) => {
     }
      */
     
-    if (process.platform === 'linux') {
-      //dirPath = '/home/pudding/.local/share/applications/test/'
-      dirPath = '/home/pudding/.local/share/applications'
-    }
-    else if (process.platform === 'win32') {
-      dirPath = 'D:/xampp/htdocs/projects-electron/Electron-Launch-Pad/demo-shortcuts/win32'
+    if (this.debug.useTestDir === true) {
+      if (process.platform === 'linux') {
+        //dirPath = '/home/pudding/.local/share/applications/test/'
+        dirPath = '/home/pudding/.local/share/applications'
+      }
+      else if (process.platform === 'win32') {
+        dirPath = 'D:/xampp/htdocs/projects-electron/Electron-Launch-Pad/demo-shortcuts/win32'
+      }
     }
     
     

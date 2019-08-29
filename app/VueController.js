@@ -298,7 +298,7 @@ let VueControllerConfig = {
   },
   methods: {
     _afterMounted: function () {
-      this.lib.ShortcutHelper.get(this.shortcutDirPath, (shortcuts) => {
+      this.lib.ShortcutHelper.get(this.shortcutsDirPath, (shortcuts) => {
         this.shortcuts = shortcuts
         
         this.initDraggable()

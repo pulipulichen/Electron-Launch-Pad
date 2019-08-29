@@ -52,6 +52,9 @@ let ElectronFileHelper = {
   },
   existsSync: function (filepath) {
     this.init()
+    if (typeof(filepath) !== 'string') {
+      return false
+    }
     return this.lib.fs.existsSync(filepath)
   },
   isDirSync: function (dirpath) {
@@ -192,11 +195,19 @@ let ElectronFileHelper = {
   },
   execExternalCommand: function (execCommand, callback) {
     if (process.platform === 'win32') {
-      execCommand = '"' + this.resolve('win32-helpers/exec-external/exec-external.exe') + '" "' + execCommand + '"'
-      console.log(execCommand)
-      
-      //const exec = require('child_process').exec
-      this.lib.exec(execCommand, callback)
+      if (this.isDirSync(execCommand)) {
+        this.lib.shell.openItem(execCommand)
+        if (typeof(callback) === 'function') {
+          callback()
+        }
+      }
+      else {
+        execCommand = '"' + this.resolve('win32-helpers/exec-external/exec-external.exe') + '" "' + execCommand + '"'
+        console.log(execCommand)
+
+        //const exec = require('child_process').exec
+        this.lib.exec(execCommand, callback)
+      }
     }
     else if (process.platform === 'linux') {
       //execCommand = `nohup ${execCommand} &`
@@ -246,6 +257,7 @@ let ElectronFileHelper = {
         file: fileList,
         dir: dirList
       })
+      return this
     }
     
     this.lib.fs.readdir(dirPath, (err, files) => {

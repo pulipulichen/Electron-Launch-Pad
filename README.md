@@ -13,6 +13,7 @@ Last merge: 2019/08/27 13:2911
 - http://www.icons101.com/icon/id_16252/setid_1784/Mac_Apps_by_Rudolf/launcher
 - https://icons8.com/icons/set/app
 - https://semantic-ui.com/elements/icon.html
+- https://findicons.com/icon/69401/folderopened_yellow
 
 ----
 
