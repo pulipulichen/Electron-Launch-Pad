@@ -57,7 +57,6 @@ let ElectronFileHelper = {
   isDirSync: function (dirpath) {
     this.init()
     if (this.existsSync(dirpath)) {
-      
       return this.lib.fs.lstatSync(dirpath).isDirectory()
     }
     else {
@@ -122,11 +121,11 @@ let ElectronFileHelper = {
     
     return this
   },
-  writeFileBase64Sync: function (filepath, base64) {
+  writeFileBase64Async: function (filepath, base64, callback) {
     this.init()
-    console.log('write base64: ' + filepath)
-    console.log(base64)
-    this.lib.fs.writeFileSync(filepath, base64, 'base64')
+    //console.log('write base64: ' + filepath)
+    //console.log(base64)
+    this.lib.fs.writeFile(filepath, base64, 'base64', callback)
     return this
   },
   getBasePath: function () {
@@ -193,7 +192,7 @@ let ElectronFileHelper = {
   },
   execExternalCommand: function (execCommand, callback) {
     if (process.platform === 'win32') {
-      execCommand = '"' + this.resolve('exec/exec.exe') + '" ' + execCommand
+      execCommand = '"' + this.resolve('win32-helpers/exec-external/exec-external.exe') + '" ' + execCommand
       console.log(execCommand)
       
       //const exec = require('child_process').exec

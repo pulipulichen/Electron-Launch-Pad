@@ -31,7 +31,8 @@ let ShortcutHelper = {
     return this
   },
   cache: {
-    shortcuts: {}
+    shortcuts: {},
+    icon: {},
   },
   buildMockShortcut: function (i) {
     let mock = {
@@ -184,9 +185,9 @@ fs.readdir(directoryPath, (err, files) => {
     let loop = (i) => {
       if (i < dirList.length) {
         let dirPath = dirList[i]
-        console.log(dirPath)
+        //console.log(dirPath)
         this.getDirShortcutMetadata(baseDirPath, dirPath, (shortcut) => {
-          return console.log(shortcut)
+          //return console.log(shortcut)
           if (shortcut !== undefined && typeof(shortcut) === 'object') {
             shortcutList.push(shortcut)
           }
@@ -208,7 +209,10 @@ fs.readdir(directoryPath, (err, files) => {
     }
     
     if (typeof(subDirPath) !== 'string' 
-            || this.lib.ElectronFileHelper.isDirSync(subDirPath)) {
+            || this.lib.ElectronFileHelper.isDirSync(subDirPath) === false) {
+      console.error('Is not dir: ' + subDirPath)
+      //console.log()
+      //"D:\\xampp\\htdocs\\projects-electron\\Electron-Launch-Pad\\demo-shortcuts\\win32\\JDownloader"
       callback()
       return this
     }
@@ -226,7 +230,7 @@ fs.readdir(directoryPath, (err, files) => {
       subItems: []
     }
     
-    return console.log(subDirPath)
+    //return console.log(subDirPath)
     
     this.lib.ElectronFileHelper.readDirectory(subDirPath, (list) => {
       let files = list.file
@@ -268,26 +272,33 @@ fs.readdir(directoryPath, (err, files) => {
     
     let result = []
     
+    console.log(fileList)
+    
     let continueLoop = (i) => {
+      console.log(i)
       i++
-      loop(i)
+      setTimeout(() => {
+        loop(i)
+      }, 0)
     }
     
     let loop = (i) => {
       if (i < fileList.length) {
         let shortcutPath = fileList[i]
         if (this.isShortcut(shortcutPath)) {
-          //console.log(shortcutPath)
+          console.log([i, shortcutPath])
           this.getShortcutMetadata(baseDirPath, shortcutPath, (metadata) => {
+            console.log([i, shortcutPath])
+            console.log(metadata)
             if (typeof(metadata) === 'object') {
               result.push(metadata)
               //console.log(metadata)
             }
-            continueLoop(i)
+            return continueLoop(i)
           })
         }
         else {
-          continueLoop(i)
+          return continueLoop(i)
         }
       }
       else {
@@ -335,19 +346,22 @@ fs.readdir(directoryPath, (err, files) => {
       return this
     }
     
-    if (typeof(shortcutPath) !== 'string' || shortcutPath.endsWith('.lnk') === false) {
+    if (typeof(shortcutPath) !== 'string' 
+            || shortcutPath.endsWith('.lnk') === false) {
       callback()
       return this
     }
     
     let shortcut = this.lib.FolderConfigHelper.readShortcutMetadata(dirPath, shortcutPath)
     if (typeof(shortcut) === 'object') {
+      console.log('有shortcut cache: ' + shortcutPath)
       callback(shortcut)
       return this
     }
     
+    console.log('開始查詢shortcut資料: ' + shortcutPath)
     this.lib.windowShortcut.query(shortcutPath, (err, data) => {
-      //console.log(data)
+      console.log(data)
 
       let name = this.lib.path.basename(shortcutPath)
       if (name.endsWith('.lnk')) {
@@ -372,6 +386,7 @@ fs.readdir(directoryPath, (err, files) => {
       if (icon === '') {
         icon = data.target
       }
+      
       if (icon.endsWith('.exe')) {
         this.getIconFromEXE(icon, (iconPath) => {
           shortcut.icon = iconPath
@@ -454,15 +469,22 @@ fs.readdir(directoryPath, (err, files) => {
     if (iconFilename.endsWith('.exe')) {
       iconFilename = iconFilename.slice(0, -4)
     }
+    //iconFilename = iconFilename.split(':').join('')
+    //iconFilename = iconFilename.split('\\').join('_')
+    
     let lengthLimit = 150
     if (iconFilename.length > lengthLimit) {
       iconFilename = iconFilename.slice(-1 * lengthLimit)
     }
-    iconFilename = escape(iconFilename) + '.ico'
+    iconFilename = md5(iconFilename)
+    if (iconFilename.length > lengthLimit) {
+      iconFilename = iconFilename.slice(-1 * lengthLimit)
+    }
+    iconFilename = iconFilename + '.ico'
     let iconFilepath = this.lib.ElectronFileHelper.resolve('cache/icon/' + iconFilename)
     
-    if (this.lib.ElectronFileHelper.existsSync(iconFilepath)) {
-      console.log('有資料' + iconFilepath)
+    if (this.lib.ElectronFileHelper.existsSync(iconFilepath) && false) {
+      //console.log('有資料' + iconFilepath)
       if (typeof(callback) === 'function') {
         callback(iconFilepath)
       }
@@ -471,18 +493,32 @@ fs.readdir(directoryPath, (err, files) => {
     
     //var iconExtractor = require('icon-extractor');
 
-    this.lib.iconExtractor.emitter.on('icon', (data) => {
+    console.log('Try to extract icon: ' + filepath)
+    this.lib.iconExtractor = RequireHelper.require('icon-extractor')
+    this.lib.iconExtractor.emitter.once('icon', (data) => {
+      if (typeof(this.cache.icon[iconFilepath]) !== 'undefined') {
+        console.log('Repeat callback: ' + filepath)
+        console.log(data)
+        return this
+      }
+      
       //console.log('Here is my context: ' + data.Context);
       //console.log('Here is the path it was for: ' + data.Path);
-      let icon = data.Base64ImageData;
+      let iconBase64 = data.Base64ImageData
+      console.log(iconBase64)
+      this.cache.icon[iconFilepath] = true
+      
       //console.log(icon)
-      this.lib.ElectronFileHelper.writeFileBase64Sync(iconFilepath, icon)
-      if (typeof(callback) === 'function') {
-        callback(iconFilepath)
-      }
+      this.lib.ElectronFileHelper.writeFileBase64Async(iconFilepath, iconBase64, () => {
+        if (typeof(callback) === 'function') {
+          setTimeout(() => {
+            callback(iconFilepath)
+          }, 3000)
+        }
+      })
     })
 
-    this.lib.iconExtractor.getIcon('ANY_TEXT', filepath)
+    this.lib.iconExtractor.getIcon(filepath, filepath)
     return this
   },
   /*
@@ -523,14 +559,14 @@ fs.readdir(directoryPath, (err, files) => {
     
     this.lib.ElectronFileHelper.readDirectory(dirPath, (list) => {
       this.getDirListShortcuts(dirPath, list.dir, (shortcuts) => {
-        //console.log(shortcuts)
+        console.log(shortcuts)
         let dirShortcuts = []
         if (Array.isArray(shortcuts)) {
           dirShortcuts = shortcuts
         }
         
         this.getFileListShortcuts(dirPath, list.file, (shortcuts) => {
-          //console.log(shortcuts)
+          console.log(shortcuts)
           let fileShortcus = []
           if (Array.isArray(shortcuts)) {
             fileShortcus = shortcuts

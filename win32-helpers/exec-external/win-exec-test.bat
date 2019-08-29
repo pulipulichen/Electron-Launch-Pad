@@ -1,0 +1,1 @@
+exec-external.exe "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --ignore-certificate-errors --app=https://github.com/pulipulichen/Pulipuli-Blog/issues

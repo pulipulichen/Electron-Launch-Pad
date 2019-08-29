@@ -178,7 +178,7 @@ let FolderConfigHelper = {
     let shortcutMetadata = this.read(folderPath, 'ShortcutMetadata')
     
     if (typeof(shortcutMetadata) !== 'object') {
-      console.error('no config data :' + folderPath)
+      //console.error('no config data :' + folderPath)
       return
     }
     else {
