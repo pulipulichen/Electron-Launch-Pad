@@ -1,6 +1,6 @@
 let ShortcutHelper = {
   debug: {
-    enableShortcutCache: false,
+    enableShortcutCache: true,
     enableIconCache: true,
   },
   inited: false,
@@ -20,7 +20,8 @@ let ShortcutHelper = {
     
     this.lib.path = RequireHelper.require('path')
     if (process.platform === 'win32') {
-      this.lib.windowShortcut = RequireHelper.require('windows-shortcuts')
+      //this.lib.windowShortcut = RequireHelper.require('windows-shortcuts')
+      this.lib.WindowsShortcutHelper = RequireHelper.require('./helpers/WindowsShortcutHelper')
       this.lib.IconExtractHelper = RequireHelper.require('./helpers/IconExtractHelper')
     }
     this.lib.ElectronFileHelper = RequireHelper.require('./helpers/electron/ElectronFileHelper')
@@ -276,7 +277,7 @@ fs.readdir(directoryPath, (err, files) => {
     //console.log(fileList)
     
     let continueLoop = (i) => {
-      console.log(i)
+      //console.log(i)
       i++
       setTimeout(() => {
         loop(i)
@@ -355,14 +356,15 @@ fs.readdir(directoryPath, (err, files) => {
     
     let shortcut = this.lib.FolderConfigHelper.readShortcutMetadata(dirPath, shortcutPath)
     if (typeof(shortcut) === 'object') {
-      console.log('有shortcut cache: ' + shortcutPath)
+      //console.log('有shortcut cache: ' + shortcutPath)
       callback(shortcut)
       return this
     }
     
-    console.log('開始查詢shortcut資料: ' + shortcutPath)
-    this.lib.windowShortcut.query(shortcutPath, (err, data) => {
-      console.log(data)
+    //console.log('開始查詢shortcut資料: ' + shortcutPath)
+    //this.lib.windowShortcut.query(shortcutPath, (err, data) => {
+    this.lib.WindowsShortcutHelper.query(shortcutPath, (data) => {
+      //console.log(data)
 
       let name = this.lib.path.basename(shortcutPath)
       if (name.endsWith('.lnk')) {
@@ -370,32 +372,21 @@ fs.readdir(directoryPath, (err, files) => {
       }
       name = name.trim()
       
-      let execCommand = `${data.target}`
-      if (data.args.trim() !== '') {
-        execCommand = `${execCommand} ${data.args}`
-      }
+      let execCommand = data.Exec
       
-      let iconv = RequireHelper.require('iconv-lite')
-      execCommand = iconv.decode(execCommand, 'UTF8')
-      console.log(execCommand)
+      //let iconv = RequireHelper.require('iconv-lite')
+      //execCommand = iconv.decode(execCommand, 'UTF8')
+      //console.log(execCommand)
 
       shortcut = {
         //icon: iconPath,
         name: name,
         exec: execCommand,
         //workingDir: data.workingDir,
-        description: data.desc
+        description: data.Comment
       }
 
-      let icon = data.icon
-      if (icon === '' 
-              || this.lib.ElectronFileHelper.existsSync(icon) === false) {
-        icon = data.target
-      }
-      console.log(['icon before', icon])
-      GLOBAL_ICON = icon
-      icon = iconv.decode(icon, 'UTF8')
-      console.log(['icon after', icon])
+      let icon = data.Icon
       
       if (icon.endsWith('.exe')) {
         this.getIconFromEXE(icon, (iconPath) => {
@@ -508,7 +499,7 @@ fs.readdir(directoryPath, (err, files) => {
     
     //var iconExtractor = require('icon-extractor');
 
-    console.log('Try to extract icon: ' + filepath)
+    //console.log('Try to extract icon: ' + filepath)
     //this.lib.iconExtractor = RequireHelper.require('icon-extractor')
     //this.lib.iconExtractor.emitter.once('icon', (data) => {
     this.lib.IconExtractHelper.extract(filepath, iconFilename, (tmpPath) => {
@@ -556,20 +547,20 @@ fs.readdir(directoryPath, (err, files) => {
       dirPath = '/home/pudding/.local/share/applications'
     }
     else if (process.platform === 'win32') {
-      dirPath = 'D:/xampp/htdocs/projects-electron/Electron-Launch-Pad/demo-shortcuts/win32/test'
+      dirPath = 'D:/xampp/htdocs/projects-electron/Electron-Launch-Pad/demo-shortcuts/win32'
     }
     
     
     this.lib.ElectronFileHelper.readDirectory(dirPath, (list) => {
       this.getDirListShortcuts(dirPath, list.dir, (shortcuts) => {
-        console.log(shortcuts)
+        //console.log(shortcuts)
         let dirShortcuts = []
         if (Array.isArray(shortcuts)) {
           dirShortcuts = shortcuts
         }
         
         this.getFileListShortcuts(dirPath, list.file, (shortcuts) => {
-          console.log(shortcuts)
+          //console.log(shortcuts)
           let fileShortcus = []
           if (Array.isArray(shortcuts)) {
             fileShortcus = shortcuts

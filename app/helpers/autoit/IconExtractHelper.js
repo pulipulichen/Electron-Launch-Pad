@@ -16,7 +16,7 @@ let IconExtractHelper = {
     this.lib.exec = require('child_process').exec
     
     this.iconExtractorPath = this.lib.path.resolve(__dirname, '../win32-helpers/icon-extractor/icon-extractor.exe')
-    console.log(this.iconExtractorPath)
+    //console.log(this.iconExtractorPath)
     
     this.inited = true
     return this
@@ -34,7 +34,7 @@ let IconExtractHelper = {
     }
     
     let command = `"${this.iconExtractorPath}" "${exePath}" "${filename}"`
-    console.log(command)
+    //console.log(command)
     this.lib.exec(command, (err, stdout, stderr) => {
       let filepath = this.lib.path.resolve(__dirname, '../win32-helpers/icon-extractor/' + filename)
       
