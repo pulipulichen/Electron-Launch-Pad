@@ -96,6 +96,7 @@ let VueControllerConfig = {
     this.lib.DayjsHelper = RequireHelper.require('./DayjsHelper')
     this.lib.FileDragNDropHelper = RequireHelper.require('./FileDragNDropHelper')
     */
+    
     this.lib.ElectronHelper.mount(this, this.persistAttrs, () => {
       this._afterMounted()
     })

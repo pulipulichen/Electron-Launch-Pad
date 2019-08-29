@@ -14,8 +14,10 @@ let ShortcutHelper = {
     // -------------
     
     this.lib.path = RequireHelper.require('path')
-    this.lib.iconExtractor = RequireHelper.require('icon-extractor')
-    this.lib.windowShortcut = RequireHelper.require('windows-shortcuts')
+    if (process.platform === 'win32') {
+      this.lib.iconExtractor = RequireHelper.require('icon-extractor')
+      this.lib.windowShortcut = RequireHelper.require('windows-shortcuts')
+    }
     this.lib.ElectronFileHelper = RequireHelper.require('helpers/electron/ElectronFileHelper')
     this.lib.FolderConfigHelper = RequireHelper.require('helpers/FolderConfigHelper')
     
@@ -267,14 +269,14 @@ fs.readdir(directoryPath, (err, files) => {
       if (typeof(callback) === 'function') {
         callback(iconFilepath)
       }
-    });
+    })
 
     this.lib.iconExtractor.getIcon('ANY_TEXT', filepath);
   },
   getShortcutsOnLinux: function (dirPath) {
     this.init()
-    console.error('getShortcutsOnLinux');
-    return []
+    //console.error('getShortcutsOnLinux');
+    return this.createMockShortcuts()
   },
   get: function (dirPath) {
     this.init()
