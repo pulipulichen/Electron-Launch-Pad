@@ -361,13 +361,7 @@ fs.readdir(directoryPath, (err, files) => {
     }
     
     let shortcut = this.lib.FolderConfigHelper.readShortcutMetadata(dirPath, shortcutPath)
-    if (typeof(shortcut) === 'object') {
-      //console.log('有shortcut cache: ' + shortcutPath)
-      if (this.lib.ElectronFileHelper.existsSync(shortcut.icon) === false) {
-        this.extractIcon(shortcut, (iconPath) => {
-          callback(shortcut)
-        })
-      }
+    if (typeof(shortcut) === 'object' && this.lib.ElectronFileHelper.existsSync(shortcut.icon)) {
       callback(shortcut)
       return this
     }
@@ -465,7 +459,7 @@ fs.readdir(directoryPath, (err, files) => {
     callback(shortcut)
     return true
   },
-  getIconFromEXE: function (data, callback) {
+  extractIcon: function (data, callback) {
     this.init()
     
     if (typeof(callback) !== 'function') {
@@ -473,9 +467,6 @@ fs.readdir(directoryPath, (err, files) => {
     }
     
     let icon = data.Icon
-    if (icon === undefined) {
-      icon = data.icon
-    }
     if (icon === '' 
             || this.lib.ElectronFileHelper.existsSync(icon) === false) {
       if (this.lib.ElectronFileHelper.existsSync(data.Target) === true) {

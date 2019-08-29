@@ -140,11 +140,21 @@ let FolderConfigHelper = {
     let configJSON = this.read(folderPath)
     
     if (typeof(key) === 'string') {
-      configJSON[key] = value
+      if (value !== undefined) {
+        configJSON[key] = value
+      }
+      else {
+        delete configJSON[key]
+      }
     }
     else if (typeof(key) === 'object') {
       for (let k in key) {
-        configJSON[k] = key[k]
+        if (typeof(key[k]) !== 'undefined') {
+          configJSON[k] = key[k]
+        }
+        else {
+          delete configJSON[k]
+        }
       }
     }
     
@@ -154,11 +164,21 @@ let FolderConfigHelper = {
     this.lib.ElectronFileHelper.writeFileDelay(configPath, configText)
     return this
   },
+  reset: function (folderPath, key) {
+    return this.write(folderPath, key)
+  },
   writeMainItemsSort: function (folderPath, sorted, itemsCount) {
     this.init()
     return this.write(folderPath, {
       'mainItemsSorted': sorted,
       'itemsCount': itemsCount
+    })
+  },
+  resetMainItemSort: function (folderPath) {
+    this.init()
+    return this.write(folderPath, {
+      'mainItemsSorted': undefined,
+      'itemsCount': undefined
     })
   },
   writeSubItemsSort: function (folderPath, folderName, sorted) {
@@ -172,6 +192,10 @@ let FolderConfigHelper = {
     configJSON[key][folderName] = sorted
     
     return this.write(folderPath, configJSON)
+  },
+  resetSubItemsSort: function (folderPath) {
+    this.init()
+    return this.write(folderPath, 'subItemsSorted')
   },
   readShortcutMetadata: function (folderPath, shortcutPath, key) {
     this.init()
@@ -207,7 +231,11 @@ let FolderConfigHelper = {
     this.lib.ElectronFileHelper.writeFileSync(configPath, configText)
     */
     return this.write(folderPath, configJSON)
-  }
+  },
+  resetShortcutMetadata: function (folderPath) {
+    this.init()
+    return this.write(folderPath, 'ShortcutMetadata')
+  },
 }
 
 if (typeof(window) !== 'undefined') {
