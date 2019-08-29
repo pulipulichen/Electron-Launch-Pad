@@ -1,11 +1,12 @@
 # Electron-Launch-Pad
 A Mac style launch pad with Electron.js
 
+Last merge: 2019/08/28 06:29
+
 - Project: https://github.com/pulipulichen/Electron-Launch-Pad
 - Issues: https://github.com/pulipulichen/Electron-Launch-Pad/issues
 - Download: https://github.com/pulipulichen/Electron-Launch-Pad/releases
-
-- Last update: 2019/08/29
+- Commits: https://github.com/pulipulichen/Electron-Launch-Pad/commits/master
 
 ----
 
@@ -16,8 +17,16 @@ A Mac style launch pad with Electron.js
 
 ----
 
-# REDIPS
-- https://www.redips.net/javascript/redips-drag-documentation/
+# Draggable.js
+- https://github.com/Shopify/draggable/tree/master/src/Draggable
+
+# Hotkey.js
+- https://github.com/jaywcjlove/hotkeys
+- https://github.com/jaywcjlove/hotkeys/blob/44283e7c1ea679cf5041a215d3266f19334ed1d3/src/var.js
+- https://keycode.info/
+
+# windows-shortcuts
+- https://www.npmjs.com/package/windows-shortcuts
 
 ----
 
