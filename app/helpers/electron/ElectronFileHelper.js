@@ -8,8 +8,6 @@ let ElectronFileHelper = {
     path: null,
     fs: null,
     exec: null,
-    shell: null,
-    electron: null,
   },
   init: function () {
     if (this.inited === true) {
@@ -21,9 +19,6 @@ let ElectronFileHelper = {
     this.lib.path = RequireHelper.require('path')
     this.lib.fs = RequireHelper.require('fs')
     this.lib.exec = RequireHelper.require('child_process').exec
-    
-    this.lib.electron = RequireHelper.require('electron')
-    this.lib.shell = this.lib.electron.shell
     
     this.inited = true
   },
@@ -50,16 +45,6 @@ let ElectronFileHelper = {
   existsSync: function (filepath) {
     this.init()
     return this.lib.fs.existsSync(filepath)
-  },
-  isDirSync: function (dirpath) {
-    this.init()
-    if (this.existsSync(dirpath)) {
-      
-      return this.lib.fs.lstatSync(dirpath).isDirectory()
-    }
-    else {
-      return false
-    }
   },
   readFileSync: function (filepath) {
     this.init()
