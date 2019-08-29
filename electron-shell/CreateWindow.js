@@ -24,21 +24,12 @@ module.exports = function (shortcutsDirPath, callback) {
   
   // https://electronjs.org/docs/api/screen
   let screen = electron.screen
-  let display
-  if (false) {
-    let point = screen.getCursorScreenPoint()
-    display = screen.getDisplayNearestPoint(point)
-  }
-  else {
-    // 測試用，固定用最後一個熒幕
-    let displays = screen.getAllDisplays()
-    display = displays[0]
-  }
-  
+  let point = screen.getCursorScreenPoint()
+  let display = screen.getDisplayNearestPoint(point)
   let offsetX = display.bounds.x
   let offsetY = display.bounds.y
   //let displays = screen.getAllDisplays()
-  //console.log(display)
+  console.log(display)
   
   let {width, height} = display.workArea
   

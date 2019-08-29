@@ -135,9 +135,13 @@
     </button>
     <button class="ui circular icon button open-folder-button" 
             type="button"
-            v-on:click.stop="openFolder"
+            v-on:click.stop="openFolderTrigger"
             title="Open shortcuts folder">
       <i class="folder open outline icon"></i>
+      <input type="file"
+         v-on:change="openFolder"
+         ref="FolderSelectInput"
+         webkitdirectory />
     </button>
     <button class="ui circular icon button" 
             type="button"

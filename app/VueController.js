@@ -55,7 +55,6 @@ let VueControllerConfig = {
       */
     },
     debug: {
-      enableAskDirPath: false,
       enableExit: false,
       enableClick: false,
       enableSortPersist: true,
@@ -301,7 +300,6 @@ let VueControllerConfig = {
       this.initDraggable()
       this.initPopup()
       this.initMouseWheelKeys()
-      this.initIPCEvent()
       this.initCurrentPage(() => {
         this.mainItemsInited = true
         //this.setupSearchInputKeyEvents()
@@ -360,14 +358,6 @@ let VueControllerConfig = {
         this.setupMainItemsKeyEvents($(this.$refs.AppList))
       }, 100)
       return this
-    },
-    initIPCEvent: function () {
-      //this.lib.ipc.send('select-folder', filepath)
-      
-      this.lib.ipc.on('change-folder-callback', (event, path) => {
-        //console.log(['[', path, ']'])
-        this.changeFolderCallback(path)
-      })
     },
     getPageByItemIndex: function (index) {
       return Math.floor(index / this.pageItemCount)
@@ -1182,30 +1172,17 @@ let VueControllerConfig = {
         return item.description
       }
     },
-    openFolder: function () {
-      //console.error('openFolder folder')
-      let dirpath = this.shortcutsDirPath
-      if (typeof(dirpath) === 'string'
-              && this.lib.ElectronFileHelper.isDirSync(dirpath)) {
-        //console.log(dirpath)
-        this.lib.ElectronFileHelper.showInFolder(dirpath)
-        this.exit()
-      }
+    openFolderTrigger: function () {
+      this.$refs.FolderSelectInput.click()
       return this
+    },
+    openFolder: function () {
+      let folderPath = this.$refs.FolderSelectInput.value
+      console.error(folderPath)
+      this.$refs.FolderSelectInput.value = ''
     },
     changeFolder: function () {
-      //console.error('change folder')
-      //this.lib.ipc.send
-      this.lib.ipc.send('change-folder', this.shortcutsDirPath)
-      return this
-    },
-    changeFolderCallback: function (dirpath) {
-      if (typeof(dirpath) === 'string'
-              && this.lib.ElectronFileHelper.isDirSync(dirpath)) {
-        //console.log(dirpath)
-        this.shortcutsDirPath = dirpath
-      }
-      return this
+      console.error('change folder')
     },
     exit: function () {
       if (this.debug.enableExit === false) {
