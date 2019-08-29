@@ -5,7 +5,7 @@ let ShortcutHelper = {
   inited: false,
   lib: {
     path: null,
-    iconExtractor: null,
+    IconExtractHelper: null,
     windowShortcut: null,
     ElectronFileHelper: null,
     FolderConfigHelper: null,
@@ -19,8 +19,8 @@ let ShortcutHelper = {
     
     this.lib.path = RequireHelper.require('path')
     if (process.platform === 'win32') {
-      this.lib.iconExtractor = RequireHelper.require('icon-extractor')
       this.lib.windowShortcut = RequireHelper.require('windows-shortcuts')
+      this.lib.IconExtractHelper = RequireHelper.require('./helpers/IconExtractHelper')
     }
     this.lib.ElectronFileHelper = RequireHelper.require('./helpers/electron/ElectronFileHelper')
     this.lib.FolderConfigHelper = RequireHelper.require('./helpers/FolderConfigHelper')
@@ -480,7 +480,7 @@ fs.readdir(directoryPath, (err, files) => {
     if (iconFilename.length > lengthLimit) {
       iconFilename = iconFilename.slice(-1 * lengthLimit)
     }
-    iconFilename = iconFilename + '.ico'
+    iconFilename = iconFilename + '.png'
     let iconFilepath = this.lib.ElectronFileHelper.resolve('cache/icon/' + iconFilename)
     
     if (this.lib.ElectronFileHelper.existsSync(iconFilepath) && false) {
@@ -494,31 +494,11 @@ fs.readdir(directoryPath, (err, files) => {
     //var iconExtractor = require('icon-extractor');
 
     console.log('Try to extract icon: ' + filepath)
-    this.lib.iconExtractor = RequireHelper.require('icon-extractor')
-    this.lib.iconExtractor.emitter.once('icon', (data) => {
-      if (typeof(this.cache.icon[iconFilepath]) !== 'undefined') {
-        console.log('Repeat callback: ' + filepath)
-        console.log(data)
-        return this
-      }
-      
-      //console.log('Here is my context: ' + data.Context);
-      //console.log('Here is the path it was for: ' + data.Path);
-      let iconBase64 = data.Base64ImageData
-      console.log(iconBase64)
-      this.cache.icon[iconFilepath] = true
-      
-      //console.log(icon)
-      this.lib.ElectronFileHelper.writeFileBase64Async(iconFilepath, iconBase64, () => {
-        if (typeof(callback) === 'function') {
-          setTimeout(() => {
-            callback(iconFilepath)
-          }, 3000)
-        }
-      })
-    })
+    //this.lib.iconExtractor = RequireHelper.require('icon-extractor')
+    //this.lib.iconExtractor.emitter.once('icon', (data) => {
+    this.lib.IconExtractHelper.extract(filepath, iconFilename, callback)
 
-    this.lib.iconExtractor.getIcon(filepath, filepath)
+    //this.lib.iconExtractor.getIcon(filepath, filepath)
     return this
   },
   /*

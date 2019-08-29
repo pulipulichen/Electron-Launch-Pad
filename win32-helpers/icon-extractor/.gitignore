@@ -1,0 +1,5 @@
+*
+!.gitignore
+!icon-extractor.au3
+!icon-extractor.exe
+!test-icon-extractor.bat
