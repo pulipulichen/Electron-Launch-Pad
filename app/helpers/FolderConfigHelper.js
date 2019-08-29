@@ -22,6 +22,8 @@ let FolderConfigHelper = {
       folderPath = 'folder-path-for-test'
     }
     
+    folderPath = folderPath.split('/').join('|')
+    
     if (folderPath.length > 30) {
       folderPath = folderPath.slice(-30)
     }
@@ -34,7 +36,7 @@ let FolderConfigHelper = {
   _getConfigPath: function (folderPath) {
     let configName = this._getConfigName(folderPath)
     let configPath = this.lib.ElectronFileHelper.resolve('cache/config/' + configName)
-    //console.log(configPath)
+    console.log([folderPath, configPath])
     return configPath
   },
   read: function (folderPath, key) {
@@ -148,6 +150,7 @@ let FolderConfigHelper = {
     
     let configPath = this._getConfigPath(folderPath)
     let configText = JSON.stringify(configJSON, null, "\t")
+    console.log(configPath)
     this.lib.ElectronFileHelper.writeFileDelay(configPath, configText)
     return this
   },
@@ -193,7 +196,7 @@ let FolderConfigHelper = {
     }
   },
   writeShortcutMetadata: function (folderPath, shortcutPath, data) {
-    
+    console.log('writeShortcutMetadata')
     let configJSON = this.read(folderPath)
     let key = 'ShortcutMetadata'
     if (typeof(configJSON[key]) !== 'object') {

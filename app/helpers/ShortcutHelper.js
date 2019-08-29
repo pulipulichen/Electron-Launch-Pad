@@ -483,6 +483,7 @@ fs.readdir(directoryPath, (err, files) => {
      */
     
     if (process.platform === 'linux') {
+      //dirPath = '/home/pudding/.local/share/applications/test/'
       dirPath = '/home/pudding/.local/share/applications/'
     }
     

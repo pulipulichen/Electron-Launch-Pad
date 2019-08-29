@@ -93,9 +93,12 @@ let ElectronFileHelper = {
    */
   writeFileDelay: function (filepath, content, delaySec, callback) {
     this.init()
+    console.log(filepath)
+    return this.writeFileSync(filepath, content)
+    
     if (typeof(delaySec) === 'function') {
       callback = delaySec
-      delaySec = 1000
+      delaySec = 1
     }
     if (typeof(callback) !== 'function') {
       callback = () => {}
@@ -106,6 +109,7 @@ let ElectronFileHelper = {
       this.writeFileDelayTimer[filepath] = null
     }
     
+    console.log('writeFile', filepath)
     this.writeFileDelayTimer[filepath] = setTimeout(() => {
       this.writeFileAsync(filepath, content, () => {
         this.writeFileDelayTimer[filepath] = null
@@ -208,9 +212,10 @@ let ElectronFileHelper = {
       //let te= require('terminal-exec')
       //te('/opt/google/chrome/google-chrome --app=http://blog.pulipuli.info')
       //te('gedit')
-      this.lib.exec('/usr/bin/xfce4-terminal --command "/opt/google/chrome/google-chrome --app=http://blog.pulipuli.info"', () => {
-        //setTimeout(callback, 3000)
-      })
+      
+      execCommand = 'nohup /usr/bin/xfce4-terminal --command "/opt/google/chrome/google-chrome --app=http://blog.pulipuli.info" &'
+      
+      this.lib.exec(execCommand, callback)
       //callback()
       /*
       this.lib.spawn('/usr/bin/xfce4-terminal', [
