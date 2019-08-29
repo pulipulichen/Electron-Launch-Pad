@@ -6,6 +6,7 @@ let ShortcutHelper = {
     windowShortcut: null,
     ElectronFileHelper: null,
     FolderConfigHelper: null,
+    LinuxDesktopShortcutReader: null,
   },
   init: function () {
     if (this.inited === true) {
@@ -18,8 +19,9 @@ let ShortcutHelper = {
       this.lib.iconExtractor = RequireHelper.require('icon-extractor')
       this.lib.windowShortcut = RequireHelper.require('windows-shortcuts')
     }
-    this.lib.ElectronFileHelper = RequireHelper.require('helpers/electron/ElectronFileHelper')
-    this.lib.FolderConfigHelper = RequireHelper.require('helpers/FolderConfigHelper')
+    this.lib.ElectronFileHelper = RequireHelper.require('./helpers/electron/ElectronFileHelper')
+    this.lib.FolderConfigHelper = RequireHelper.require('./helpers/FolderConfigHelper')
+    this.lib.LinuxDesktopShortcutReader = RequireHelper.require('./helpers/LinuxDesktopShortcutReader')
     
     // -------------
     this.inited = true
@@ -282,48 +284,21 @@ fs.readdir(directoryPath, (err, files) => {
     
     
     
-    this.lib.windowShortcut.query(shortcutPath, (err, data) => {
-      //console.log(data)
+    let metadata = this.lib.LinuxDesktopShortcutReader.read(shortcutPath)
+    //console.log(data)
 
-      let name = this.lib.path.basename(shortcutPath)
-      if (name.endsWith('.lnk')) {
-        name = name.slice(0, -4)
-      }
-      name = name.trim()
-      
-      let execCommand = `${data.target}`
-      if (data.args.trim() !== '') {
-        execCommand = `${execCommand} ${data.args}`
-      }
-
-      shortcut = {
-        //icon: iconPath,
-        name: name,
-        exec: execCommand,
-        //workingDir: data.workingDir,
-        description: data.desc
-      }
-
-      let icon = data.icon
-      if (icon === '') {
-        icon = data.target
-      }
-      if (icon.endsWith('.exe')) {
-        this.getIconFromEXE(icon, (iconPath) => {
-          shortcut.icon = iconPath
-          this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
-          callback(shortcut)
-          return true
-        })
-      }
-      else {
-        shortcut.icon = icon
-        this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
-        callback(shortcut)
-        return true
-      }
-    })
-    return this
+    shortcut = {
+      //icon: iconPath,
+      name: metadata.Name,
+      exec: metadata.Exec,
+      //workingDir: data.workingDir,
+      description: metadata.Comment,
+      icon: metadata.Icon
+    }
+    
+    this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
+    callback(shortcut)
+    return true
   },
   getIconFromEXE: function (filepath, callback) {
     this.init()

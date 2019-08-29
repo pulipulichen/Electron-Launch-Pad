@@ -13,7 +13,9 @@ let LinuxDesktopShortcutReader = {
     this.lib.fs = require('fs')
     
     this.inited = true
+    return this
   },
+  cache: {},
   read: function (path) {
     this.init()
     
@@ -22,19 +24,26 @@ let LinuxDesktopShortcutReader = {
       return undefined
     }
     
+    let cache = this.cache[path]
+    if (typeof(cache) !== 'undefined') {
+      return cache
+    }
+    
     let content = this.lib.fs.readFileSync(path, 'utf8')
     
     let result = {}
     content.split('\n', (line) => {
       line = line.trim()
       if (line === '' || line.indexOf('=') === -1) {
-        return
+        return this
       }
       
       let key = line.slice(0, line.indexOf('=')).trim()
       let value = line.slice(line.indexOf('=')+1).trim()
       result[key] = value
     })
+    
+    this.cache[path] = result
     
     return result
   }
