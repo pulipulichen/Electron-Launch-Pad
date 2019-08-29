@@ -1,15 +1,30 @@
 #app {
+  @pager-buttons-height: 100px;
+  .pager-buttons-panel {
+    position: fixed;
+    right: 0;
+    top: calc(@searchbar-height - 10px);
+    width: @pager-width;
+    
+    button {
+      margin-bottom: 0.5rem;
+    }
+  }
   .pager {
     position: fixed;
     right: 0;
-    top: @searchbar-height;
+    top: calc(@searchbar-height + @pager-buttons-height);
     width: @pager-width;
     //text-align: center;
     color: white;
     font-size: 3rem;
-    
+    padding-left: 7px;
     max-height: calc(100vh - (@searchbar-height * 2));
     overflow-y: auto;
+    
+    &.hidden {
+      visibility: hidden;
+    }
     
     .item {
       //margin-bottom: 1rem;

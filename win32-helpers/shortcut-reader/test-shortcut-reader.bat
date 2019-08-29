@@ -1,0 +1,1 @@
+shortcut-reader.exe "D:\xampp\htdocs\projects-electron\Electron-Launch-Pad\demo-shortcuts\win32\test\64bit_VidCoder-1.5.24-Beta-x64-Portable - Copy.exe.lnk"

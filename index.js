@@ -13,12 +13,16 @@ const {
 
 const ProcessArgvHelper = require('./electron-shell/ProcessArgvHelper.js')
 
-let dirPath
-ProcessArgvHelper.getDirPaths().forEach(path => {
-  if (dirPath === undefined) {
-    dirPath = path
-  }
-})
+let dirPath = ProcessArgvHelper.getDirPaths()
+//console.log(ProcessArgvHelper.getDirPaths())
+console.log(dirPath)
+if (Array.isArray(dirPath) && dirPath.length > 0) {
+  dirPath = dirPath[0]
+}
+else {
+  dirPath = undefined
+}
+console.log(dirPath)
 
 // ------------
 
@@ -40,4 +44,5 @@ app.on('ready', () => {
 
 const createWindow = require('./electron-shell/CreateWindow')
 
-require('./electron-shell/IpcEventManager')
+const IPCEventManager = require('./electron-shell/IpcEventManager')
+IPCEventManager()

@@ -1,0 +1,1 @@
+icon-extractor.exe "D:\PortableApps\[Development\npp.7.2.2.bin\notepad++.exe" aaa.png

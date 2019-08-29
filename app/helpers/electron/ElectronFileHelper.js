@@ -1,3 +1,5 @@
+/* global __dirname */
+
 let ElectronFileHelper = {
   inited: false,
   lib: {
@@ -5,16 +7,26 @@ let ElectronFileHelper = {
     fileType: null,
     path: null,
     fs: null,
+    exec: null,
+    shell: null,
+    spawn: null,
+    electron: null,
   },
   init: function () {
     if (this.inited === true) {
-      return
+      return this
     }
     
     this.lib.readChunk = RequireHelper.require('read-chunk')
     this.lib.fileType = RequireHelper.require('file-type')
     this.lib.path = RequireHelper.require('path')
     this.lib.fs = RequireHelper.require('fs')
+    const child_process = RequireHelper.require('child_process')
+    this.lib.exec = child_process.exec
+    this.lib.spawn = child_process.spawn
+    
+    this.lib.electron = RequireHelper.require('electron')
+    this.lib.shell = this.lib.electron.shell
     
     this.inited = true
   },
@@ -40,6 +52,9 @@ let ElectronFileHelper = {
   },
   existsSync: function (filepath) {
     this.init()
+    if (typeof(filepath) !== 'string') {
+      return false
+    }
     return this.lib.fs.existsSync(filepath)
   },
   isDirSync: function (dirpath) {
@@ -187,7 +202,7 @@ let ElectronFileHelper = {
         }
       }
       else {
-        execCommand = '"' + this.resolve('win32-helpers/exec-external/exec-external.exe') + '" "' + execCommand + '"'
+        execCommand = '"' + this.resolve('win32-helpers/exec-external/exec-external.exe') + '" ' + execCommand
         console.log(execCommand)
 
         //const exec = require('child_process').exec
