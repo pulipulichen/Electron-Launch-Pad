@@ -15,7 +15,7 @@ if (process.argv.indexOf('--mode') - process.argv.indexOf('development') === -1)
 // For test
 //mode = 'development'
 
-module.exports = function (shortcutDirPath, callback) {
+module.exports = function (shortcutsDirPath, callback) {
   
   let iconPath = path.join(__dirname, '../app/imgs/icon256.ico')
   if (process.platform === 'linux') {
@@ -85,7 +85,7 @@ module.exports = function (shortcutDirPath, callback) {
   //win.rendererSideName.filepath = filepath
   //win.rendererSideName.mode = mode
   win.mode = mode
-  win.shortcutDirPath = shortcutDirPath
+  win.shortcutsDirPath = shortcutsDirPath
   
   //return win
   win.webContents.once('dom-ready', () => {

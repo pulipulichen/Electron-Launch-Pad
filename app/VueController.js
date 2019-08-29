@@ -70,7 +70,7 @@ let VueControllerConfig = {
     this.lib.execFile = RequireHelper.require('child_process').execFile;
     this.lib.win = this.lib.remote.getCurrentWindow()
     this.lib.mode = this.lib.win.mode
-    this.lib.shortcutDirPath = this.lib.win.shortcutDirPath
+    this.shortcutsDirPath = this.lib.win.shortcutsDirPath
     this.lib.ipc = this.lib.electron.ipcRenderer
     
     //this.lib.REDIPSHelper = RequireHelper.require('./helpers/REDIPSHelper')
@@ -307,6 +307,7 @@ let VueControllerConfig = {
         //this.setupSearchInputKeyEvents()
         this.$refs.SearchInput.focus()
         
+        //console.log(this.shortcutsDirPath)
         if (this.debug.enableAskDirPath === true 
                 && this.lib.ElectronFileHelper.isDirSync(this.shortcutsDirPath) === false) {
           this.changeFolder()
