@@ -99,6 +99,7 @@ let ShortcutHelper = {
     }
     return shortcuts
   },
+  /*
   getShortcutsOnWindows: function (dirPath, callback) {
     this.init()
     
@@ -159,6 +160,7 @@ fs.readdir(directoryPath, (err, files) => {
     console.error('getShortcutsOnWindows');
     return []
   },
+  */
   getDirListShortcuts: function (baseDirPath, dirList, callback) {
     this.init()
     
@@ -470,11 +472,13 @@ fs.readdir(directoryPath, (err, files) => {
 
     this.lib.iconExtractor.getIcon('ANY_TEXT', filepath);
   },
+  /*
   getShortcutsOnLinux: function (dirPath) {
     this.init()
     //console.error('getShortcutsOnLinux');
     return this.createMockShortcuts()
   },
+  */
   get: function (dirPath, callback) {
     this.init()
     
@@ -498,6 +502,9 @@ fs.readdir(directoryPath, (err, files) => {
     if (process.platform === 'linux') {
       //dirPath = '/home/pudding/.local/share/applications/test/'
       dirPath = '/home/pudding/.local/share/applications'
+    }
+    else if (process.platform === 'win32') {
+      dirPath = 'D:/xampp/htdocs/projects-electron/Electron-Launch-Pad/demo-shortcuts/win32'
     }
     
     
