@@ -198,7 +198,7 @@ let ElectronFileHelper = {
       this.lib.exec(execCommand, callback)
     }
     else if (process.platform === 'linux') {
-      execCommand = `nohup ${execCommand} &`
+      //execCommand = `nohup ${execCommand} &`
       //console.log(execCommand)
       
       /*
@@ -213,7 +213,7 @@ let ElectronFileHelper = {
       //te('/opt/google/chrome/google-chrome --app=http://blog.pulipuli.info')
       //te('gedit')
       
-      execCommand = 'nohup /usr/bin/xfce4-terminal --command "/opt/google/chrome/google-chrome --app=http://blog.pulipuli.info" &'
+      execCommand = `nohup /usr/bin/xfce4-terminal --command "${execCommand}" &`
       
       this.lib.exec(execCommand, callback)
       //callback()
