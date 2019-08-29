@@ -56,7 +56,7 @@ let VueControllerConfig = {
     },
     debug: {
       enableAskDirPath: false,
-      enableExit: true,
+      enableExit: false,
       enableClick: true,
       enableSortPersist: true,
     }

@@ -1,6 +1,7 @@
 let ShortcutHelper = {
   debug: {
     enableShortcutCache: false,
+    enableIconCache: true,
   },
   inited: false,
   lib: {
@@ -483,7 +484,7 @@ fs.readdir(directoryPath, (err, files) => {
     iconFilename = iconFilename + '.png'
     let iconFilepath = this.lib.ElectronFileHelper.resolve('cache/icon/' + iconFilename)
     
-    if (this.lib.ElectronFileHelper.existsSync(iconFilepath) && false) {
+    if (this.lib.ElectronFileHelper.existsSync(iconFilepath) && this.debug.enableIconCache) {
       //console.log('有資料' + iconFilepath)
       if (typeof(callback) === 'function') {
         callback(iconFilepath)
