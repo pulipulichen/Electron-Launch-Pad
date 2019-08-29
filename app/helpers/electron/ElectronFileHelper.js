@@ -9,6 +9,7 @@ let ElectronFileHelper = {
     fs: null,
     exec: null,
     shell: null,
+    spawn: null,
     electron: null,
   },
   init: function () {
@@ -20,7 +21,9 @@ let ElectronFileHelper = {
     this.lib.fileType = RequireHelper.require('file-type')
     this.lib.path = RequireHelper.require('path')
     this.lib.fs = RequireHelper.require('fs')
-    this.lib.exec = RequireHelper.require('child_process').exec
+    const child_process = RequireHelper.require('child_process')
+    this.lib.exec = child_process.exec
+    this.lib.spawn = child_process.spawn
     
     this.lib.electron = RequireHelper.require('electron')
     this.lib.shell = this.lib.electron.shell
@@ -186,9 +189,37 @@ let ElectronFileHelper = {
     if (process.platform === 'win32') {
       execCommand = '"' + this.resolve('exec/exec.exe') + '" ' + execCommand
       console.log(execCommand)
+      
+      //const exec = require('child_process').exec
+      this.lib.exec(execCommand, callback)
     }
-    //const exec = require('child_process').exec
-    this.lib.exec(execCommand, callback)
+    else if (process.platform === 'linux') {
+      execCommand = `nohup ${execCommand} &`
+      //console.log(execCommand)
+      
+      /*
+      let spawn = require('child_process').spawn
+      //spawn("gedit", {}, {shell: true})
+      // /opt/google/chrome/google-chrome --app=http://blog.pulipuli.info
+      spawn("/opt/google/chrome/google-chrome", [
+        '--app=http://blog.pulipuli.info'
+      ], {shell: true})
+       */
+      //let te= require('terminal-exec')
+      //te('/opt/google/chrome/google-chrome --app=http://blog.pulipuli.info')
+      //te('gedit')
+      this.lib.exec('/usr/bin/xfce4-terminal --command "/opt/google/chrome/google-chrome --app=http://blog.pulipuli.info"', () => {
+        //setTimeout(callback, 3000)
+      })
+      //callback()
+      /*
+      this.lib.spawn('/usr/bin/xfce4-terminal', [
+        "--command",
+        "/opt/google/chrome/google-chrome --app=http://blog.pulipuli.info"
+      ])
+      //callback()
+      */
+    }
   },
   showInFolder: function (path) {
     if (this.existsSync(path)) {

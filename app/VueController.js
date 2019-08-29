@@ -56,8 +56,8 @@ let VueControllerConfig = {
     },
     debug: {
       enableAskDirPath: false,
-      enableExit: false,
-      enableClick: false,
+      enableExit: true,
+      enableClick: true,
       enableSortPersist: true,
     }
   },
@@ -1285,7 +1285,7 @@ let VueControllerConfig = {
       }
       
       //let parameters = []
-      this.lib.win.hide()
+      //this.lib.win.hide()
       this.lib.ElectronFileHelper.execExternalCommand(execCommand,() => {
         return this.exit()
       })

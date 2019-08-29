@@ -38,7 +38,9 @@
 <script src="./vendors/draggable/draggable.bundle.js"></script>
 <script src="./vendors/draggable/sortable.js"></script>
 
+<!--
 <script src="vendors/hotkeys/hotkeys.min.js" ></script>
+-->
 
   </head>
   <body>
@@ -175,11 +177,13 @@
              v-on:click="exec(item.exec)"
              v-bind:data-shortcut-index="i"
              v-bind:title="displayDescription(item)">
+          <!--
           <div class="hotkey-label"
                v-bind:class="{'hide': (mainItemHotkeyLabelInited === false || enableDragScroll)}">
             <span class="background"></span>
             <span class="hotkey">1</span>
           </div>
+          -->
           <template v-if="item === null">
             <img class="icon"
                  draggable="false" />
@@ -239,11 +243,13 @@
              v-on:click="exec(item.exec)"
              v-bind:data-shortcut-index="i"
              v-bind:title="displayDescription(item)">
+          <!--
           <div class="hotkey-label"
                v-bind:class="{'hide': (mainItemHotkeyLabelInited === false || enableDragScroll)}">
             <span class="background"></span>
             <span class="hotkey">1</span>
           </div>
+          -->
           <template v-if="item === null">
             <img class="icon"
                  draggable="false"/>

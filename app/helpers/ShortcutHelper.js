@@ -26,14 +26,23 @@ let ShortcutHelper = {
     return this
   },
   buildMockShortcut: function (i) {
-    return {
+    let mock = {
       icon: this.lib.path.join(__dirname, '/imgs/icons8-app-symbol-256.png'),
       name: `${i} APP`,
       //exec: `C:\\Windows\\notepad.exe "APP ${i}.txt"`,p
       exec: `"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" --ignore-certificate-errors --app=https://blog.pulipuli.info --test APP${i}`,
+      //exec: 'gedit',
       description: 'description',
       //order: i
     }
+    
+    if (process.platform === 'linux') {
+      //mock.exec = '/opt/google/chrome/google-chrome --app=http://blog.pulipuli.info'
+      mock.exec = 'gedit'
+    }
+    
+    
+    return mock
   },
   createMockShortcuts: function () {
     this.init()
@@ -89,7 +98,12 @@ let ShortcutHelper = {
     this.init()
     
     // for test
-    dirPath = 'D:/xampp/htdocs/projects-electron/Electron-Launch-Pad/demo-shortcuts/win32'
+    if (process.platform === 'win32') {
+      dirPath = 'D:/xampp/htdocs/projects-electron/Electron-Launch-Pad/demo-shortcuts/win32'
+    }
+    else if (process.platform === 'linux') {
+      dirPath = '/home/pudding/NetBeansProjects/[nodejs]/Electron-Launch-Pad/demo-shortcuts/linux'
+    }
     
     if (typeof(callback) !== 'function') {
       return this
