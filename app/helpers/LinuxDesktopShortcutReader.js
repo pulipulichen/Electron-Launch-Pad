@@ -29,10 +29,11 @@ let LinuxDesktopShortcutReader = {
       return cache
     }
     
+    //console.log(path)
     let content = this.lib.fs.readFileSync(path, 'utf8')
-    
+    //console.log(content)
     let result = {}
-    content.split('\n', (line) => {
+    content.split('\n').forEach((line) => {
       line = line.trim()
       if (line === '' || line.indexOf('=') === -1) {
         return this
@@ -43,11 +44,40 @@ let LinuxDesktopShortcutReader = {
       result[key] = value
     })
     
+    // -----------------
+    // remove shortcut which is not existed
+    
+    if (typeof(result["Exec"]) !== 'string') {
+      return undefined
+    }
+    else {
+      let execCommend = result["Exec"]
+      if (execCommend.startsWith('"')) {
+        execCommend = execCommend.slice(1, execCommend.indexOf('"', 1))
+      }
+      else if (execCommend.startsWith("'")) {
+        execCommend = execCommend.slice(1, execCommend.indexOf("'", 1))
+      }
+      else {
+        execCommend = execCommend.slice(0, execCommend.indexOf(' '))
+      }
+      
+      if (this.lib.fs.existsSync(execCommend) === false) {
+        return undefined
+      }
+    }
+    
+    // -----------------
+    
+    //console.log(result)
     this.cache[path] = result
+    
     
     return result
   }
 }
+
+// file:///home/pudding/NetBeansProjects/[nodejs]/Electron-Launch-Pad/app/chrome-aohghmighlieiainnegkcijnfilokake-Default
 
 if (typeof(window) !== 'undefined') {
   window.LinuxDesktopShortcutReader = LinuxDesktopShortcutReader

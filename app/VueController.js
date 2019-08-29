@@ -854,12 +854,15 @@ let VueControllerConfig = {
             <div class="launchpad-item sub-item" 
                  title="${shortcut.description}"
                  data-exec="${shortcut.exec}">
-              <img class="icon" draggable="false"
-                   src="${shortcut.icon}" />
+              <img class="icon" draggable="false" />
               <div class="name">
                 ${shortcut.name}
               </div>
             </div>`)
+          
+          if (typeof(shortcut.icon) === 'string') {
+            item.find('img.icon').attr('src', shortcut.icon)
+          }
           
           item.click(function () {
             let exec = this.getAttribute('data-exec')
@@ -1353,6 +1356,18 @@ let VueControllerConfig = {
       else {
         return ''
       }
+    },
+    getSubItemIcons: function (item) {
+      let list = []
+      if (Array.isArray(item.subItems)) {
+        for (let i = 0; i < item.subItems.length; i++) {
+          list.push(item.subItems[i])
+          if (list.length === 4) {
+            break
+          }
+        }
+      }
+      return list
     }
   }
 }

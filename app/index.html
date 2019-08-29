@@ -193,14 +193,22 @@
             </div>
           </template>
           <template v-else>
-            <img class="icon"
-                 v-bind:src="item.icon" 
-                 draggable="false"
-                 v-if="Array.isArray(item.icon) === false"/>
+            <template v-if="Array.isArray(item.subItems) === false">
+              <template v-if="typeof(item.icon) === 'string'">
+                <img class="icon"
+                     v-bind:src="item.icon" 
+                     draggable="false"/>
+              </template>
+              <template v-else>
+                <img class="icon"
+                     draggable="false"/>
+              </template>
+            </template>
+              
             <div class="icon folder"
-                 v-if="Array.isArray(item.icon) === true">
-              <template v-for="path in item.icon">
-                <img v-bind:src="path"
+                 v-if="Array.isArray(item.subItems) === true">
+              <template v-for="subIconPath in getSubItemIcons(item)">
+                <img v-bind:src="subIconPath"
                      draggable="false" />
               </template>
             </div>

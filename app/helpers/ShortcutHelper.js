@@ -261,9 +261,11 @@ fs.readdir(directoryPath, (err, files) => {
       if (i < fileList.length) {
         let shortcutPath = fileList[i]
         if (this.isShortcut(shortcutPath)) {
+          //console.log(shortcutPath)
           this.getShortcutMetadata(baseDirPath, shortcutPath, (metadata) => {
             if (typeof(metadata) === 'object') {
               result.push(metadata)
+              console.log(metadata)
             }
             continueLoop(i)
           })
@@ -379,18 +381,41 @@ fs.readdir(directoryPath, (err, files) => {
       return this
     }
     
-    
-    
     let metadata = this.lib.LinuxDesktopShortcutReader.read(shortcutPath)
+    if (metadata === undefined) {
+      callback()
+      return this
+    }
+    
     //console.log(data)
+
+    let name = metadata.Name
+    if (name.endsWith(".desktop")) {
+      name = name.slice(0, -8)
+    }
+    
+    let icon = metadata.Icon
+    if (typeof(icon) === 'string' 
+            && icon.startsWith('chrome-') 
+            && icon.endsWith('-Default') 
+            || (typeof(icon) === 'undefined')) {
+      icon = this.lib.path.join(__dirname, '/imgs/icons8-app-symbol-256.png')
+    }
+    
+    let execCommand = metadata.Exec
+    if (execCommand.indexOf('google-chrome') > -1 
+            && execCommand.indexOf(' --app-id=') > -1 ) {
+      callback()
+      return true
+    }
 
     shortcut = {
       //icon: iconPath,
-      name: metadata.Name,
-      exec: metadata.Exec,
+      name: name,
+      exec: execCommand,
       //workingDir: data.workingDir,
       description: metadata.Comment,
-      icon: metadata.Icon
+      icon: icon
     }
     
     this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
@@ -458,24 +483,27 @@ fs.readdir(directoryPath, (err, files) => {
      */
     
     if (process.platform === 'linux') {
-      dirPath = '/home/pudding/.local/share/applications/facebook.desktop'
+      dirPath = '/home/pudding/.local/share/applications/'
     }
     
     
     this.lib.ElectronFileHelper.readDirectory(dirPath, (list) => {
-      this.getDirListShortcuts(list.dir, (shortcuts) => {
+      this.getDirListShortcuts(dirPath, list.dir, (shortcuts) => {
+        //console.log(shortcuts)
         let dirShortcuts = []
         if (Array.isArray(shortcuts)) {
           dirShortcuts = shortcuts
         }
         
-        this.getFileListShortcuts(list.file, (shortcuts) => {
+        this.getFileListShortcuts(dirPath, list.file, (shortcuts) => {
+          //console.log(shortcuts)
           let fileShortcus = []
           if (Array.isArray(shortcuts)) {
             fileShortcus = shortcuts
           }
           
           let totalShortcuts = dirShortcuts.concat(fileShortcus)
+          //console.log(totalShortcuts)
           callback(totalShortcuts)
         })
       })
