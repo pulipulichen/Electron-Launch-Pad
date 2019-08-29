@@ -1,4 +1,9 @@
 let ShortcutHelper = {
+  debug: {
+    enableShortcutCache: false,
+    enableIconCache: false,
+    useTextDir: false,
+  },
   inited: false,
   lib: {
     path: null,

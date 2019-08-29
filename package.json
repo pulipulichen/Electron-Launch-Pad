@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "0.run-development": "electron index.js --mode development",
+    "2.run-development-dir": "electron index.js --mode development \"D:\\Program Files\\Weka-3-8\"",
+    "3.run-development-dir": "electron index.js --mode development \"D:\\xampp\\htdocs\\projects-electron\\Electron-Launch-Pad\\demo-shortcuts\\win32\"",
     "1.run-production": "electron index.js --mode production",
     "pack & open": "electron-builder index.js && node open-dist.js"
   },
@@ -28,10 +30,8 @@
   },
   "dependencies": {
     "electron-prompt": "^1.3.1",
-    "file-type": "^12.2.0",
     "jquery": "^3.4.1",
-    "platform-folders": "^0.4.1",
-    "read-chunk": "^3.2.0"
+    "terminal-exec": "^0.0.8"
   },
   "build": {
     "appId": "electron.launch.pad",

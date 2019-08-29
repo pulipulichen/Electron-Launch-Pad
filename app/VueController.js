@@ -236,7 +236,47 @@ let VueControllerConfig = {
        
         let items = $(this.$refs.main).find('.launchpad-item:not(.empty)')
         items.popup(popupOptions)
-        items.click(function () {
+      }, 0)
+    },
+    calcPopupSize: function (subItems) {
+      let size = Math.ceil(Math.sqrt(subItems.length))
+      if (size > 4) {
+        size = "4"
+      }
+      return size
+    },
+    buildSubItems: function (folderName, shortcuts) {
+      let _this = this
+      let container = $('<div class="launchpad-items-container"></div>')
+      container.attr('data-folder-name', folderName)
+      
+      let size = this.calcPopupSize(shortcuts)
+      container.attr('data-grid-size', size)
+      
+      if (Array.isArray(shortcuts)) {
+        shortcuts = this.getSortedSubItems(folderName, shortcuts)
+        
+        shortcuts.forEach((shortcut) => {
+          let item = $(`
+            <div class="launchpad-item sub-item" 
+                 title="${shortcut.description}"
+                 data-exec="${shortcut.exec}">
+              <img class="icon" draggable="false" />
+              <div class="name">
+                ${shortcut.name}
+              </div>
+            </div>`)
+          
+          if (typeof(shortcut.icon) === 'string') {
+            item.find('img.icon').attr('src', shortcut.icon)
+          }
+          
+          item.click(function () {
+            let exec = this.getAttribute('data-exec')
+            _this.exec(exec)
+          })
+          
+          container.append(item)
         })
         /*
         tippy('.redips-drag[data-order="3"]', {
