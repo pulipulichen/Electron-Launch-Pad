@@ -192,7 +192,18 @@ fs.readdir(directoryPath, (err, files) => {
     loop(0)
     return this
   },
-  getShortcutMetadata: function (dirPath, shortcutPath, callback) {
+  getShortcutMetadata: function (baseDirPath, shorcutPath, callback) {
+    if (process.platform === 'win32') {
+      return this.getShortcutMetadataOnWindows(baseDirPath, shorcutPath, callback)
+    }
+    else if (process.platform === 'linux') {
+      return this.getShortcutMetadataOnLinux(baseDirPath, shorcutPath, callback)
+    }
+    else {
+      console.error(`Platform is not support: ${process.platform}`)
+    }
+  },
+  getShortcutMetadataOnWindows: function (dirPath, shortcutPath, callback) {
     this.init()
     if (typeof(callback) !== 'function') {
       return this
@@ -208,6 +219,68 @@ fs.readdir(directoryPath, (err, files) => {
       callback(shortcut)
       return this
     }
+    
+    this.lib.windowShortcut.query(shortcutPath, (err, data) => {
+      //console.log(data)
+
+      let name = this.lib.path.basename(shortcutPath)
+      if (name.endsWith('.lnk')) {
+        name = name.slice(0, -4)
+      }
+      name = name.trim()
+      
+      let execCommand = `${data.target}`
+      if (data.args.trim() !== '') {
+        execCommand = `${execCommand} ${data.args}`
+      }
+
+      shortcut = {
+        //icon: iconPath,
+        name: name,
+        exec: execCommand,
+        //workingDir: data.workingDir,
+        description: data.desc
+      }
+
+      let icon = data.icon
+      if (icon === '') {
+        icon = data.target
+      }
+      if (icon.endsWith('.exe')) {
+        this.getIconFromEXE(icon, (iconPath) => {
+          shortcut.icon = iconPath
+          this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
+          callback(shortcut)
+          return true
+        })
+      }
+      else {
+        shortcut.icon = icon
+        this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
+        callback(shortcut)
+        return true
+      }
+    })
+    return this
+  },
+  getShortcutMetadataOnLinux: function (dirPath, shortcutPath, callback) {
+    this.init()
+    if (typeof(callback) !== 'function') {
+      return this
+    }
+    
+    if (typeof(shortcutPath) !== 'string' || shortcutPath.endsWith('.lnk') === false) {
+      callback()
+      return this
+    }
+    
+    let shortcut = this.lib.FolderConfigHelper.readShortcutMetadata(dirPath, shortcutPath)
+    if (typeof(shortcut) === 'object') {
+      callback(shortcut)
+      return this
+    }
+    
+    
     
     this.lib.windowShortcut.query(shortcutPath, (err, data) => {
       //console.log(data)
