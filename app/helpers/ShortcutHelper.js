@@ -1,4 +1,7 @@
 let ShortcutHelper = {
+  debug: {
+    enableShortcutCache: false,
+  },
   inited: false,
   lib: {
     path: null,
@@ -164,6 +167,9 @@ fs.readdir(directoryPath, (err, files) => {
   getDirListShortcuts: function (baseDirPath, dirList, callback) {
     this.init()
     
+    //console.log(dirList)
+    //return 
+    
     if (typeof(callback) !== 'function') {
       return this
     }
@@ -178,7 +184,9 @@ fs.readdir(directoryPath, (err, files) => {
     let loop = (i) => {
       if (i < dirList.length) {
         let dirPath = dirList[i]
+        console.log(dirPath)
         this.getDirShortcutMetadata(baseDirPath, dirPath, (shortcut) => {
+          return console.log(shortcut)
           if (shortcut !== undefined && typeof(shortcut) === 'object') {
             shortcutList.push(shortcut)
           }
@@ -207,6 +215,7 @@ fs.readdir(directoryPath, (err, files) => {
     
     let shortcut = this.lib.FolderConfigHelper.readShortcutMetadata(baseDirPath, subDirPath)
     if (typeof(shortcut) === 'object') {
+      return console.log(shortcut)
       callback(shortcut)
       return this
     }
@@ -216,6 +225,8 @@ fs.readdir(directoryPath, (err, files) => {
       name: this.lib.path.basename(subDirPath),
       subItems: []
     }
+    
+    return console.log(subDirPath)
     
     this.lib.ElectronFileHelper.readDirectory(subDirPath, (list) => {
       let files = list.file
@@ -364,7 +375,7 @@ fs.readdir(directoryPath, (err, files) => {
       if (icon.endsWith('.exe')) {
         this.getIconFromEXE(icon, (iconPath) => {
           shortcut.icon = iconPath
-          this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
+          //this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
           callback(shortcut)
           return true
         })
@@ -451,6 +462,7 @@ fs.readdir(directoryPath, (err, files) => {
     let iconFilepath = this.lib.ElectronFileHelper.resolve('cache/icon/' + iconFilename)
     
     if (this.lib.ElectronFileHelper.existsSync(iconFilepath)) {
+      console.log('有資料' + iconFilepath)
       if (typeof(callback) === 'function') {
         callback(iconFilepath)
       }
@@ -470,7 +482,8 @@ fs.readdir(directoryPath, (err, files) => {
       }
     })
 
-    this.lib.iconExtractor.getIcon('ANY_TEXT', filepath);
+    this.lib.iconExtractor.getIcon('ANY_TEXT', filepath)
+    return this
   },
   /*
   getShortcutsOnLinux: function (dirPath) {
@@ -525,7 +538,9 @@ fs.readdir(directoryPath, (err, files) => {
           
           let totalShortcuts = dirShortcuts.concat(fileShortcus)
           
-          this.lib.FolderConfigHelper.write(dirPath, 'ShortcutMetadata', this.cache.shortcuts)
+          if (this.debug.enableShortcutCache === true) { 
+            this.lib.FolderConfigHelper.write(dirPath, 'ShortcutMetadata', this.cache.shortcuts)
+          }
           //console.log(totalShortcuts)
           callback(totalShortcuts)
         })

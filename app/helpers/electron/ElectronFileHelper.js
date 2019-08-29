@@ -124,6 +124,8 @@ let ElectronFileHelper = {
   },
   writeFileBase64Sync: function (filepath, base64) {
     this.init()
+    console.log('write base64: ' + filepath)
+    console.log(base64)
     this.lib.fs.writeFileSync(filepath, base64, 'base64')
     return this
   },

@@ -1361,7 +1361,7 @@ let VueControllerConfig = {
       let list = []
       if (Array.isArray(item.subItems)) {
         for (let i = 0; i < item.subItems.length; i++) {
-          list.push(item.subItems[i])
+          list.push(item.subItems[i].icon)
           if (list.length === 4) {
             break
           }
