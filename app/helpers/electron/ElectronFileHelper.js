@@ -195,6 +195,47 @@ let ElectronFileHelper = {
       this.lib.shell.openExternal(path)
     }
     return this
+  },
+  readDirectory: function (dirPath, callback) {
+    
+    let fileList = []
+    let dirList = []
+    
+    if (typeof(callback) !== 'function') {
+      return this
+    }
+    else if (this.isDirSync(dirPath) === false) {
+      callback({
+        file: fileList,
+        dir: dirList
+      })
+    }
+    
+    this.lib.fs.readdir(dirPath, (err, files) => {
+        //handling error
+        if (err) {
+            return console.error('Unable to scan directory: ' + dirPath + '\n' + err);
+        } 
+        //listing all files using forEach
+        files.forEach((file) => {
+          // Do whatever you want to do with the file
+          let filepath = this.lib.path.join(dirPath, file)
+          let isDir = this.lib.fs.lstatSync(filepath).isDirectory()
+
+          if (isDir) {
+            dirList.push(filepath)
+          }
+          else {
+            fileList.push(filepath)
+          }
+        })
+        
+        callback({
+          file: fileList.sort(),
+          dir: dirList.sort()
+        })
+    })
+    return this
   }
 }
 
