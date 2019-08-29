@@ -8,6 +8,8 @@ let ElectronFileHelper = {
     path: null,
     fs: null,
     exec: null,
+    shell: null,
+    electron: null,
   },
   init: function () {
     if (this.inited === true) {
@@ -19,6 +21,9 @@ let ElectronFileHelper = {
     this.lib.path = RequireHelper.require('path')
     this.lib.fs = RequireHelper.require('fs')
     this.lib.exec = RequireHelper.require('child_process').exec
+    
+    this.lib.electron = RequireHelper.require('electron')
+    this.lib.shell = this.lib.electron.shell
     
     this.inited = true
   },
@@ -45,6 +50,16 @@ let ElectronFileHelper = {
   existsSync: function (filepath) {
     this.init()
     return this.lib.fs.existsSync(filepath)
+  },
+  isDirSync: function (dirpath) {
+    this.init()
+    if (this.existsSync(dirpath)) {
+      
+      return this.lib.fs.lstatSync(dirpath).isDirectory()
+    }
+    else {
+      return false
+    }
   },
   readFileSync: function (filepath) {
     this.init()
@@ -179,47 +194,6 @@ let ElectronFileHelper = {
     if (this.existsSync(path)) {
       this.lib.shell.openExternal(path)
     }
-    return this
-  },
-  readDirectory: function (dirPath, callback) {
-    
-    let fileList = []
-    let dirList = []
-    
-    if (typeof(callback) !== 'function') {
-      return this
-    }
-    else if (this.isDirSync(dirPath) === false) {
-      callback({
-        file: fileList,
-        dir: dirList
-      })
-    }
-    
-    this.lib.fs.readdir(dirPath, (err, files) => {
-        //handling error
-        if (err) {
-            return console.error('Unable to scan directory: ' + dirPath + '\n' + err);
-        } 
-        //listing all files using forEach
-        files.forEach((file) => {
-          // Do whatever you want to do with the file
-          let filepath = this.lib.path.join(dirPath, file)
-          let isDir = this.lib.fs.lstatSync(filepath).isDirectory()
-
-          if (isDir) {
-            dirList.push(filepath)
-          }
-          else {
-            fileList.push(filepath)
-          }
-        })
-        
-        callback({
-          file: fileList.sort(),
-          dir: dirList.sort()
-        })
-    })
     return this
   }
 }

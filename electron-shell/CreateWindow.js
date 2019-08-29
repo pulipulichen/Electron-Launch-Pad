@@ -15,7 +15,7 @@ if (process.argv.indexOf('--mode') - process.argv.indexOf('development') === -1)
 // For test
 //mode = 'development'
 
-module.exports = function (shortcutDirPath, callback) {
+module.exports = function (shortcutsDirPath, callback) {
   
   let iconPath = path.join(__dirname, '../app/imgs/icon256.ico')
   if (process.platform === 'linux') {
@@ -24,12 +24,21 @@ module.exports = function (shortcutDirPath, callback) {
   
   // https://electronjs.org/docs/api/screen
   let screen = electron.screen
-  let point = screen.getCursorScreenPoint()
-  let display = screen.getDisplayNearestPoint(point)
+  let display
+  if (false) {
+    let point = screen.getCursorScreenPoint()
+    display = screen.getDisplayNearestPoint(point)
+  }
+  else {
+    // 測試用，固定用最後一個熒幕
+    let displays = screen.getAllDisplays()
+    display = displays[0]
+  }
+  
   let offsetX = display.bounds.x
   let offsetY = display.bounds.y
   //let displays = screen.getAllDisplays()
-  console.log(display)
+  //console.log(display)
   
   let {width, height} = display.workArea
   
@@ -76,7 +85,7 @@ module.exports = function (shortcutDirPath, callback) {
   //win.rendererSideName.filepath = filepath
   //win.rendererSideName.mode = mode
   win.mode = mode
-  win.shortcutDirPath = shortcutDirPath
+  win.shortcutsDirPath = shortcutsDirPath
   
   //return win
   win.webContents.once('dom-ready', () => {

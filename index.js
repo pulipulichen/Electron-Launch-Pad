@@ -14,11 +14,13 @@ const {
 const ProcessArgvHelper = require('./electron-shell/ProcessArgvHelper.js')
 
 let dirPath
+//console.log(ProcessArgvHelper.getDirPaths())
 ProcessArgvHelper.getDirPaths().forEach(path => {
   if (dirPath === undefined) {
     dirPath = path
   }
 })
+//console.log(dirPath)
 
 // ------------
 
