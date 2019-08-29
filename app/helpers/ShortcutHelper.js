@@ -27,6 +27,9 @@ let ShortcutHelper = {
     this.inited = true
     return this
   },
+  cache: {
+    shortcuts: {}
+  },
   buildMockShortcut: function (i) {
     let mock = {
       icon: this.lib.path.join(__dirname, '/imgs/icons8-app-symbol-256.png'),
@@ -292,15 +295,25 @@ fs.readdir(directoryPath, (err, files) => {
       return false
     }
   },
-  getShortcutMetadata: function (baseDirPath, shorcutPath, callback) {
+  getShortcutMetadata: function (baseDirPath, shortcutPath, callback) {
+    let addShortcutCache = (shortcut) => {
+      
+      this.cache.shortcuts[shortcutPath] = shortcut
+      
+      if (typeof(callback) === 'function') {
+        callback(shortcut)
+      }
+    }
+    
     if (process.platform === 'win32') {
-      return this.getShortcutMetadataOnWindows(baseDirPath, shorcutPath, callback)
+      return this.getShortcutMetadataOnWindows(baseDirPath, shortcutPath, addShortcutCache)
     }
     else if (process.platform === 'linux') {
-      return this.getShortcutMetadataOnLinux(baseDirPath, shorcutPath, callback)
+      return this.getShortcutMetadataOnLinux(baseDirPath, shortcutPath, addShortcutCache)
     }
     else {
       console.error(`Platform is not support: ${process.platform}`)
+      return this
     }
   },
   getShortcutMetadataOnWindows: function (dirPath, shortcutPath, callback) {
@@ -484,7 +497,7 @@ fs.readdir(directoryPath, (err, files) => {
     
     if (process.platform === 'linux') {
       //dirPath = '/home/pudding/.local/share/applications/test/'
-      dirPath = '/home/pudding/.local/share/applications/test/'
+      dirPath = '/home/pudding/.local/share/applications'
     }
     
     
@@ -504,6 +517,8 @@ fs.readdir(directoryPath, (err, files) => {
           }
           
           let totalShortcuts = dirShortcuts.concat(fileShortcus)
+          
+          this.lib.FolderConfigHelper.write(dirPath, 'ShortcutMetadata', this.cache.shortcuts)
           //console.log(totalShortcuts)
           callback(totalShortcuts)
         })
