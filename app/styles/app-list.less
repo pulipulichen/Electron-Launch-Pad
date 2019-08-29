@@ -5,7 +5,6 @@
   max-height: calc(100vh - (@searchbar-height * 2));
   overflow-y: hidden;
   outline: none;
-  user-select: none;
 
   &.disabled,
   &.disabled .launchpad-item {
@@ -34,95 +33,22 @@
   //max-height: (100vh - @searchbar-height);
   //overflow: hidden;
 
-  &.hidden .launchpad-item {
-    visibility: hidden;
-  }
-  
   .launchpad-item {
     display: inline-block;
     height: calc(((100vh - @searchbar-height - @scroll-down-padding-height) / @max-rows));
     width: calc(((100vw - (@pager-width * 2)) / @max-cols) - 10px);
 
-    //border: 1px solid yellow;
-    
+    //border: 1px solid red;
     text-align: center;
     color: white;
     font-size: 2rem;
     user-select: none;
+    cursor: pointer;
     //position: absolute;
-    //border-radius: 1rem;
-    outline: none;
-    
-    &:focus .item-wrapper {
-      //border: 1px solid yellow;
-      background-color: @launchpad-item-focus-color;
-    }
-    
-    //&.draggable--over .hotkey-label,
-    //&.draggable-source--placed .hotkey-label {
-    //  opacity: 0 !important;
-    //}
+    border-radius: 1rem;
 
-    .item-wrapper {
-      display: inline-block;
-      border-radius: 2rem;
-      padding-left: 1rem;
-      padding-right: 1rem;
-      padding-top: 0.5rem;
-      cursor: pointer;
-      
-      .hotkey-label {
-        position: relative;
-        left: calc((((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 7px) / 2 * -1);
-        transition: opacity 500ms;
-        opacity: 1;
-        
-        &.hide {
-          //display: none;
-          opacity: 0;
-        }
-        
-        /*
-        span.background {
-          width: 0;
-          height: 0;
-          border-style: solid;
-          border-width: 2.5rem 2.5rem 0 0;
-          border-color: rgb(255,255,255) transparent transparent transparent;
-          position: absolute;
-        }
-        */
-        
-        span.hotkey {
-          font-size: 1rem;
-          //background-color: rgb(255,255,255, 0.7);
-          color: black;
-          padding: 0.2rem;
-          position: absolute;
-          width: 3rem;
-          line-height: 1.3rem;
-          text-align: center;
-          background-color: rgb(255,255,255);
-          border-radius: 0.2rem;
-        }
-      }
-    }
-    
-    /*
-    &.folder span.triangle {
-      border-color: rgb(255,255,255) transparent transparent transparent !important;
-    }
-    */
-    
-    .name {
-      line-height: 2rem;
-      font-size: 2rem;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      max-width: calc(((100vw - (@pager-width * 2)) / @max-cols) - 50px);
-      margin-left: 1rem;
-      margin-right: 1rem;
+    div {
+      height: 2rem;
     }
 
     .icon {
@@ -133,10 +59,10 @@
       margin: auto;
       
       &.folder {
-        height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 7px);
-        max-height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 7px);
-        width: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 7px);
-        max-width: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 7px);
+        height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px);
+        max-height: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px);
+        width: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px);
+        max-width: calc(((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px);
         border: 2px solid white;
         border-radius: 2rem;
         padding: 2px;
@@ -163,13 +89,12 @@
     }
 
     &.disable {
-      //pointer-events: none;
+      pointer-events: none;
     }
 
-    &.draggable-source--is-dragging .item-wrapper {
-      background-color: rgba(255, 255, 255, 0.3);
-      opacity: 0.7;
-      
+    &.draggable-source--is-dragging {
+      background-color: rgba(255, 255, 255, 0.5);
+      opacity: 0.5;
     }
   }
 
@@ -199,9 +124,5 @@
     vertical-align: top;
   }
   */
-  
-  &.is-dragging .hotkey-label {
-    opacity: 0 !important;
-  }
-}
 
+}

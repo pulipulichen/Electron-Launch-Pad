@@ -32,21 +32,18 @@
 <script src="vendors/vue/vue.min.js"></script>
 
 <script src="./helpers/ShortcutHelper.js"></script>
-<script src="./helpers/FolderConfigHelper.js"></script>
 
 <!-- Entire bundle -->
-<script src="./vendors/draggable/draggable.bundle.js"></script>
-<script src="./vendors/draggable/sortable.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/draggable.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/sortable.js"></script>
 
-<script src="vendors/hotkeys/hotkeys.min.js" ></script>
 
   </head>
   <body>
 
 <!-- tables inside this DIV could contain drag-able content  -->
 <div id="app" 
-     ref="main"
-     v-bind:class="{'popup-visible': isPopupVisiable}">
+     ref="main">
   
   <div class="searchbar"
        v-on:mouseover="scrollPaddingDragUpEnter"
@@ -54,42 +51,18 @@
     <div class="ui search fluid" 
          v-on:click.stop="">
       <div class="ui icon fluid input">
-        <input type="text" class="prompt"
+        <input class="prompt" type="text" 
                placeholder="Search APP..."
-               v-model="searchKeyword"
-               ref='SearchInput'
-               v-on:keydown="onSearchInputKeyDown(event)"
-               v-on:focus="onSearchInputFocus"
-               v-on:blur="onSearchInputBlur">
-        <i class="search icon"
-           v-if="isSearchMode === false"></i>
-        <i class="close icon reset"
-           v-if="isSearchMode === true"
-           v-on:click="searchKeyword = ''"></i>
+               v-modal="searchKeyword">
+        <i class="search icon"></i>
       </div>
       <div class="results"></div>
     </div>
   </div>
   
-  <div class="pager-buttons-panel">
-    <button class="ui circular icon button" 
-            type="button"
-            v-on:click.stop="scrollPage(false)"
-            title="Scroll to previous page">
-      <i class="arrow up icon"></i>
-    </button>
-    <button class="ui circular icon button" 
-            type="button"
-            v-on:click.stop="scrollPage(true)"
-            title="Scroll to next page">
-      <i class="arrow down icon"></i>
-    </button>
-  </div>
   <div class="pager"
        v-on:wheel.stop=""
-       ref="pager"
-       v-if="isSearchMode === false"
-       v-bind:class="{'hidden': (mainItemsInited === false)}">
+       ref="pager">
     <div v-for="i in maxPages"
          class="item"
          v-bind:class="{'current': ((i-1) === currentPage), 'disabled': waitDragScroll}"
@@ -97,49 +70,41 @@
          v-bind:title="'Go to page ' + i">
     </div>
   </div>
-  <div class="pager"
-       v-on:wheel.stop=""
-       ref="searchResultPager"
-       v-if="isSearchMode === true"
-       v-bind:class="{'hidden': (mainItemsInited === false)}">
-    <div v-for="i in searchResultPageLength"
-         class="item"
-         v-bind:class="{'current': ((i-1) === currentSearchResultPage), 'disabled': waitDragScroll}"
-         v-on:click="scrollPage((i-1))"
-         v-bind:title="'Go to search result page ' + i">
-    </div>
-  </div>
   
   <div class="buttons-panel"
        v-on:click.stop="">
-    <button class="ui circular icon button" 
+    <button class="ui icon button" 
             type="button"
-            v-on:click.stop="addPage"
-            title="add page"
-            v-if="isSearchMode === false">
-      <i class="plus icon"></i>
+            v-on:click.stop="scrollPage(false)"
+            title="Scroll to previous page">
+      <i class="arrow up icon"></i>
     </button>
-    <button class="ui circular icon button" 
+    <button class="ui icon button" 
+            type="button"
+            v-on:click.stop="scrollPage(true)"
+            title="Scroll to next page">
+      <i class="arrow down icon"></i>
+    </button>
+    <button class="ui icon button" 
             type="button"
             v-on:click.stop="removePage"
-            v-bind:class="{disabled: (isPageRemovable === false)}"
-            title="remove page"
-            v-if="isSearchMode === false">
+            v-bind:class="{disabled: (isPageRemoable === false)}"
+            title="add page">
       <i class="minus icon"></i>
     </button>
-    <button class="ui circular icon button" 
+    <button class="ui icon button" 
+            type="button"
+            v-on:click.stop="addPage"
+            title="remove page">
+      <i class="plus icon"></i>
+    </button>
+    <button class="ui icon button" 
             type="button"
             v-on:click.stop="changeFolder"
             title="Change shortcuts folder">
-      <i class="cogs icon"></i>
-    </button>
-    <button class="ui circular icon button open-folder-button" 
-            type="button"
-            v-on:click.stop="openFolder"
-            title="Open shortcuts folder">
       <i class="folder open outline icon"></i>
     </button>
-    <button class="ui circular icon button" 
+    <button class="ui icon button" 
             type="button"
             v-on:click.stop="exit"
             title="Exit">
@@ -147,125 +112,51 @@
     </button>
   </div>
   
-  <!-- --------------------------------------------------- -->
-  
-  <div class="app-list"
+  <!--
+  <div class="drag-overlay"
+       v-on:mousemove.stop=""
+       v-on:dragover.stop=""
+       v-on:dragenter.stop=""
+       v-bind:class="{enable: waitDragScroll}">
+  </div>
+  -->
+
+    <div class="app-list"
          id="AppList"
          v-bind:data-page="currentPage"
-         v-bind:class="{
-            'disabled': waitDragScroll, 
-            'is-dragging': enableDragScroll, 
-            'hidden': (mainItemsInited === false),
-            'search-input-focused': isSearchInputFocused
-         }"
+         v-bind:class="{'disabled': waitDragScroll}"
          ref="AppList"
-         tabindex="-1"
-         v-if="isSearchMode === false">
-      <div v-for="(item, i) in sortedMainItems"
+         tabindex="-1">
+      <div v-for="(item, i) in getSortedShortcuts"
            class="launchpad-item"
-           v-bind:class="{
-              'empty': (item === null), 
-              'item': (item !== null), 
-              'folder': (item !== null && Array.isArray(item.subItems) === true),
-              'visible-in-current-page': isVisibleInCurrentPage(i)
-            }"
-           v-bind:tabindex="attrTabIndex(item)"
-           v-on:focus="setLastFocus">
-        <div class="item-wrapper"
-             v-on:click="exec(item.exec)"
-             v-bind:data-shortcut-index="i"
-             v-bind:title="displayDescription(item)">
-          <div class="hotkey-label"
-               v-bind:class="{'hide': (mainItemHotkeyLabelInited === false || enableDragScroll)}">
-            <span class="background"></span>
-            <span class="hotkey">1</span>
+           v-bind:class="{'empty': (item === null), 'disable': (item === null && enableDragScroll === false)}"
+           v-bind:tabindex="getTabIndex(item)"
+           v-bind:title="displayDescription(item)"
+           v-bind:data-shortcut-index="i">
+        <template v-if="item === null">
+          <img draggable="false"/>
+          <div>
+            (NULL)
           </div>
-          <template v-if="item === null">
-            <img class="icon"
-                 draggable="false" />
-            <div class="name">
-              (NULL)
-            </div>
-          </template>
-          <template v-else>
-            <img class="icon"
-                 v-bind:src="item.icon" 
-                 draggable="false"
-                 v-if="Array.isArray(item.icon) === false"/>
-            <div class="icon folder"
-                 v-if="Array.isArray(item.icon) === true">
-              <template v-for="path in item.icon">
-                <img v-bind:src="path"
-                     draggable="false" />
-              </template>
-            </div>
-            <div class="name">
-              {{ item.name }}
-            </div>
-          </template>
-        </div>
-      </div>
-      
-      <div class="scroll-padding down"
-          v-bind:class="{'enable': enableDragScroll}"
-          v-on:mouseover="scrollPaddingDragDownEnter"
-          v-on:click="scrollPage(true)">
-      </div>
-  </div>
-  
-  <!-- --------------------------------------------------- -->
-  
-  <div class="app-list search-result-list"
-         id="SearchResultList"
-         v-bind:data-page="currentSearchResultPage"
-         v-bind:class="{
-          'disabled': waitDragScroll, 
-          'hidden': (mainItemsInited === false),
-          'search-input-focused': isSearchInputFocused,
-         }"
-         ref="SearchResultList"
-         tabindex="-1"
-         v-if="isSearchMode === true">
-      <div v-for="(item, i) in searchResultList"
-           class="launchpad-item"
-           v-bind:class="{
-            'empty': (item === null),
-            'item': (item !== null), 
-            'visible-in-current-page': isVisibleInCurrentPage(i)
-           }"
-           v-bind:tabindex="attrTabIndex(item)"
-           v-on:focus="setLastFocus">
-        <div class="item-wrapper"
-             v-on:click="exec(item.exec)"
-             v-bind:data-shortcut-index="i"
-             v-bind:title="displayDescription(item)">
-          <div class="hotkey-label"
-               v-bind:class="{'hide': (mainItemHotkeyLabelInited === false || enableDragScroll)}">
-            <span class="background"></span>
-            <span class="hotkey">1</span>
+        </template>
+        <template v-else>
+          <img class="icon"
+               v-bind:src="item.icon" 
+               draggable="false"
+               v-if="Array.isArray(item.icon) === false"/>
+          <div class="icon folder"
+               v-if="Array.isArray(item.icon) === true">
+            <template v-for="path in item.icon">
+              <img v-bind:src="path"
+                   draggable="false" />
+            </template>
           </div>
-          <template v-if="item === null">
-            <img class="icon"
-                 draggable="false"/>
-            <div class="name">
-              (NULL)
-            </div>
-          </template>
-          <template v-else>
-            <img class="icon"
-                 v-bind:src="item.icon" 
-                 draggable="false"
-                 v-if="Array.isArray(item.icon) === false"/>
-            <div class="icon folder"
-                 v-if="Array.isArray(item.icon) === true">
-              <template v-for="path in item.icon">
-                <img v-bind:src="path"
-                     draggable="false" />
-              </template>
-            </div>
-            <div class="name" v-html="displaySearchNameMatch(item.name)"></div>
-          </template>
-        </div>
+          <div>
+            {{ item.name }}
+          </div>
+        
+  
+        </template>
       </div>
       
       <div class="scroll-padding down"
