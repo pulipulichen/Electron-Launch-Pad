@@ -265,7 +265,7 @@ fs.readdir(directoryPath, (err, files) => {
           this.getShortcutMetadata(baseDirPath, shortcutPath, (metadata) => {
             if (typeof(metadata) === 'object') {
               result.push(metadata)
-              console.log(metadata)
+              //console.log(metadata)
             }
             continueLoop(i)
           })
@@ -356,7 +356,7 @@ fs.readdir(directoryPath, (err, files) => {
       }
       else {
         shortcut.icon = icon
-        this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
+        //this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
         callback(shortcut)
         return true
       }
@@ -418,7 +418,7 @@ fs.readdir(directoryPath, (err, files) => {
       icon: icon
     }
     
-    this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
+    //this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
     callback(shortcut)
     return true
   },
@@ -484,7 +484,7 @@ fs.readdir(directoryPath, (err, files) => {
     
     if (process.platform === 'linux') {
       //dirPath = '/home/pudding/.local/share/applications/test/'
-      dirPath = '/home/pudding/.local/share/applications/'
+      dirPath = '/home/pudding/.local/share/applications/test/'
     }
     
     

@@ -93,8 +93,8 @@ let ElectronFileHelper = {
    */
   writeFileDelay: function (filepath, content, delaySec, callback) {
     this.init()
-    console.log(filepath)
-    return this.writeFileSync(filepath, content)
+    //console.log(filepath)
+    //return this.writeFileSync(filepath, content)
     
     if (typeof(delaySec) === 'function') {
       callback = delaySec
@@ -109,9 +109,9 @@ let ElectronFileHelper = {
       this.writeFileDelayTimer[filepath] = null
     }
     
-    console.log('writeFile', filepath)
+    //console.log('writeFile', filepath)
     this.writeFileDelayTimer[filepath] = setTimeout(() => {
-      this.writeFileAsync(filepath, content, () => {
+      this.writeFileSync(filepath, content, () => {
         this.writeFileDelayTimer[filepath] = null
         
         if (typeof(callback) === 'function') {
