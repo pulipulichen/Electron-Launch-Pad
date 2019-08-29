@@ -273,6 +273,12 @@ let ElectronFileHelper = {
       })
     })
     return this
+  },
+  move: function (oldPath, newPath) {
+    if (this.existsSync(oldPath)) {
+      this.lib.fs.renameSync(oldPath, newPath)
+    }
+    return this
   }
 }
 

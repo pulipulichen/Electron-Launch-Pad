@@ -273,7 +273,7 @@ fs.readdir(directoryPath, (err, files) => {
     
     let result = []
     
-    console.log(fileList)
+    //console.log(fileList)
     
     let continueLoop = (i) => {
       console.log(i)
@@ -287,10 +287,10 @@ fs.readdir(directoryPath, (err, files) => {
       if (i < fileList.length) {
         let shortcutPath = fileList[i]
         if (this.isShortcut(shortcutPath)) {
-          console.log([i, shortcutPath])
+          //console.log([i, shortcutPath])
           this.getShortcutMetadata(baseDirPath, shortcutPath, (metadata) => {
-            console.log([i, shortcutPath])
-            console.log(metadata)
+            //console.log([i, shortcutPath])
+            //console.log(metadata)
             if (typeof(metadata) === 'object') {
               result.push(metadata)
               //console.log(metadata)
@@ -374,6 +374,10 @@ fs.readdir(directoryPath, (err, files) => {
       if (data.args.trim() !== '') {
         execCommand = `${execCommand} ${data.args}`
       }
+      
+      let iconv = RequireHelper.require('iconv-lite')
+      execCommand = iconv.decode(execCommand, 'UTF8')
+      console.log(execCommand)
 
       shortcut = {
         //icon: iconPath,
@@ -384,9 +388,14 @@ fs.readdir(directoryPath, (err, files) => {
       }
 
       let icon = data.icon
-      if (icon === '') {
+      if (icon === '' 
+              || this.lib.ElectronFileHelper.existsSync(icon) === false) {
         icon = data.target
       }
+      console.log(['icon before', icon])
+      GLOBAL_ICON = icon
+      icon = iconv.decode(icon, 'UTF8')
+      console.log(['icon after', icon])
       
       if (icon.endsWith('.exe')) {
         this.getIconFromEXE(icon, (iconPath) => {
@@ -466,6 +475,11 @@ fs.readdir(directoryPath, (err, files) => {
   },
   getIconFromEXE: function (filepath, callback) {
     this.init()
+    
+    if (typeof(callback) !== 'function') {
+      return this
+    }
+    
     let iconFilename = filepath
     if (iconFilename.endsWith('.exe')) {
       iconFilename = iconFilename.slice(0, -4)
@@ -497,7 +511,15 @@ fs.readdir(directoryPath, (err, files) => {
     console.log('Try to extract icon: ' + filepath)
     //this.lib.iconExtractor = RequireHelper.require('icon-extractor')
     //this.lib.iconExtractor.emitter.once('icon', (data) => {
-    this.lib.IconExtractHelper.extract(filepath, iconFilename, callback)
+    this.lib.IconExtractHelper.extract(filepath, iconFilename, (tmpPath) => {
+      if (tmpPath !== undefined) {
+        this.lib.ElectronFileHelper.move(tmpPath, iconFilepath)
+        callback(iconFilepath)
+      }
+      else {
+        callback()
+      }
+    })
 
     //this.lib.iconExtractor.getIcon(filepath, filepath)
     return this
@@ -534,7 +556,7 @@ fs.readdir(directoryPath, (err, files) => {
       dirPath = '/home/pudding/.local/share/applications'
     }
     else if (process.platform === 'win32') {
-      dirPath = 'D:/xampp/htdocs/projects-electron/Electron-Launch-Pad/demo-shortcuts/win32'
+      dirPath = 'D:/xampp/htdocs/projects-electron/Electron-Launch-Pad/demo-shortcuts/win32/test'
     }
     
     
