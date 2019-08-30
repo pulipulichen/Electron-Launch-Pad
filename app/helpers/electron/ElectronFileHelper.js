@@ -330,6 +330,12 @@ let ElectronFileHelper = {
       this.lib.fs.renameSync(oldPath, newPath)
     }
     return this
+  },
+  remove: function (path) {
+    if (this.existsSync(path)) {
+      this.lib.fs.unlinkSync(path)
+    }
+    return this
   }
 }
 

@@ -9,7 +9,7 @@ let VueControllerConfig = {
     
     searchKeyword: "",
     currentSearchResultPage: 0,
-    shortcutsDirPath: null,
+    shortcutsFolderPath: null,
     
     mainItemsInited: false,
     currentPage: 0,
@@ -18,7 +18,6 @@ let VueControllerConfig = {
     enableDragScroll: false,
     isPopupVisiable: false,
     waitDragScroll: false,
-    shortcutsFolderPath: 'folder-path-for-test',
     mainItemsDraggable: null,
     currentPopupTrigger: null,
     mainItemHotkeyLabelInited: false,
@@ -56,8 +55,8 @@ let VueControllerConfig = {
     },
     debug: {
       enableAskDirPath: true,
-      enableExit: true,
-      enableClick: true,
+      enableExit: false,
+      enableClick: false,
       enableSortPersist: true,
     }
   },
@@ -70,7 +69,7 @@ let VueControllerConfig = {
     this.lib.execFile = RequireHelper.require('child_process').execFile;
     this.lib.win = this.lib.remote.getCurrentWindow()
     this.lib.mode = this.lib.win.mode
-    this.shortcutsDirPath = this.lib.win.shortcutsDirPath
+    this.shortcutsFolderPath = this.lib.win.shortcutsDirPath
     this.lib.ipc = this.lib.electron.ipcRenderer
     
     //this.lib.REDIPSHelper = RequireHelper.require('./helpers/REDIPSHelper')
@@ -105,6 +104,10 @@ let VueControllerConfig = {
   },
   computed: {
     isSearchMode: function () {
+      setTimeout(() => {
+        this.initDropdownMenu()
+      }, 10)
+      
       let keyword = this.searchKeyword.trim()
       return (keyword !== "")
     },
@@ -298,21 +301,22 @@ let VueControllerConfig = {
   },
   methods: {
     _afterMounted: function () {
-      this.lib.ShortcutHelper.get(this.shortcutsDirPath, (shortcuts) => {
+      this.lib.ShortcutHelper.get(this.shortcutsFolderPath, (shortcuts) => {
         this.shortcuts = shortcuts
         
         this.initDraggable()
         this.initPopup()
         this.initMouseWheelKeys()
         this.initIPCEvent()
+        this.initDropdownMenu()
         this.initCurrentPage(() => {
           this.mainItemsInited = true
           //this.setupSearchInputKeyEvents()
           this.$refs.SearchInput.focus()
 
-          //console.log(this.shortcutsDirPath)
+          //console.log(this.shortcutsFolderPath)
           if (this.debug.enableAskDirPath === true 
-                  && this.lib.ElectronFileHelper.isDirSync(this.shortcutsDirPath) === false) {
+                  && this.lib.ElectronFileHelper.isDirSync(this.shortcutsFolderPath) === false) {
             this.changeFolder()
           }
         })
@@ -373,6 +377,17 @@ let VueControllerConfig = {
         //console.log(['[', path, ']'])
         this.changeFolderCallback(path)
       })
+      return this
+    },
+    initDropdownMenu: function () {
+      let menu = $(this.$refs.DropdownMenu)
+      
+      let className = 'dropdown-menu-inited'
+      if (menu.hasClass(className) === false) {
+        menu.addClass(className)
+              .dropdown()
+      }
+      return this
     },
     getPageByItemIndex: function (index) {
       return Math.floor(index / this.pageItemCount)
@@ -852,7 +867,7 @@ let VueControllerConfig = {
         shortcuts.forEach((shortcut) => {
           let item = $(`
             <div class="launchpad-item sub-item" 
-                 title="${shortcut.description}">
+                 title="${this.displayDescription(shortcut)}">
               <img class="icon" draggable="false" />
               <div class="name">
                 ${shortcut.name}
@@ -1196,16 +1211,24 @@ let VueControllerConfig = {
       return this
     },
     displayDescription: function (item) {
-      if (item === null || typeof(item.description) !== 'string') {
-        return ''
+      let description = []
+      
+      if (typeof(item) === 'object' && item !== null) { 
+        if (typeof(item.name) === 'string'
+                && item.name.trim() !== '') {
+          description.push(item.name.trim())
+        }
+        if (typeof(item.description) === 'string' 
+                && item.description.trim() !== '') {
+          description.push(item.description.trim())
+        }
       }
-      else {
-        return item.description
-      }
+      
+      return description.join(': ')
     },
     openFolder: function () {
       //console.error('openFolder folder')
-      let dirpath = this.shortcutsDirPath
+      let dirpath = this.shortcutsFolderPath
       if (typeof(dirpath) === 'string'
               && this.lib.ElectronFileHelper.isDirSync(dirpath)) {
         //console.log(dirpath)
@@ -1217,16 +1240,17 @@ let VueControllerConfig = {
     changeFolder: function () {
       //console.error('change folder')
       //this.lib.ipc.send
-      this.lib.ipc.send('change-folder', this.shortcutsDirPath)
+      this.lib.ipc.send('change-folder', this.shortcutsFolderPath)
       return this
     },
     changeFolderCallback: function (dirpath) {
       if (typeof(dirpath) === 'string'
               && this.lib.ElectronFileHelper.isDirSync(dirpath)) {
         //console.log(dirpath)
-        this.shortcutsDirPath = dirpath
+        this.shortcutsFolderPath = dirpath
+        this.searchKeyword = ''
         this.mainItemsInited = false
-        this.lib.ShortcutHelper.get(this.shortcutsDirPath, (shortcuts) => {
+        this.lib.ShortcutHelper.get(this.shortcutsFolderPath, (shortcuts) => {
           this.shortcuts = shortcuts
           this.initDraggable()
           this.initPopup()
@@ -1390,6 +1414,60 @@ let VueControllerConfig = {
         }
       }
       return list
+    },
+    resetAllConfig: function () {
+      this.resetOrder(false)
+      this.resetShortcutsCache(false)
+      this.resetIconsCache(true)
+      return this
+    },
+    resetOrder: function (doReload) {
+      this.lib.FolderConfigHelper.reset(this.shortcutsFolderPath, ['mainItemsSorted', 'itemsCount', 'subItemsSorted'])
+      // 重新載入icon吧
+      if (doReload !== false) {
+        //this.changeFolderCallback(this.shortcutsFolderPath)
+        location.reload()
+      }
+      return this
+    },
+    resetShortcutsCache: function (doReload) {
+      //console.error('resetShortcutsCache')
+      this.lib.FolderConfigHelper.reset(this.shortcutsFolderPath, 'ShortcutMetadata')
+      // 重新載入icon吧
+      if (doReload !== false) {
+        //this.changeFolderCallback(this.shortcutsFolderPath)
+        location.reload()
+      }
+      return this
+    },
+    resetIconsCache: function (doReload) {
+      //console.error('resetIconsCache')
+      // 遍歷現在的shortcuts中，開頭為抽取出來的檔案的icon
+      let header = this.lib.ElectronFileHelper.resolve('cache/icon/')
+      let checkAndRemoveIcons = (shortcut) => {
+        if (typeof(shortcut.icon) === 'string' 
+                && shortcut.icon.startsWith(header)) {
+          this.lib.ElectronFileHelper.remove(shortcut.icon)
+        }
+      }
+      
+      this.shortcuts.forEach(shortcut => {
+        if (Array.isArray(shortcut.subItems) === false) {
+          checkAndRemoveIcons(shortcut)
+        }
+        else {
+          shortcut.subItems.forEach(subShortcut => {
+            checkAndRemoveIcons(subShortcut)
+          })
+        }
+      })
+      
+      // 重新載入icon吧
+      if (doReload !== false) {
+        //this.changeFolderCallback(this.shortcutsFolderPath)
+        location.reload()
+      }
+      return this
     }
   }
 }

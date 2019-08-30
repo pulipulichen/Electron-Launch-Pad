@@ -160,12 +160,21 @@ let FolderConfigHelper = {
     
     let configPath = this._getConfigPath(folderPath)
     let configText = JSON.stringify(configJSON, null, "\t")
-    //console.log(configPath)
-    this.lib.ElectronFileHelper.writeFileDelay(configPath, configText)
+    console.log(configPath)
+    this.lib.ElectronFileHelper.writeFileDelay(configPath, configText, 0)
     return this
   },
   reset: function (folderPath, key) {
-    return this.write(folderPath, key)
+    if (typeof(key) === 'string') {
+      return this.write(folderPath, key)
+    }
+    else if (Array.isArray(key)) {
+      let resetData = {}
+      key.forEach(k => {
+        resetData[k] = undefined
+      })
+      return this.write(folderPath, resetData)
+    }
   },
   writeMainItemsSort: function (folderPath, sorted, itemsCount) {
     this.init()
@@ -203,7 +212,7 @@ let FolderConfigHelper = {
     
     if (typeof(shortcutMetadata) !== 'object') {
       //console.error('no config data :' + folderPath)
-      return
+      return undefined
     }
     else {
       let metadata = shortcutMetadata[shortcutPath]

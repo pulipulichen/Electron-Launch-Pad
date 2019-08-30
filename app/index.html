@@ -121,6 +121,72 @@
   
   <div class="buttons-panel"
        v-on:click.stop="">
+    
+    <div class="ui dropdown icon circular button item"
+         ref="DropdownMenu">
+      <i class="wrench icon"></i>
+      <div class="menu">
+        <div class="item"
+             v-on:click.stop="addPage"
+             title="Add page"
+             v-bind:class="{disabled: (isSearchMode)}">
+          <i class="plus icon"></i>
+          <span class="text">Add Page</span>
+        </div>
+        <div class="item"
+             v-on:click.stop="removePage"
+             v-bind:class="{disabled: (isPageRemovable === false || isSearchMode)}"
+             title="Remove page">
+          <i class="minus icon"></i>
+          <span class="text">Remove Page</span>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="item open-folder-button"
+             v-on:click.stop="openFolder"
+             title="Open shortcuts folder">
+          <i class="folder open outline icon"></i>
+          <span class="text">Open shortcuts folder</span>
+        </div>
+        <div class="item"
+             v-on:click.stop="changeFolder"
+             title="Change shortcuts folder">
+          <i class="cogs icon"></i>
+          <span class="text">Open shortcuts folder</span>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="item"
+             v-on:click.stop="resetAllConfig"
+             title="Reset the launchpad configuration of current folder">
+          <i class="eraser icon"></i>
+          <span class="text">Reset all config</span>
+        </div>
+        <div class="item"
+             v-on:click.stop="resetOrder"
+             title="Reset order of current folder">
+          <i class="eraser icon"></i>
+          <span class="text">Reset order</span>
+        </div>
+        <div class="item"
+             v-on:click.stop="resetShortcutsCache"
+             title="Reset the shortcuts' cache of current folder">
+          <i class="eraser icon"></i>
+          <span class="text">Reset shortcuts' cache</span>
+        </div>
+        <div class="item"
+             v-on:click.stop="resetIconsCache"
+             title="Reset the icons' cache of current folder">
+          <i class="eraser icon"></i>
+          <span class="text">Reset icons' cache</span>
+        </div>
+        
+      </div>
+    </div>
+    
+    <!--
     <button class="ui circular icon button" 
             type="button"
             v-on:click.stop="addPage"
@@ -148,6 +214,7 @@
             title="Open shortcuts folder">
       <i class="folder open outline icon"></i>
     </button>
+    -->
     <button class="ui circular icon button" 
             type="button"
             v-on:click.stop="exit"

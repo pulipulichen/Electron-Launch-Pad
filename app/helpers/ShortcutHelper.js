@@ -1,7 +1,7 @@
 let ShortcutHelper = {
   debug: {
-    enableShortcutCache: false,
-    enableIconCache: false,
+    enableShortcutCache: true,
+    enableIconCache: true,
     useTestDir: false,
   },
   inited: false,
@@ -160,7 +160,7 @@ let ShortcutHelper = {
     
     let shortcut = this.lib.FolderConfigHelper.readShortcutMetadata(baseDirPath, subDirPath)
     if (typeof(shortcut) === 'object') {
-      //return console.log(shortcut)
+      //console.log(shortcut)
       callback(shortcut)
       return this
     }
@@ -174,7 +174,7 @@ let ShortcutHelper = {
     //return console.log(subDirPath)
     
     this.lib.ElectronFileHelper.readDirectoryFilesRecursively(subDirPath, (files) => {
-      console.log(files)
+      //console.log(files)
       //let files = list.file
       
       let continueLoop = (i) => {
@@ -307,10 +307,10 @@ let ShortcutHelper = {
       return this
     }
     
-    console.log('開始查詢shortcut資料: ' + shortcutPath)
+    //console.log('開始查詢shortcut資料: ' + shortcutPath)
     //this.lib.windowShortcut.query(shortcutPath, (err, data) => {
     this.lib.WindowsShortcutHelper.query(shortcutPath, (data) => {
-      console.log(data)
+      //console.log(data)
 
       let name = this.lib.path.basename(shortcutPath)
       if (name.endsWith('.lnk')) {
@@ -491,7 +491,7 @@ let ShortcutHelper = {
     this.init()
     //console.log(dirPath)
     if (typeof(callback) !== 'function') {
-      return
+      return this
     }
     
     // 先做mock
