@@ -55,8 +55,8 @@ let VueControllerConfig = {
       */
     },
     debug: {
-      enableAskDirPath: false,
-      enableExit: false,
+      enableAskDirPath: true,
+      enableExit: true,
       enableClick: true,
       enableSortPersist: true,
     }
@@ -1225,6 +1225,15 @@ let VueControllerConfig = {
               && this.lib.ElectronFileHelper.isDirSync(dirpath)) {
         //console.log(dirpath)
         this.shortcutsDirPath = dirpath
+        this.mainItemsInited = false
+        this.lib.ShortcutHelper.get(this.shortcutsDirPath, (shortcuts) => {
+          this.shortcuts = shortcuts
+          this.initDraggable()
+          this.initPopup()
+          this.scrollPage(0, false)
+          this.mainItemsInited = true
+          this.$refs.SearchInput.focus()
+        })
       }
       return this
     },

@@ -41,7 +41,7 @@ let WindowsShortcutHelper = {
       let outText = stdout
       //console.log(outText)
       outText = this.lib.iconv.decode(outText, 'big5')
-      console.log(outText)
+      //console.log(outText)
       
       outText.split('\n').forEach(line => {
         line = line.trim()

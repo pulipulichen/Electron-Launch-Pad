@@ -366,10 +366,10 @@ fs.readdir(directoryPath, (err, files) => {
       return this
     }
     
-    //console.log('開始查詢shortcut資料: ' + shortcutPath)
+    console.log('開始查詢shortcut資料: ' + shortcutPath)
     //this.lib.windowShortcut.query(shortcutPath, (err, data) => {
     this.lib.WindowsShortcutHelper.query(shortcutPath, (data) => {
-      //console.log(data)
+      console.log(data)
 
       let name = this.lib.path.basename(shortcutPath)
       if (name.endsWith('.lnk')) {
@@ -467,6 +467,12 @@ fs.readdir(directoryPath, (err, files) => {
     }
     
     let icon = data.Icon
+    
+    console.log(data)
+    if (icon === undefined) {
+      
+    }
+    
     if (icon === '' 
             || this.lib.ElectronFileHelper.existsSync(icon) === false) {
       if (this.lib.ElectronFileHelper.existsSync(data.Target) === true) {
@@ -477,7 +483,8 @@ fs.readdir(directoryPath, (err, files) => {
       }
     }
     
-    if (icon.endsWith('.exe') === false 
+    if (typeof(icon) === 'string' 
+            && icon.endsWith('.exe') === false 
             && this.lib.ElectronFileHelper.existsSync(icon) === true) {
       // 就是這個icon了
       return callback(icon)
