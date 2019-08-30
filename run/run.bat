@@ -1,3 +1,4 @@
 cd /D "%~dp0"
-cd "../"
-npm run 1.run-production
+cd ..
+echo %1 
+electron index.js --mode production %1
