@@ -12,6 +12,7 @@ let ShortcutHelper = {
     ElectronFileHelper: null,
     FolderConfigHelper: null,
     LinuxDesktopShortcutReader: null,
+    ImageMagickHelper: null,
   },
   init: function () {
     if (this.inited === true) {
@@ -29,7 +30,7 @@ let ShortcutHelper = {
     this.lib.FolderConfigHelper = RequireHelper.require('./helpers/FolderConfigHelper')
     this.lib.LinuxDesktopShortcutReader = RequireHelper.require('./helpers/LinuxDesktopShortcutReader')
     
-    this.lib.ElectronImageHelper = RequireHelper.require('./helpers/electron/ElectronImageHelper')
+    this.lib.ImageMagickHelper = RequireHelper.require('./helpers/autoit/ImageMagickHelper')
     
     // -------------
     this.inited = true
@@ -416,10 +417,10 @@ let ShortcutHelper = {
     
     
     if (icon.endsWith('.ico')) {
-      let dimensions = this.lib.ElectronImageHelper.sizeOf(icon)
+      let dimensions = this.lib.ImageMagickHelper.sizeOf(icon)
       if (dimensions.width > 128 || dimensions.height > 128) {
         // 轉換成png之後另存新檔
-        return this.lib.ElectronImageHelper.icoToPng(icon, callback)
+        return this.lib.ImageMagickHelper.icoToPng(icon, callback)
       }
     }
     
