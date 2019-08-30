@@ -244,6 +244,45 @@ let ElectronFileHelper = {
     }
     return this
   },
+  readDirectoryFilesRecursively: function (dirPath, callback) {
+    let fileList = []
+    
+    if (typeof(callback) !== 'function') {
+      return this
+    }
+    else if (this.isDirSync(dirPath) === false) {
+      callback(fileList)
+      return this
+    }
+    
+    let addDir = (dirPath, callback) => {
+      
+      this.readDirectory(dirPath, (list) => {
+        fileList = fileList.concat(list.file)
+        //console.log(list)
+        let loop = (i) => {
+          if (i < list.dir.length) {
+            addDir(list.dir[i], () => {
+              //console.log(list)
+              //fileList = fileList.concat(list)
+              i++
+              loop(i)
+            })
+          }
+          else {
+            callback()
+          }
+        }
+        loop(0)
+      })
+    }
+    
+    addDir(dirPath, () => {
+      callback(fileList)
+    })
+    
+    return this
+  },
   readDirectory: function (dirPath, callback) {
     
     let fileList = []

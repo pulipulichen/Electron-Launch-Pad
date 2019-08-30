@@ -173,8 +173,9 @@ let ShortcutHelper = {
     
     //return console.log(subDirPath)
     
-    this.lib.ElectronFileHelper.readDirectory(subDirPath, (list) => {
-      let files = list.file
+    this.lib.ElectronFileHelper.readDirectoryFilesRecursively(subDirPath, (files) => {
+      console.log(files)
+      //let files = list.file
       
       let continueLoop = (i) => {
         i++
