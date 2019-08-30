@@ -248,7 +248,7 @@
            v-bind:tabindex="attrTabIndex(item)"
            v-on:focus="setLastFocus">
         <div class="item-wrapper"
-             v-on:click="exec(item.exec)"
+             v-on:click="exec(item)"
              v-bind:data-shortcut-index="i"
              v-bind:title="displayDescription(item)">
           <!--
@@ -322,7 +322,7 @@
            v-bind:tabindex="attrTabIndex(item)"
            v-on:focus="setLastFocus">
         <div class="item-wrapper"
-             v-on:click="exec(item.exec)"
+             v-on:click="exec(item)"
              v-bind:data-shortcut-index="i"
              v-bind:title="displayDescription(item)">
           <!--

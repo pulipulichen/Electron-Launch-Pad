@@ -168,7 +168,8 @@ let ShortcutHelper = {
     // -------------------------
     let dirShortcut = {
       name: this.lib.path.basename(subDirPath),
-      subItems: []
+      subItems: [],
+      //path: subDirPath
     }
     
     //return console.log(subDirPath)
@@ -329,7 +330,8 @@ let ShortcutHelper = {
         name: name,
         exec: execCommand,
         //workingDir: data.workingDir,
-        description: data.Comment
+        description: data.Comment,
+        path: shortcutPath,
       }
       
       this.extractIcon(data, (iconPath) => {
@@ -393,7 +395,8 @@ let ShortcutHelper = {
       exec: execCommand,
       //workingDir: data.workingDir,
       description: metadata.Comment,
-      icon: icon
+      icon: icon,
+      path: shortcutPath,
     }
     
     //this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)

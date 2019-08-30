@@ -23,6 +23,7 @@ let VueControllerConfig = {
     mainItemHotkeyLabelInited: false,
     isSearchInputFocused: false,
     lastFocusIndex: null,
+    isEditingMode: true,
     
     cache: {
       subItemsSorted: {}
@@ -855,11 +856,27 @@ let VueControllerConfig = {
     },
     buildSubItems: function (folderName, shortcuts) {
       let _this = this
-      let container = $('<div class="launchpad-items-container"></div>')
-      container.attr('data-folder-name', folderName)
+      let container = $(`<div>
+        <div class="folder-name" title="${folderName}">
+            <i class="folder open outline icon"></i>
+            ${folderName}
+        </div>
+        <div class="launchpad-items-container"></div>
+      </div>`)
+      
+      container.find('.folder-name:first').click((event) => {
+        this.openFolder(this.shortcutsFolderPath + '/' + folderName)
+        this.exit()
+        event.stopPropagation()
+      })
+      
+      let itemsContainer = container.find('.launchpad-items-container:first')
+      
+      itemsContainer.attr('data-folder-name', folderName)
+      
       
       let size = this.calcPopupSize(shortcuts)
-      container.attr('data-grid-size', size)
+      itemsContainer.attr('data-grid-size', size)
       
       if (Array.isArray(shortcuts)) {
         shortcuts = this.getSortedSubItems(folderName, shortcuts)
@@ -875,20 +892,29 @@ let VueControllerConfig = {
             </div>`)
           
           item.attr('data-exec', shortcut.exec)
+          item.attr('data-path', shortcut.path)
           
           if (typeof(shortcut.icon) === 'string') {
             item.find('img.icon').attr('src', shortcut.icon)
           }
           
-          item.click(function () {
-            let exec = this.getAttribute('data-exec')
-            _this.exec(exec)
+          item.click(function (event) {
+            let data
+            if (_this.isEditingMode === true) {
+              data = this.getAttribute('data-path')
+            }
+            else {
+              data = this.getAttribute('data-exec')
+            }
+            //console.log(data)
+            _this.exec(data)
+            event.stopPropagation()
           })
           
-          container.append(item)
+          itemsContainer.append(item)
         })
         
-        const draggable = new this.lib.Draggable.Sortable(container[0], {
+        const draggable = new this.lib.Draggable.Sortable(itemsContainer[0], {
           draggable: 'div.launchpad-item',
           delay: this.dragDelay
         })
@@ -907,18 +933,22 @@ let VueControllerConfig = {
         
         draggable.on('drag:stop', (event) => {
           //console.log(event.)
-          let container = event.sourceContainer
-          let folderName = container.getAttribute('data-folder-name')
+          let itemsContainer = event.sourceContainer
+          let folderName = itemsContainer.getAttribute('data-folder-name')
           
-          this.onSubItemDropped(folderName, container)
+          this.onSubItemDropped(folderName, itemsContainer)
           //console.log('folder item drag:stop')
         })
         
         setTimeout(() => {
-          container.find('.launchpad-item:first').focus()
-          this.setupSubItemsKeyEvents(container)
+          itemsContainer.find('.launchpad-item:first').focus()
+          this.setupSubItemsKeyEvents(itemsContainer)
         }, 50)
       }
+      
+      container.click(() => {
+        container.find('.launchpad-item:first').focus()
+      })
       
       return container
     },
@@ -1226,11 +1256,13 @@ let VueControllerConfig = {
       
       return description.join(': ')
     },
-    openFolder: function () {
+    openFolder: function (dirpath) {
       //console.error('openFolder folder')
-      let dirpath = this.shortcutsFolderPath
+      if (typeof(dirpath) !== 'string') {
+        dirpath = this.shortcutsFolderPath
+      }
       if (typeof(dirpath) === 'string'
-              && this.lib.ElectronFileHelper.isDirSync(dirpath)) {
+              && this.lib.ElectronFileHelper.existsSync(dirpath)) {
         //console.log(dirpath)
         this.lib.ElectronFileHelper.showInFolder(dirpath)
         this.exit()
@@ -1328,7 +1360,24 @@ let VueControllerConfig = {
 
       return this
     },
-    exec: function (execCommand) {
+    exec: function (shortcut) {
+      if (this.isEditingMode === true) {
+        let path = shortcut
+        if (typeof(path.path) === 'string') {
+          path = path.path
+        }
+        //console.log(path)
+        if (typeof(path) === 'string') {
+          this.openFolder(path)
+        }
+        return this
+      }
+      
+      let execCommand = shortcut
+      if (typeof(execCommand.exec) === 'string') {
+        execCommand = execCommand.exec
+      }
+      
       if (typeof(execCommand) !== 'string') {
         return this
       }

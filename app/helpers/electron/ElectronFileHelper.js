@@ -240,7 +240,12 @@ let ElectronFileHelper = {
   },
   showInFolder: function (path) {
     if (this.existsSync(path)) {
-      this.lib.shell.openExternal(path)
+      if (this.isDirSync(path)) {
+        this.lib.shell.openExternal(path)
+      }
+      else {
+        this.lib.shell.showItemInFolder(path)
+      }
     }
     return this
   },

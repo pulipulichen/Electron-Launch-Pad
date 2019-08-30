@@ -44,9 +44,24 @@
   }
   */
   
-  
+  .folder-name {
+    text-align: center;
+    line-height: 1.5rem;
+    font-size: 1.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: calc(((100vw - (@pager-width * 2)) / @max-cols) - 50px);
+    //margin-left: 1rem;
+    //margin-right: 1rem;
+    font-family: Noto Sans CJK TC;
+    
+    cursor: pointer;
+    
+  }
   
   .launchpad-items-container {
+    clear:both;
     //margin-left: auto;
     //margin-right: auto;
     

@@ -1,3 +1,7 @@
+const debug = {
+  useMousePositionDisplay: false
+}
+
 const electron = require('electron')
 const {
   app,
@@ -25,7 +29,7 @@ module.exports = function (shortcutsDirPath, callback) {
   // https://electronjs.org/docs/api/screen
   let screen = electron.screen
   let display
-  if (false) {
+  if (debug.useMousePositionDisplay) {
     let point = screen.getCursorScreenPoint()
     display = screen.getDisplayNearestPoint(point)
   }
