@@ -44,9 +44,24 @@
   }
   */
   
-  
+  .folder-name {
+    text-align: center;
+    line-height: 1.5rem;
+    font-size: 1.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: calc(((100vw - (@pager-width * 2)) / @max-cols) - 50px);
+    //margin-left: 1rem;
+    //margin-right: 1rem;
+    font-family: Noto Sans CJK TC;
+    
+    cursor: pointer;
+    
+  }
   
   .launchpad-items-container {
+    clear:both;
     //margin-left: auto;
     //margin-right: auto;
     
@@ -73,20 +88,24 @@
     }
     
     .icon {
-      height: calc(@folder-item-width);
-      max-height: calc(@folder-item-width);
+      @popup-icon-margin: 4px;
+      height: calc(@folder-item-width - (@popup-icon-margin * 2));
+      max-height: calc(@folder-item-width - (@popup-icon-margin * 2));
       width: auto;
       display: block;
+      margin: @popup-icon-margin;
     }
     
     .name {
-      font-size: 1.5rem;
+      font-size: 1.2rem;
+      height: 1.5rem;
       overflow:hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
       max-width: calc(@folder-item-width - 1rem);
       margin-left: 0.5rem;
       margin-right: 0.5rem;
+      font-family: Noto Sans CJK TC;
     }
     
     &.draggable-source--is-dragging {

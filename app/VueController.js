@@ -2,14 +2,14 @@ let VueControllerConfig = {
   el: '#app',
   data: {
     popupHideDelay: 1000 * 60,
-    dragDelay: 100,
+    dragDelay: 500,
     maxRows: 4,
     maxCols: 4,
     hotkeyConfig: [1,2,3,4,'q','w','e','r','a','s','d','f','z','x','c','v'],
     
     searchKeyword: "",
     currentSearchResultPage: 0,
-    shortcutsDirPath: null,
+    shortcutsFolderPath: null,
     
     mainItemsInited: false,
     currentPage: 0,
@@ -18,12 +18,12 @@ let VueControllerConfig = {
     enableDragScroll: false,
     isPopupVisiable: false,
     waitDragScroll: false,
-    shortcutsFolderPath: 'folder-path-for-test',
     mainItemsDraggable: null,
     currentPopupTrigger: null,
     mainItemHotkeyLabelInited: false,
     isSearchInputFocused: false,
     lastFocusIndex: null,
+    isEditingMode: false,
     
     cache: {
       subItemsSorted: {}
@@ -55,7 +55,7 @@ let VueControllerConfig = {
       */
     },
     debug: {
-      enableAskDirPath: false,
+      enableAskDirPath: true,
       enableExit: false,
       enableClick: true,
       enableSortPersist: true,
@@ -70,7 +70,7 @@ let VueControllerConfig = {
     this.lib.execFile = RequireHelper.require('child_process').execFile;
     this.lib.win = this.lib.remote.getCurrentWindow()
     this.lib.mode = this.lib.win.mode
-    this.shortcutsDirPath = this.lib.win.shortcutsDirPath
+    this.shortcutsFolderPath = this.lib.win.shortcutsDirPath
     this.lib.ipc = this.lib.electron.ipcRenderer
     
     //this.lib.REDIPSHelper = RequireHelper.require('./helpers/REDIPSHelper')
@@ -105,6 +105,10 @@ let VueControllerConfig = {
   },
   computed: {
     isSearchMode: function () {
+      setTimeout(() => {
+        this.initDropdownMenu()
+      }, 10)
+      
       let keyword = this.searchKeyword.trim()
       return (keyword !== "")
     },
@@ -294,25 +298,34 @@ let VueControllerConfig = {
       else {
         return this.$refs.SearchResultList
       }
+    },
+    displayEditingMode: function () {
+      if (this.isEditingMode === true) {
+        return 'EDIT'
+      }
+      else {
+        return 'OPEN'
+      }
     }
-  },
+  },  // computed
   methods: {
     _afterMounted: function () {
-      this.lib.ShortcutHelper.get(this.shortcutsDirPath, (shortcuts) => {
+      this.lib.ShortcutHelper.get(this.shortcutsFolderPath, (shortcuts) => {
         this.shortcuts = shortcuts
         
         this.initDraggable()
         this.initPopup()
         this.initMouseWheelKeys()
         this.initIPCEvent()
+        this.initDropdownMenu()
         this.initCurrentPage(() => {
           this.mainItemsInited = true
           //this.setupSearchInputKeyEvents()
           this.$refs.SearchInput.focus()
 
-          //console.log(this.shortcutsDirPath)
+          //console.log(this.shortcutsFolderPath)
           if (this.debug.enableAskDirPath === true 
-                  && this.lib.ElectronFileHelper.isDirSync(this.shortcutsDirPath) === false) {
+                  && this.lib.ElectronFileHelper.isDirSync(this.shortcutsFolderPath) === false) {
             this.changeFolder()
           }
         })
@@ -373,6 +386,17 @@ let VueControllerConfig = {
         //console.log(['[', path, ']'])
         this.changeFolderCallback(path)
       })
+      return this
+    },
+    initDropdownMenu: function () {
+      let menu = $(this.$refs.DropdownMenu)
+      
+      let className = 'dropdown-menu-inited'
+      if (menu.hasClass(className) === false) {
+        menu.addClass(className)
+              .dropdown()
+      }
+      return this
     },
     getPageByItemIndex: function (index) {
       return Math.floor(index / this.pageItemCount)
@@ -840,11 +864,27 @@ let VueControllerConfig = {
     },
     buildSubItems: function (folderName, shortcuts) {
       let _this = this
-      let container = $('<div class="launchpad-items-container"></div>')
-      container.attr('data-folder-name', folderName)
+      let container = $(`<div>
+        <div class="folder-name" title="${folderName}">
+            <i class="folder open outline icon"></i>
+            ${folderName}
+        </div>
+        <div class="launchpad-items-container"></div>
+      </div>`)
+      
+      container.find('.folder-name:first').click((event) => {
+        this.openFolder(this.shortcutsFolderPath + '/' + folderName)
+        this.exit()
+        event.stopPropagation()
+      })
+      
+      let itemsContainer = container.find('.launchpad-items-container:first')
+      
+      itemsContainer.attr('data-folder-name', folderName)
+      
       
       let size = this.calcPopupSize(shortcuts)
-      container.attr('data-grid-size', size)
+      itemsContainer.attr('data-grid-size', size)
       
       if (Array.isArray(shortcuts)) {
         shortcuts = this.getSortedSubItems(folderName, shortcuts)
@@ -852,7 +892,7 @@ let VueControllerConfig = {
         shortcuts.forEach((shortcut) => {
           let item = $(`
             <div class="launchpad-item sub-item" 
-                 title="${shortcut.description}">
+                 title="${this.displayDescription(shortcut)}">
               <img class="icon" draggable="false" />
               <div class="name">
                 ${shortcut.name}
@@ -860,20 +900,29 @@ let VueControllerConfig = {
             </div>`)
           
           item.attr('data-exec', shortcut.exec)
+          item.attr('data-path', shortcut.path)
           
           if (typeof(shortcut.icon) === 'string') {
             item.find('img.icon').attr('src', shortcut.icon)
           }
           
-          item.click(function () {
-            let exec = this.getAttribute('data-exec')
-            _this.exec(exec)
+          item.click(function (event) {
+            let data
+            if (_this.isEditingMode === true) {
+              data = this.getAttribute('data-path')
+            }
+            else {
+              data = this.getAttribute('data-exec')
+            }
+            //console.log(data)
+            _this.exec(data)
+            event.stopPropagation()
           })
           
-          container.append(item)
+          itemsContainer.append(item)
         })
         
-        const draggable = new this.lib.Draggable.Sortable(container[0], {
+        const draggable = new this.lib.Draggable.Sortable(itemsContainer[0], {
           draggable: 'div.launchpad-item',
           delay: this.dragDelay
         })
@@ -892,18 +941,22 @@ let VueControllerConfig = {
         
         draggable.on('drag:stop', (event) => {
           //console.log(event.)
-          let container = event.sourceContainer
-          let folderName = container.getAttribute('data-folder-name')
+          let itemsContainer = event.sourceContainer
+          let folderName = itemsContainer.getAttribute('data-folder-name')
           
-          this.onSubItemDropped(folderName, container)
+          this.onSubItemDropped(folderName, itemsContainer)
           //console.log('folder item drag:stop')
         })
         
         setTimeout(() => {
-          container.find('.launchpad-item:first').focus()
-          this.setupSubItemsKeyEvents(container)
+          itemsContainer.find('.launchpad-item:first').focus()
+          this.setupSubItemsKeyEvents(itemsContainer)
         }, 50)
       }
+      
+      container.click(() => {
+        container.find('.launchpad-item:first').focus()
+      })
       
       return container
     },
@@ -1020,7 +1073,19 @@ let VueControllerConfig = {
       }
       
       //this.currentPage++
-      //console.log([this.currentPage, this.maxPages])
+      // 20190830 克服要捲動頁面超過最大頁面的問題
+      //console.log([this.currentPage, this.maxPages, isNext])
+      if (typeof(isNext) === 'number' 
+              && isNext >= this.maxPages) {
+        isNext = this.maxPages - 1
+        if (isNext === this.currentPage) {
+          //console.log('不捲動')
+          if (typeof(callback) === 'function') {
+            callback()
+          }
+          return this
+        }
+      }
       
       let page = this.currentPage
       let pageLength = this.maxPages
@@ -1184,18 +1249,28 @@ let VueControllerConfig = {
       return this
     },
     displayDescription: function (item) {
-      if (item === null || typeof(item.description) !== 'string') {
-        return ''
+      let description = []
+      
+      if (typeof(item) === 'object' && item !== null) { 
+        if (typeof(item.name) === 'string'
+                && item.name.trim() !== '') {
+          description.push(item.name.trim())
+        }
+        if (typeof(item.description) === 'string' 
+                && item.description.trim() !== '') {
+          description.push(item.description.trim())
+        }
       }
-      else {
-        return item.description
-      }
+      
+      return description.join(': ')
     },
-    openFolder: function () {
+    openFolder: function (dirpath) {
       //console.error('openFolder folder')
-      let dirpath = this.shortcutsDirPath
+      if (typeof(dirpath) !== 'string') {
+        dirpath = this.shortcutsFolderPath
+      }
       if (typeof(dirpath) === 'string'
-              && this.lib.ElectronFileHelper.isDirSync(dirpath)) {
+              && this.lib.ElectronFileHelper.existsSync(dirpath)) {
         //console.log(dirpath)
         this.lib.ElectronFileHelper.showInFolder(dirpath)
         this.exit()
@@ -1205,14 +1280,24 @@ let VueControllerConfig = {
     changeFolder: function () {
       //console.error('change folder')
       //this.lib.ipc.send
-      this.lib.ipc.send('change-folder', this.shortcutsDirPath)
+      this.lib.ipc.send('change-folder', this.shortcutsFolderPath)
       return this
     },
     changeFolderCallback: function (dirpath) {
       if (typeof(dirpath) === 'string'
               && this.lib.ElectronFileHelper.isDirSync(dirpath)) {
         //console.log(dirpath)
-        this.shortcutsDirPath = dirpath
+        this.shortcutsFolderPath = dirpath
+        this.searchKeyword = ''
+        this.mainItemsInited = false
+        this.lib.ShortcutHelper.get(this.shortcutsFolderPath, (shortcuts) => {
+          this.shortcuts = shortcuts
+          this.initDraggable()
+          this.initPopup()
+          this.scrollPage(0, false)
+          this.mainItemsInited = true
+          this.$refs.SearchInput.focus()
+        })
       }
       return this
     },
@@ -1283,7 +1368,24 @@ let VueControllerConfig = {
 
       return this
     },
-    exec: function (execCommand) {
+    exec: function (shortcut) {
+      if (this.isEditingMode === true) {
+        let path = shortcut
+        if (typeof(path.path) === 'string') {
+          path = path.path
+        }
+        //console.log(path)
+        if (typeof(path) === 'string') {
+          this.openFolder(path)
+        }
+        return this
+      }
+      
+      let execCommand = shortcut
+      if (typeof(execCommand.exec) === 'string') {
+        execCommand = execCommand.exec
+      }
+      
       if (typeof(execCommand) !== 'string') {
         return this
       }
@@ -1369,8 +1471,70 @@ let VueControllerConfig = {
         }
       }
       return list
+    },
+    resetAllConfig: function () {
+      this.resetOrder(false)
+      this.resetShortcutsCache(false)
+      this.resetIconsCache(true)
+      return this
+    },
+    resetOrder: function (doReload) {
+      this.lib.FolderConfigHelper.reset(this.shortcutsFolderPath, ['mainItemsSorted', 'itemsCount', 'subItemsSorted'])
+      // 重新載入icon吧
+      if (doReload !== false) {
+        //this.changeFolderCallback(this.shortcutsFolderPath)
+        location.reload()
+      }
+      return this
+    },
+    resetShortcutsCache: function (doReload) {
+      //console.error('resetShortcutsCache')
+      this.lib.FolderConfigHelper.reset(this.shortcutsFolderPath, 'ShortcutMetadata')
+      // 重新載入icon吧
+      if (doReload !== false) {
+        //this.changeFolderCallback(this.shortcutsFolderPath)
+        location.reload()
+      }
+      return this
+    },
+    resetIconsCache: function (doReload) {
+      //console.error('resetIconsCache')
+      // 遍歷現在的shortcuts中，開頭為抽取出來的檔案的icon
+      let header = this.lib.ElectronFileHelper.resolve('cache/icon/')
+      let checkAndRemoveIcons = (shortcut) => {
+        if (typeof(shortcut.icon) === 'string' 
+                && shortcut.icon.startsWith(header)) {
+          this.lib.ElectronFileHelper.remove(shortcut.icon)
+        }
+      }
+      
+      this.shortcuts.forEach(shortcut => {
+        if (shortcut === null) {
+          return
+        }
+        
+        if (Array.isArray(shortcut.subItems) === false) {
+          checkAndRemoveIcons(shortcut)
+        }
+        else {
+          shortcut.subItems.forEach(subShortcut => {
+            checkAndRemoveIcons(subShortcut)
+          })
+        }
+      })
+      
+      // 重新載入icon吧
+      if (doReload !== false) {
+        //this.changeFolderCallback(this.shortcutsFolderPath)
+        location.reload()
+      }
+      return this
+    },
+    toggleEditingMode: function () {
+      this.isEditingMode = (this.isEditingMode === false)
+      return this
     }
-  }
+  } // methods
 }
 
 if (typeof(window) !== 'undefined') {

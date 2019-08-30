@@ -195,8 +195,13 @@ let ElectronFileHelper = {
   },
   execExternalCommand: function (execCommand, callback) {
     if (process.platform === 'win32') {
-      if (this.isDirSync(execCommand)) {
-        this.lib.shell.openItem(execCommand)
+      let tmpFolderPath = execCommand
+      if (tmpFolderPath.startsWith('"') && tmpFolderPath.endsWith('"')) {
+        tmpFolderPath = tmpFolderPath.slice(1, -1)
+      }
+      //console.log([tmpFolderPath, this.isDirSync(tmpFolderPath)])
+      if (this.isDirSync(tmpFolderPath)) {
+        this.lib.shell.openItem(tmpFolderPath)
         if (typeof(callback) === 'function') {
           callback()
         }
@@ -240,8 +245,52 @@ let ElectronFileHelper = {
   },
   showInFolder: function (path) {
     if (this.existsSync(path)) {
-      this.lib.shell.openExternal(path)
+      if (this.isDirSync(path)) {
+        this.lib.shell.openExternal(path)
+      }
+      else {
+        this.lib.shell.showItemInFolder(path)
+      }
     }
+    return this
+  },
+  readDirectoryFilesRecursively: function (dirPath, callback) {
+    let fileList = []
+    
+    if (typeof(callback) !== 'function') {
+      return this
+    }
+    else if (this.isDirSync(dirPath) === false) {
+      callback(fileList)
+      return this
+    }
+    
+    let addDir = (dirPath, callback) => {
+      
+      this.readDirectory(dirPath, (list) => {
+        fileList = fileList.concat(list.file)
+        //console.log(list)
+        let loop = (i) => {
+          if (i < list.dir.length) {
+            addDir(list.dir[i], () => {
+              //console.log(list)
+              //fileList = fileList.concat(list)
+              i++
+              loop(i)
+            })
+          }
+          else {
+            callback()
+          }
+        }
+        loop(0)
+      })
+    }
+    
+    addDir(dirPath, () => {
+      callback(fileList)
+    })
+    
     return this
   },
   readDirectory: function (dirPath, callback) {
@@ -289,6 +338,12 @@ let ElectronFileHelper = {
   move: function (oldPath, newPath) {
     if (this.existsSync(oldPath)) {
       this.lib.fs.renameSync(oldPath, newPath)
+    }
+    return this
+  },
+  remove: function (path) {
+    if (this.existsSync(path)) {
+      this.lib.fs.unlinkSync(path)
     }
     return this
   }

@@ -26,7 +26,7 @@ let IconExtractHelper = {
     if (this.lib.fs.existsSync(exePath) === false) {
       console.error('exe is not found: ' + exePath)
       callback()
-      return
+      return false
     }
     
     if (filename.endsWith('.png') === false) {

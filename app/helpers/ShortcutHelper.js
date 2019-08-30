@@ -12,6 +12,7 @@ let ShortcutHelper = {
     ElectronFileHelper: null,
     FolderConfigHelper: null,
     LinuxDesktopShortcutReader: null,
+    ImageMagickHelper: null,
   },
   init: function () {
     if (this.inited === true) {
@@ -28,6 +29,8 @@ let ShortcutHelper = {
     this.lib.ElectronFileHelper = RequireHelper.require('./helpers/electron/ElectronFileHelper')
     this.lib.FolderConfigHelper = RequireHelper.require('./helpers/FolderConfigHelper')
     this.lib.LinuxDesktopShortcutReader = RequireHelper.require('./helpers/LinuxDesktopShortcutReader')
+    
+    this.lib.ImageMagickHelper = RequireHelper.require('./helpers/autoit/ImageMagickHelper')
     
     // -------------
     this.inited = true
@@ -106,68 +109,6 @@ let ShortcutHelper = {
     }
     return shortcuts
   },
-  /*
-  getShortcutsOnWindows: function (dirPath, callback) {
-    this.init()
-    
-    // for test
-    if (process.platform === 'win32') {
-      dirPath = 'D:/xampp/htdocs/projects-electron/Electron-Launch-Pad/demo-shortcuts/win32'
-    }
-    else if (process.platform === 'linux') {
-      dirPath = '/home/pudding/NetBeansProjects/[nodejs]/Electron-Launch-Pad/demo-shortcuts/linux'
-    }
-    
-    if (typeof(callback) !== 'function') {
-      return this
-    }
-    
-    this.lib.ElectronFileHelper.readDirectory(dirPath, (list) => {
-      
-    })
-    
-    
-const path = require('path');
-const fs = require('fs');
-//joining path of directory 
-const directoryPath = dirPath
-//passsing directoryPath and callback function
-fs.readdir(directoryPath, (err, files) => {
-    //handling error
-    if (err) {
-        return console.log('Unable to scan directory: ' + err);
-    } 
-    //listing all files using forEach
-    files.forEach((file) => {
-        // Do whatever you want to do with the file
-        let filepath = path.join(dirPath, file)
-        let isDir = fs.lstatSync(filepath).isDirectory()
-        console.log(file, isDir); 
-        
-        if (file.endsWith('.lnk')) {
-          var ws = require('windows-shortcuts');
-          ws.query(filepath, (err, data) => {
-            console.log(data)
-            
-            let icon = data.icon
-            if (icon === '') {
-              icon = data.target
-            }
-            if (icon.endsWith('.exe')) {
-              this.getIconFromEXE(icon, (iconPath) => {
-                console.log(iconPath)
-              })
-            }
-          });
- 
-        }
-    });
-});
-    
-    console.error('getShortcutsOnWindows');
-    return []
-  },
-  */
   getDirListShortcuts: function (baseDirPath, dirList, callback) {
     this.init()
     
@@ -222,7 +163,7 @@ fs.readdir(directoryPath, (err, files) => {
     
     let shortcut = this.lib.FolderConfigHelper.readShortcutMetadata(baseDirPath, subDirPath)
     if (typeof(shortcut) === 'object') {
-      return console.log(shortcut)
+      //console.log(shortcut)
       callback(shortcut)
       return this
     }
@@ -230,13 +171,15 @@ fs.readdir(directoryPath, (err, files) => {
     // -------------------------
     let dirShortcut = {
       name: this.lib.path.basename(subDirPath),
-      subItems: []
+      subItems: [],
+      //path: subDirPath
     }
     
     //return console.log(subDirPath)
     
-    this.lib.ElectronFileHelper.readDirectory(subDirPath, (list) => {
-      let files = list.file
+    this.lib.ElectronFileHelper.readDirectoryFilesRecursively(subDirPath, (files) => {
+      //console.log(files)
+      //let files = list.file
       
       let continueLoop = (i) => {
         i++
@@ -361,7 +304,9 @@ fs.readdir(directoryPath, (err, files) => {
     }
     
     let shortcut = this.lib.FolderConfigHelper.readShortcutMetadata(dirPath, shortcutPath)
-    if (typeof(shortcut) === 'object' && this.lib.ElectronFileHelper.existsSync(shortcut.icon)) {
+    if (typeof(shortcut) === 'object' 
+            && this.debug.enableShortcutCache === true
+            && this.lib.ElectronFileHelper.existsSync(shortcut.icon)) {
       callback(shortcut)
       return this
     }
@@ -388,7 +333,8 @@ fs.readdir(directoryPath, (err, files) => {
         name: name,
         exec: execCommand,
         //workingDir: data.workingDir,
-        description: data.Comment
+        description: data.Comment,
+        path: shortcutPath,
       }
       
       this.extractIcon(data, (iconPath) => {
@@ -452,7 +398,8 @@ fs.readdir(directoryPath, (err, files) => {
       exec: execCommand,
       //workingDir: data.workingDir,
       description: metadata.Comment,
-      icon: icon
+      icon: icon,
+      path: shortcutPath,
     }
     
     //this.lib.FolderConfigHelper.writeShortcutMetadata(dirPath, shortcutPath, shortcut)
@@ -467,24 +414,52 @@ fs.readdir(directoryPath, (err, files) => {
     }
     
     let icon = data.Icon
+    
+    
+    if (icon.endsWith('.ico')) {
+      let dimensions = this.lib.ImageMagickHelper.sizeOf(icon)
+      if (dimensions.width > 128 || dimensions.height > 128) {
+        // 轉換成png之後另存新檔
+        return this.lib.ImageMagickHelper.icoToPng(icon, callback)
+      }
+    }
+    
+    
+    //console.log(data)
+    //console.log([icon === '', this.lib.ElectronFileHelper.existsSync(icon), this.lib.ElectronFileHelper.existsSync(data.Target)])
     if (icon === '' 
             || this.lib.ElectronFileHelper.existsSync(icon) === false) {
       if (this.lib.ElectronFileHelper.existsSync(data.Target) === true) {
         icon = data.Target
+        
         if (this.lib.ElectronFileHelper.isDirSync(icon)) {
-          icon = this.lib.path.join(__dirname, '/imgs/folderopened_yellow.png')
+          icon = this.lib.path.join(__dirname, '/imgs/predefined/folderopened_yellow.png')
+        }
+        else if (icon.endsWith('.bat')) {
+          icon = this.lib.path.join(__dirname, '/imgs/predefined/filetype_bat.png')
+        }
+        else if (icon.endsWith('.yaml')) {
+          icon = this.lib.path.join(__dirname, '/imgs/predefined/text_xml.png')
         }
       }
     }
     
-    if (icon.endsWith('.exe') === false 
+    if (icon === 'C:\\Windows\\system32\\narrator.exe') {
+      icon = this.lib.path.join(__dirname, '/imgs/predefined/narrator.png')
+    }
+    
+    if (typeof(icon) === 'string' 
+            && icon.endsWith('.exe') === false 
+            && icon.endsWith('.dll') === false 
             && this.lib.ElectronFileHelper.existsSync(icon) === true) {
       // 就是這個icon了
+      //console.log(icon)
       return callback(icon)
     }
     
     let iconFilename = icon
-    if (iconFilename.endsWith('.exe')) {
+    if (iconFilename.endsWith('.exe') 
+            || iconFilename.endsWith('.dll')) {
       iconFilename = iconFilename.slice(0, -4)
     }
     //iconFilename = iconFilename.split(':').join('')
@@ -510,6 +485,9 @@ fs.readdir(directoryPath, (err, files) => {
     }
     
     //var iconExtractor = require('icon-extractor');
+    if (icon === '') {
+      console.error(data)
+    }
 
     console.log('Try to extract icon: ' + icon)
     //this.lib.iconExtractor = RequireHelper.require('icon-extractor')
@@ -538,7 +516,7 @@ fs.readdir(directoryPath, (err, files) => {
     this.init()
     //console.log(dirPath)
     if (typeof(callback) !== 'function') {
-      return
+      return this
     }
     
     // 先做mock

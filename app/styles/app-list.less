@@ -147,10 +147,13 @@
       }
       
       img {
+        @folder-image-margin: 4px;
+        
         display: inline-block;
-        height: calc(((((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px) / 2) - 4px);
-        max-height: calc(((((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px) / 2) - 4px);
+        height: calc(((((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px) / 2) - 4px - (@folder-image-margin * 2));
+        max-height: calc(((((100vh - @searchbar-height - @scroll-down-padding-height)  / @max-rows) - 10px - 3rem - 10px) / 2) - 4px - (@folder-image-margin * 2));
         width: auto;
+        margin: @folder-image-margin;
       }
     }
     

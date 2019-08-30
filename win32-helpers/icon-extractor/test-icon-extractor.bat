@@ -1,1 +1,1 @@
-icon-extractor.exe "D:\PortableApps\[Development\npp.7.2.2.bin\notepad++.exe" aaa.png
+icon-extractor.exe "C:\Windows\System32\shell32.dll" aaa.png

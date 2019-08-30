@@ -6,6 +6,7 @@ Last merge: 2019/08/31 13:2911
 - Project: https://github.com/pulipulichen/Electron-Launch-Pad
 - Issues: https://github.com/pulipulichen/Electron-Launch-Pad/issues
 - Download: https://github.com/pulipulichen/Electron-Launch-Pad/releases
+- Commit: https://github.com/pulipulichen/Electron-Launch-Pad/commits/master
 
 ----
 
@@ -14,6 +15,8 @@ Last merge: 2019/08/31 13:2911
 - https://icons8.com/icons/set/app
 - https://semantic-ui.com/elements/icon.html
 - https://findicons.com/icon/69401/folderopened_yellow
+- https://findicons.com/icon/173598/filetype_bat
+- https://findicons.com/icon/238112/text_xml
 
 ----
 
