@@ -29,6 +29,8 @@ let ShortcutHelper = {
     this.lib.FolderConfigHelper = RequireHelper.require('./helpers/FolderConfigHelper')
     this.lib.LinuxDesktopShortcutReader = RequireHelper.require('./helpers/LinuxDesktopShortcutReader')
     
+    this.lib.ElectronImageHelper = RequireHelper.require('./helpers/electron/ElectronImageHelper')
+    
     // -------------
     this.inited = true
     return this
@@ -411,6 +413,16 @@ let ShortcutHelper = {
     }
     
     let icon = data.Icon
+    
+    
+    if (icon.endsWith('.ico')) {
+      let dimensions = this.lib.ElectronImageHelper.sizeOf(icon)
+      if (dimensions.width > 128 || dimensions.height > 128) {
+        // 轉換成png之後另存新檔
+        return this.lib.ElectronImageHelper.icoToPng(icon, callback)
+      }
+    }
+    
     
     //console.log(data)
     //console.log([icon === '', this.lib.ElectronFileHelper.existsSync(icon), this.lib.ElectronFileHelper.existsSync(data.Target)])
