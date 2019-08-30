@@ -16,6 +16,7 @@ Last merge: 2019/08/27 13:2911
 - https://semantic-ui.com/elements/icon.html
 - https://findicons.com/icon/69401/folderopened_yellow
 - https://findicons.com/icon/173598/filetype_bat
+- https://findicons.com/icon/238112/text_xml
 
 ----
 

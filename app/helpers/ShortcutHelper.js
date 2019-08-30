@@ -413,10 +413,8 @@ let ShortcutHelper = {
     let icon = data.Icon
     
     //console.log(data)
-    if (icon === undefined) {
-      
-    }
-    
+    //console.log([icon === '', this.lib.ElectronFileHelper.existsSync(icon), this.lib.ElectronFileHelper.existsSync(data.Target)])
+    console.log([data.Target, this.lib.ElectronFileHelper.existsSync(data.Target)])
     if (icon === '' 
             || this.lib.ElectronFileHelper.existsSync(icon) === false) {
       if (this.lib.ElectronFileHelper.existsSync(data.Target) === true) {
@@ -427,6 +425,12 @@ let ShortcutHelper = {
         else if (icon.endsWith('.bat')) {
           icon = this.lib.path.join(__dirname, '/imgs/predefined/filetype_bat.png')
         }
+        else if (icon.endsWith('.yaml')) {
+          icon = this.lib.path.join(__dirname, '/imgs/predefined/text_xml.png')
+        }
+        else if (icon === 'C:\\Windows\\system32\\narrator.exe') {
+          icon = this.lib.path.join(__dirname, '/imgs/predefined/narrator.png')
+        }
       }
     }
     
@@ -435,6 +439,7 @@ let ShortcutHelper = {
             && icon.endsWith('.dll') === false 
             && this.lib.ElectronFileHelper.existsSync(icon) === true) {
       // 就是這個icon了
+      //console.log(icon)
       return callback(icon)
     }
     
@@ -466,6 +471,9 @@ let ShortcutHelper = {
     }
     
     //var iconExtractor = require('icon-extractor');
+    if (icon === '') {
+      console.error(data)
+    }
 
     console.log('Try to extract icon: ' + icon)
     //this.lib.iconExtractor = RequireHelper.require('icon-extractor')

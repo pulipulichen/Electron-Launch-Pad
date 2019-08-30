@@ -195,8 +195,13 @@ let ElectronFileHelper = {
   },
   execExternalCommand: function (execCommand, callback) {
     if (process.platform === 'win32') {
-      if (this.isDirSync(execCommand)) {
-        this.lib.shell.openItem(execCommand)
+      let tmpFolderPath = execCommand
+      if (tmpFolderPath.startsWith('"') && tmpFolderPath.endsWith('"')) {
+        tmpFolderPath = tmpFolderPath.slice(1, -1)
+      }
+      //console.log([tmpFolderPath, this.isDirSync(tmpFolderPath)])
+      if (this.isDirSync(tmpFolderPath)) {
+        this.lib.shell.openItem(tmpFolderPath)
         if (typeof(callback) === 'function') {
           callback()
         }

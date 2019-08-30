@@ -160,7 +160,7 @@ let FolderConfigHelper = {
     
     let configPath = this._getConfigPath(folderPath)
     let configText = JSON.stringify(configJSON, null, "\t")
-    console.log(configPath)
+    //console.trace(configPath)
     this.lib.ElectronFileHelper.writeFileDelay(configPath, configText, 0)
     return this
   },

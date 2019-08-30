@@ -2,7 +2,7 @@ let VueControllerConfig = {
   el: '#app',
   data: {
     popupHideDelay: 1000 * 60,
-    dragDelay: 100,
+    dragDelay: 500,
     maxRows: 4,
     maxCols: 4,
     hotkeyConfig: [1,2,3,4,'q','w','e','r','a','s','d','f','z','x','c','v'],
@@ -57,7 +57,7 @@ let VueControllerConfig = {
     debug: {
       enableAskDirPath: true,
       enableExit: false,
-      enableClick: false,
+      enableClick: true,
       enableSortPersist: true,
     }
   },
@@ -1509,6 +1509,10 @@ let VueControllerConfig = {
       }
       
       this.shortcuts.forEach(shortcut => {
+        if (shortcut === null) {
+          return
+        }
+        
         if (Array.isArray(shortcut.subItems) === false) {
           checkAndRemoveIcons(shortcut)
         }
