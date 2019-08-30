@@ -1,7 +1,7 @@
 let ShortcutHelper = {
   debug: {
-    enableShortcutCache: true,
-    enableIconCache: true,
+    enableShortcutCache: false,
+    enableIconCache: false,
     useTestDir: false,
   },
   inited: false,
@@ -106,68 +106,6 @@ let ShortcutHelper = {
     }
     return shortcuts
   },
-  /*
-  getShortcutsOnWindows: function (dirPath, callback) {
-    this.init()
-    
-    // for test
-    if (process.platform === 'win32') {
-      dirPath = 'D:/xampp/htdocs/projects-electron/Electron-Launch-Pad/demo-shortcuts/win32'
-    }
-    else if (process.platform === 'linux') {
-      dirPath = '/home/pudding/NetBeansProjects/[nodejs]/Electron-Launch-Pad/demo-shortcuts/linux'
-    }
-    
-    if (typeof(callback) !== 'function') {
-      return this
-    }
-    
-    this.lib.ElectronFileHelper.readDirectory(dirPath, (list) => {
-      
-    })
-    
-    
-const path = require('path');
-const fs = require('fs');
-//joining path of directory 
-const directoryPath = dirPath
-//passsing directoryPath and callback function
-fs.readdir(directoryPath, (err, files) => {
-    //handling error
-    if (err) {
-        return console.log('Unable to scan directory: ' + err);
-    } 
-    //listing all files using forEach
-    files.forEach((file) => {
-        // Do whatever you want to do with the file
-        let filepath = path.join(dirPath, file)
-        let isDir = fs.lstatSync(filepath).isDirectory()
-        console.log(file, isDir); 
-        
-        if (file.endsWith('.lnk')) {
-          var ws = require('windows-shortcuts');
-          ws.query(filepath, (err, data) => {
-            console.log(data)
-            
-            let icon = data.icon
-            if (icon === '') {
-              icon = data.target
-            }
-            if (icon.endsWith('.exe')) {
-              this.getIconFromEXE(icon, (iconPath) => {
-                console.log(iconPath)
-              })
-            }
-          });
- 
-        }
-    });
-});
-    
-    console.error('getShortcutsOnWindows');
-    return []
-  },
-  */
   getDirListShortcuts: function (baseDirPath, dirList, callback) {
     this.init()
     
@@ -222,7 +160,7 @@ fs.readdir(directoryPath, (err, files) => {
     
     let shortcut = this.lib.FolderConfigHelper.readShortcutMetadata(baseDirPath, subDirPath)
     if (typeof(shortcut) === 'object') {
-      return console.log(shortcut)
+      //return console.log(shortcut)
       callback(shortcut)
       return this
     }
@@ -361,7 +299,9 @@ fs.readdir(directoryPath, (err, files) => {
     }
     
     let shortcut = this.lib.FolderConfigHelper.readShortcutMetadata(dirPath, shortcutPath)
-    if (typeof(shortcut) === 'object' && this.lib.ElectronFileHelper.existsSync(shortcut.icon)) {
+    if (typeof(shortcut) === 'object' 
+            && this.enableShortcutCache === true
+            && this.lib.ElectronFileHelper.existsSync(shortcut.icon)) {
       callback(shortcut)
       return this
     }
@@ -468,7 +408,7 @@ fs.readdir(directoryPath, (err, files) => {
     
     let icon = data.Icon
     
-    console.log(data)
+    //console.log(data)
     if (icon === undefined) {
       
     }
@@ -478,20 +418,25 @@ fs.readdir(directoryPath, (err, files) => {
       if (this.lib.ElectronFileHelper.existsSync(data.Target) === true) {
         icon = data.Target
         if (this.lib.ElectronFileHelper.isDirSync(icon)) {
-          icon = this.lib.path.join(__dirname, '/imgs/folderopened_yellow.png')
+          icon = this.lib.path.join(__dirname, '/imgs/predefined/folderopened_yellow.png')
+        }
+        else if (icon.endsWith('.bat')) {
+          icon = this.lib.path.join(__dirname, '/imgs/predefined/filetype_bat.png')
         }
       }
     }
     
     if (typeof(icon) === 'string' 
             && icon.endsWith('.exe') === false 
+            && icon.endsWith('.dll') === false 
             && this.lib.ElectronFileHelper.existsSync(icon) === true) {
       // 就是這個icon了
       return callback(icon)
     }
     
     let iconFilename = icon
-    if (iconFilename.endsWith('.exe')) {
+    if (iconFilename.endsWith('.exe') 
+            || iconFilename.endsWith('.dll')) {
       iconFilename = iconFilename.slice(0, -4)
     }
     //iconFilename = iconFilename.split(':').join('')
