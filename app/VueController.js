@@ -23,7 +23,7 @@ let VueControllerConfig = {
     mainItemHotkeyLabelInited: false,
     isSearchInputFocused: false,
     lastFocusIndex: null,
-    isEditingMode: true,
+    isEditingMode: false,
     
     cache: {
       subItemsSorted: {}
@@ -298,8 +298,16 @@ let VueControllerConfig = {
       else {
         return this.$refs.SearchResultList
       }
+    },
+    displayEditingMode: function () {
+      if (this.isEditingMode === true) {
+        return 'EDIT'
+      }
+      else {
+        return 'OPEN'
+      }
     }
-  },
+  },  // computed
   methods: {
     _afterMounted: function () {
       this.lib.ShortcutHelper.get(this.shortcutsFolderPath, (shortcuts) => {
@@ -1517,8 +1525,12 @@ let VueControllerConfig = {
         location.reload()
       }
       return this
+    },
+    toggleEditingMode: function () {
+      this.isEditingMode = (this.isEditingMode === false)
+      return this
     }
-  }
+  } // methods
 }
 
 if (typeof(window) !== 'undefined') {

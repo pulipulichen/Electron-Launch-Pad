@@ -122,6 +122,12 @@
   <div class="buttons-panel"
        v-on:click.stop="">
     
+    <button class="ui button current-mode"
+            v-on:click="toggleEditingMode"
+            v-bind:class="{blue: isEditingMode}">
+      {{ displayEditingMode }}
+    </button>
+    
     <div class="ui dropdown icon circular button item"
          ref="DropdownMenu">
       <i class="wrench icon"></i>
