@@ -7,7 +7,7 @@
     "0.run-development": "electron index.js --mode development",
     "2.run-development-dir": "electron index.js --mode development \"D:\\Program Files\\Weka-3-8\"",
     "3.run-development-dir": "electron index.js --mode development \"D:\\xampp\\htdocs\\projects-electron\\Electron-Launch-Pad\\demo-shortcuts\\win32\\test\"",
-    "4.run-development-dir": "electron index.js --mode development \"D:\\Docouments\\Start Menu\\Programs\"",
+    "4.run-development-dir": "electron index.js --mode development \"D:\\Docouments\\Start Menu\\Programs\\Startup\"",
     "1.run-production": "electron index.js --mode production",
     "pack & open": "electron-builder index.js && node open-dist.js"
   },

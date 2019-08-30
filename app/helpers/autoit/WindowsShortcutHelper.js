@@ -4,7 +4,8 @@ let WindowsShortcutHelper = {
     fs: null,
     path: null,
     exec: null,
-    iconv: null
+    iconv: null,
+    WindowsEnvVarHelper: null
   },
   shortcutReaderPath: null,
   init: function () {
@@ -16,6 +17,8 @@ let WindowsShortcutHelper = {
     this.lib.path = require('path')
     this.lib.exec = require('child_process').exec
     this.lib.iconv = require('iconv-lite')
+    
+    this.lib.WindowsEnvVarHelper = RequireHelper.require('./helpers/autoit/WindowsEnvVarHelper')
     
     this.shortcutReaderPath = this.lib.path.resolve(__dirname, '../win32-helpers/shortcut-reader/shortcut-reader.exe')
     //console.log(this.shortcutReaderPath)
@@ -52,8 +55,15 @@ let WindowsShortcutHelper = {
         
         let key = line.slice(0, quelPos)
         let value = line.slice(quelPos + 1).trim()
+        
+        if (['Exec', 'Target', 'Icon'].indexOf(key) > -1) {
+          value = this.lib.WindowsEnvVarHelper.replaceEnvVars(value)
+        }
+        
         result[key] = value
       })
+      
+      
       
       if (typeof(callback) === 'function') {
         callback(result)
