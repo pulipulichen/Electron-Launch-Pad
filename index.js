@@ -22,7 +22,7 @@ if (Array.isArray(dirPath) && dirPath.length > 0) {
 else {
   dirPath = undefined
 }
-console.log(dirPath)
+//console.log(dirPath)
 
 // ------------
 

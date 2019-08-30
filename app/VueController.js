@@ -1020,7 +1020,19 @@ let VueControllerConfig = {
       }
       
       //this.currentPage++
-      //console.log([this.currentPage, this.maxPages])
+      // 20190830 克服要捲動頁面超過最大頁面的問題
+      //console.log([this.currentPage, this.maxPages, isNext])
+      if (typeof(isNext) === 'number' 
+              && isNext >= this.maxPages) {
+        isNext = this.maxPages - 1
+        if (isNext === this.currentPage) {
+          //console.log('不捲動')
+          if (typeof(callback) === 'function') {
+            callback()
+          }
+          return this
+        }
+      }
       
       let page = this.currentPage
       let pageLength = this.maxPages
