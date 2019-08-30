@@ -302,7 +302,7 @@ let ShortcutHelper = {
     
     let shortcut = this.lib.FolderConfigHelper.readShortcutMetadata(dirPath, shortcutPath)
     if (typeof(shortcut) === 'object' 
-            && this.enableShortcutCache === true
+            && this.debug.enableShortcutCache === true
             && this.lib.ElectronFileHelper.existsSync(shortcut.icon)) {
       callback(shortcut)
       return this
@@ -414,11 +414,11 @@ let ShortcutHelper = {
     
     //console.log(data)
     //console.log([icon === '', this.lib.ElectronFileHelper.existsSync(icon), this.lib.ElectronFileHelper.existsSync(data.Target)])
-    console.log([data.Target, this.lib.ElectronFileHelper.existsSync(data.Target)])
     if (icon === '' 
             || this.lib.ElectronFileHelper.existsSync(icon) === false) {
       if (this.lib.ElectronFileHelper.existsSync(data.Target) === true) {
         icon = data.Target
+        
         if (this.lib.ElectronFileHelper.isDirSync(icon)) {
           icon = this.lib.path.join(__dirname, '/imgs/predefined/folderopened_yellow.png')
         }
@@ -428,10 +428,11 @@ let ShortcutHelper = {
         else if (icon.endsWith('.yaml')) {
           icon = this.lib.path.join(__dirname, '/imgs/predefined/text_xml.png')
         }
-        else if (icon === 'C:\\Windows\\system32\\narrator.exe') {
-          icon = this.lib.path.join(__dirname, '/imgs/predefined/narrator.png')
-        }
       }
+    }
+    
+    if (icon === 'C:\\Windows\\system32\\narrator.exe') {
+      icon = this.lib.path.join(__dirname, '/imgs/predefined/narrator.png')
     }
     
     if (typeof(icon) === 'string' 

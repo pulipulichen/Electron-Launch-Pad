@@ -63,7 +63,7 @@ let WindowsShortcutHelper = {
         result[key] = value
       })
       
-      
+      result['Path'] = lnkPath
       
       if (typeof(callback) === 'function') {
         callback(result)
