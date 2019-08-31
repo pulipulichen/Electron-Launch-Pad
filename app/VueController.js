@@ -1533,6 +1533,10 @@ let VueControllerConfig = {
     toggleEditingMode: function () {
       this.isEditingMode = (this.isEditingMode === false)
       return this
+    },
+    openURL: function (url) {
+      this.lib.ElectronHelper.openURL(url)
+      return this
     }
   } // methods
 }
