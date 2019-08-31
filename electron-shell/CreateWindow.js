@@ -1,5 +1,5 @@
 const debug = {
-  useMousePositionDisplay: false
+  useMousePositionDisplay: true
 }
 
 const electron = require('electron')
