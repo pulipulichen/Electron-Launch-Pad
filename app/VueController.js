@@ -1,6 +1,14 @@
 let VueControllerConfig = {
   el: '#app',
   data: {
+    
+    debug: {
+      enableAskDirPath: true,
+      enableExit: true,
+      enableClick: true,
+      enableSortPersist: true,
+    },
+    
     popupHideDelay: 1000 * 60,
     dragDelay: 500,
     maxRows: 4,
@@ -54,12 +62,6 @@ let VueControllerConfig = {
       FileDragNDropHelper: null,
       */
     },
-    debug: {
-      enableAskDirPath: true,
-      enableExit: true,
-      enableClick: true,
-      enableSortPersist: true,
-    }
   },
   mounted: function () {
     this.lib.ElectronHelper = RequireHelper.require('./helpers/electron/ElectronHelper')
@@ -1463,8 +1465,11 @@ let VueControllerConfig = {
     getSubItemIcons: function (item) {
       let list = []
       if (Array.isArray(item.subItems)) {
-        for (let i = 0; i < item.subItems.length; i++) {
-          list.push(item.subItems[i].icon)
+        // 這邊需要取得排序
+        let subItems = this.getSortedSubItems(item.name, item.subItems)
+        
+        for (let i = 0; i < subItems.length; i++) {
+          list.push(subItems[i].icon)
           if (list.length === 4) {
             break
           }

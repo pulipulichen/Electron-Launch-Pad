@@ -25,7 +25,7 @@
   &[data-grid-size="4"] {
     //height: calc(@folder-item-height * 4);
     width: calc(@folder-item-width * 4 + 10px);
-    max-height: calc(@folder-item-height * 4 + 10px);
+    max-height: calc(@folder-item-height * 4 + 10px + 3rem);
   }
   
   /*
@@ -46,18 +46,19 @@
   
   .folder-name {
     text-align: center;
-    line-height: 1.5rem;
+    height: 1.7rem;
     font-size: 1.5rem;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    max-width: calc(((100vw - (@pager-width * 2)) / @max-cols) - 50px);
+    //max-width: calc(((100vw - (@pager-width * 2)) / @max-cols) - 50px);
     //margin-left: 1rem;
     //margin-right: 1rem;
     font-family: Noto Sans CJK TC;
     
     cursor: pointer;
-    
+    margin-bottom: 0.5rem;
+    max-width: 100%;
   }
   
   .launchpad-items-container {
