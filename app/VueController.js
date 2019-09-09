@@ -917,6 +917,13 @@ let VueControllerConfig = {
               data = this.getAttribute('data-exec')
             }
             //console.log(data)
+            if (data.indexOf(' ') > -1 
+                    && data.startsWith('"') === false
+                    && data.indexOf('"') === -1) {
+              data = `"${data}"`
+            }
+            
+            //window.alert(data)
             _this.exec(data)
             event.stopPropagation()
           })

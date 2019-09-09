@@ -1,6 +1,6 @@
 #include <Array.au3>
 #include <MsgBoxConstants.au3>
-#pragma compile(Icon, '../app/imgs/icon256.ico')
+#pragma compile(Icon, '../../app/imgs/icon256.ico')
 ;FileChangeDir(@ScriptDir)
 ;ShellExecute("C:\Windows\notepad.exe", "", "", "", @SW_HIDE)
 
