@@ -103,8 +103,8 @@ let VueControllerConfig = {
       this._afterMounted()
     })
   },
-  watch: {
-  },
+  //watch: {
+  //},
   computed: {
     isSearchMode: function () {
       setTimeout(() => {
