@@ -62,9 +62,9 @@ let LinuxDesktopShortcutReader = {
         execCommend = execCommend.slice(0, execCommend.indexOf(' '))
       }
       
-      if (this.lib.fs.existsSync(execCommend) === false) {
-        return undefined
-      }
+      //if (this.lib.fs.existsSync(execCommend) === false) {
+      //  return undefined
+      //}
     }
     
     // -----------------

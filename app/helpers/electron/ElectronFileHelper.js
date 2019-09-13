@@ -230,7 +230,7 @@ let ElectronFileHelper = {
       //te('/opt/google/chrome/google-chrome --app=http://blog.pulipuli.info')
       //te('gedit')
       
-      execCommand = `nohup /usr/bin/xfce4-terminal --command "${execCommand}" &`
+      execCommand = `nohup /usr/bin/xfce4-terminal -e "${execCommand}" >/dev/null 2>&1 &`
       
       this.lib.exec(execCommand, callback)
       //callback()

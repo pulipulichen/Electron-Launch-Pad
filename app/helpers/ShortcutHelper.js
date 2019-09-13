@@ -365,10 +365,10 @@ let ShortcutHelper = {
     }
     
     let metadata = this.lib.LinuxDesktopShortcutReader.read(shortcutPath)
-    if (metadata === undefined) {
-      callback()
-      return this
-    }
+    //if (metadata === undefined) {
+    //  callback()
+    //  return this
+    //}
     
     //console.log(data)
 
