@@ -917,11 +917,15 @@ let VueControllerConfig = {
               data = this.getAttribute('data-exec')
             }
             //console.log(data)
-            if (data.indexOf(' ') > -1 
-                    && data.startsWith('"') === false
-                    && data.indexOf('"') === -1) {
-              data = `"${data}"`
+            if (process.platform === 'win32') {
+              if (data.indexOf(' ') > -1 
+                      && data.startsWith('"') === false
+                      && data.indexOf('"') === -1) {
+                data = `"${data}"`
+              }
             }
+            
+            //console.log(data)
             
             //window.alert(data)
             _this.exec(data)
