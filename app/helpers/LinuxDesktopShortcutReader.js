@@ -41,7 +41,9 @@ let LinuxDesktopShortcutReader = {
       
       let key = line.slice(0, line.indexOf('=')).trim()
       let value = line.slice(line.indexOf('=')+1).trim()
-      result[key] = value
+      if (typeof(result[key]) !== 'string') {
+        result[key] = value
+      }
     })
     
     // -----------------
@@ -52,6 +54,11 @@ let LinuxDesktopShortcutReader = {
     }
     else {
       let execCommend = result["Exec"]
+      
+      if (execCommend.endsWith(' %F')) {
+        execCommend = execCommend.slice(0, -3)
+      }
+      
       if (execCommend.startsWith('"')) {
         execCommend = execCommend.slice(1, execCommend.indexOf('"', 1))
       }
@@ -65,6 +72,12 @@ let LinuxDesktopShortcutReader = {
       //if (this.lib.fs.existsSync(execCommend) === false) {
       //  return undefined
       //}
+      result["Exec"] = execCommend
+    }
+    
+    if (typeof(result['Icon']) === 'string' 
+            && result['Icon'].startsWith('/') === false) {
+      result['Icon'] = undefined
     }
     
     // -----------------
