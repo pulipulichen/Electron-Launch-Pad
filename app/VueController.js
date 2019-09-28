@@ -1286,7 +1286,7 @@ let VueControllerConfig = {
               && this.lib.ElectronFileHelper.existsSync(dirpath)) {
         //console.log(dirpath)
         this.lib.ElectronFileHelper.showInFolder(dirpath)
-        this.exit()
+        //this.exit()
       }
       return this
     },
@@ -1384,12 +1384,16 @@ let VueControllerConfig = {
     exec: function (shortcut) {
       if (this.isEditingMode === true) {
         let path = shortcut
-        if (typeof(path.path) === 'string') {
+        if (typeof(path) === 'object' 
+                && typeof(path.path) === 'string') {
           path = path.path
         }
         //console.log(path)
         if (typeof(path) === 'string') {
           this.openFolder(path)
+          setTimeout(() => {
+            return this.exit()
+          }, 500)
         }
         return this
       }
