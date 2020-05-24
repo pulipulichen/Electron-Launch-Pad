@@ -73,7 +73,7 @@ let ElectronFileHelper = {
   writeFileSync: function (filepath, content) {
     this.init()
     
-    let configDir = this.lib.path.basename(filepath)
+    let configDir = this.lib.path.dirname(filepath)
     if (this.lib.fs.existsSync(configDir) === false) {
       //let cacheDir = this.lib.path.basename(configDir)
       //if (this.lib.fs.existsSync(cacheDir) === false) {
