@@ -10,7 +10,8 @@
     "4.run-development-dir start": "electron index.js --mode development \"D:\\Docouments\\Start Menu\\Programs\\[LaunchPad]\"",
     "5.run-development-dir linux": "electron index.js --mode development /home/pudding/.local/share/applications/launchpad/",
     "1.run-production": "electron index.js --mode production",
-    "pack & open": "electron-builder index.js && node open-dist.js"
+    "pack & open": "electron-builder index.js && node open-dist.js",
+    "pack-win": "electron-builder index.js --dir --win portable"
   },
   "repository": {
     "type": "git",
@@ -37,7 +38,11 @@
     "image-size": "^0.7.4",
     "jquery": "^3.4.1",
     "read-chunk": "^3.2.0",
+    "safer-buffer": "^2.1.2",
     "terminal-exec": "^0.0.8"
+  },
+  "build-comment": {
+    "compression": "normal “store” | “normal” | “maximum”"
   },
   "build": {
     "appId": "electron.launch.pad",
@@ -58,8 +63,7 @@
       }
     },
     "portable": {
-      "artifactName": "electron-launch-pad.exe",
-      "unpackDirName": "electron-launch-pad"
+      "artifactName": "electron-launch-pad.exe"
     }
   }
 }

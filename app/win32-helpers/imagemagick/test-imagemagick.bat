@@ -1,0 +1,1 @@
+convert.exe convert -resize 128x128 gmail.ico rose.ico

@@ -1,3 +1,5 @@
+/* global __dirname */
+
 let WindowsShortcutHelper = {
   inited: false,
   lib: {
@@ -72,7 +74,11 @@ let WindowsShortcutHelper = {
       if (typeof(altPath) === 'string') {
         result['Icon'] = altPath
       }
-      else if (result['Target'].endsWith('chrome.exe') 
+      //else if (!result['Target']) {
+      //  console.error('result["Target"] is not found')
+      //}
+      else if (result['Target'] 
+              && result['Target'].endsWith('chrome.exe') 
               && result['Target'] !== result['Exec']) {
         // do nothing
       }
@@ -116,7 +122,17 @@ let WindowsShortcutHelper = {
       let altPath = alternativeList[i]
       if (this.lib.fs.existsSync(altPath) 
               && this.lib.imageSize(altPath).width > width) {
-        return altPath
+        
+        // 把目標檔案的圖片，複製到我的icon底下
+        let altName = this.lib.path.basename(altPath)
+        let cloneAltPath = this.lib.path.resolve(iconDir, altName)
+        
+        if (this.lib.fs.existsSync(cloneAltPath) === false) {
+          let iconDir = this.lib.path.resolve(__dirname, './config/icon/')
+          this.lib.fs.copySync(altPath, iconDir)
+        }
+        console.log('copyed: ', altPath, cloneAltPath)
+        return cloneAltPath
       }
     }
   }

@@ -1,3 +1,5 @@
+/* global __dirname */
+
 const debug = {
   useMousePositionDisplay: true
 }
@@ -82,9 +84,9 @@ module.exports = function (shortcutsDirPath, callback) {
   
   //settings.set('mode', mode);
   
-  if (mode === 'development') {
+  //if (mode === 'development') {
     win.webContents.openDevTools()
-  }
+  //}
   
   //win.rendererSideName.filepath = filepath
   //win.rendererSideName.mode = mode

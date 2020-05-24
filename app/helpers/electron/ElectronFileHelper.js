@@ -1,4 +1,4 @@
-/* global __dirname */
+/* global __dirname, path, fs */
 
 let ElectronFileHelper = {
   inited: false,
@@ -72,6 +72,16 @@ let ElectronFileHelper = {
   },
   writeFileSync: function (filepath, content) {
     this.init()
+    
+    let configDir = this.lib.path.basename(filepath)
+    if (this.lib.fs.existsSync(configDir) === false) {
+      //let cacheDir = this.lib.path.basename(configDir)
+      //if (this.lib.fs.existsSync(cacheDir) === false) {
+      //  this.lib.fs.mkdirSync(cacheDir)
+      //}
+      this.lib.fs.mkdirSync(configDir)
+    }
+    
     this.lib.fs.writeFileSync(filepath, content, 'utf8')
     return filepath
   },

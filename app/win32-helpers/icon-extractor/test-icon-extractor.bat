@@ -1,0 +1,1 @@
+icon-extractor.exe "C:\Windows\System32\shell32.dll" aaa.png

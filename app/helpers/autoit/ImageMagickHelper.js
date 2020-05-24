@@ -1,3 +1,5 @@
+/* global __dirname */
+
 let ImageMagickHelper = {
   inited: false,
   lib: {
@@ -19,7 +21,32 @@ let ImageMagickHelper = {
     this.lib.exec = require('child_process').exec
     
     this.lib.imageSize = require('image-size')
-    this.imagemagickPath = this.lib.path.resolve(__dirname, '../win32-helpers/imagemagick/convert.exe')
+    
+    //this.imagemagickPath = this.lib.path.resolve(__dirname, '../win32-helpers/imagemagick/convert.exe')
+    this.imagemagickPath = this.lib.path.resolve(__dirname, './cache/imagemagick/convert.exe')
+    if (process.platform === 'win32'
+      && this.lib.fs.existsSync(this.imagemagickPath) === false) {
+      
+      let ElectronFileHelper = RequireHelper.require('./helpers/electron/ElectronFileHelper')
+      let originalExe = ElectronFileHelper.resolveAppPath('win32-helpers/imagemagick/convert.exe')
+      
+      if (this.lib.fs.existsSync(originalExe) === false) {
+        let errorMessage = 'convert.exe is not found: ' + originalExe
+        alert(errorMessage)
+        throw Error(errorMessage)
+        return false
+      }
+      
+      let dir = this.lib.path.dirname(this.imagemagickPath)
+      if (this.lib.fs.existsSync(dir) === false) {
+        this.lib.fs.mkdirSync(dir, {
+          recursive: true
+        })
+      }
+      
+      this.lib.fs.copyFileSync(originalExe, this.imagemagickPath)
+    }
+    
     //this.lib.imagemagick = require('imagemagick')
     //this.lib.gm = require('gm').subClass({imageMagick: false})
     
