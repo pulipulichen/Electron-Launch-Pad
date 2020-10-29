@@ -1382,6 +1382,8 @@ let VueControllerConfig = {
       return this
     },
     exec: function (shortcut) {
+      //console.log(JSON.stringify(shortcut))
+      //window.alert(JSON.stringify(shortcut))
       if (this.isEditingMode === true) {
         let path = shortcut
         if (typeof(path) === 'object' 
@@ -1413,6 +1415,10 @@ let VueControllerConfig = {
       
       //let parameters = []
       //this.lib.win.hide()
+      
+      //console.log({execCommand})
+      //window.alert(execCommand)
+      
       this.lib.ElectronFileHelper.execExternalCommand(execCommand,() => {
         return this.exit()
       })

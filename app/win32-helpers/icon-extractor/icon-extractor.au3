@@ -4,13 +4,29 @@
 ;ExtractIcon("D:\PortableApps\[Development\npp.7.2.2.bin\notepad++.exe", @ScriptDir & "\notepad.png")
 
 Func ExtractIcon($file, $output)
-    $hIcon = _WinAPI_ShellExtractIcon($file, 0, 32, 32)
-    _GDIPlus_Startup()
-    $pBitmap = _GDIPlus_BitmapCreateFromHICON($hIcon)
-    _GDIPlus_ImageSaveToFileEx($pBitmap, $output, _GDIPlus_EncodersGetCLSID("PNG"))
-    _GDIPlus_ImageDispose($pBitmap)
-    _GDIPlus_Shutdown()
-    _WinAPI_DestroyIcon($hIcon)
+
+    If StringRight($file, 4) == ".lnk" Then
+      ;MsgBox($MB_SYSTEMMODAL, StringRight($file, 4))
+      Local $aDetails = FileGetShortcut ( $file )
+      Local $iconPath = $aDetails[4]
+      ;FileGetShortcut($sFilePath)
+      ;MsgBox($MB_SYSTEMMODAL, "", "Path: " & $aDetails[0] & @CRLF & _
+      ;            "Working directory: " & $aDetails[1] & @CRLF & _
+      ;            "Arguments: " & $aDetails[2] & @CRLF & _
+      ;            "Description: " & $aDetails[3] & @CRLF & _
+      ;            "Icon filename: " & $aDetails[4] & @CRLF & _
+      ;            "Icon index: " & $aDetails[5] & @CRLF & _
+      ;            "Shortcut state: " & $aDetails[6] & @CRLF)
+	  FileCopy ( $iconPath, $output)
+    Else
+      $hIcon = _WinAPI_ShellExtractIcon($file, 0, 32, 32)
+      _GDIPlus_Startup()
+      $pBitmap = _GDIPlus_BitmapCreateFromHICON($hIcon)
+      _GDIPlus_ImageSaveToFileEx($pBitmap, $output, _GDIPlus_EncodersGetCLSID("PNG"))
+      _GDIPlus_ImageDispose($pBitmap)
+      _GDIPlus_Shutdown()
+      _WinAPI_DestroyIcon($hIcon)
+    EndIf
 EndFunc
 
 If $CmdLine[0] > 1 Then

@@ -1,3 +1,5 @@
+/* global __dirname */
+
 let ShortcutHelper = {
   debug: {
     enableShortcutCache: true,
@@ -31,6 +33,8 @@ let ShortcutHelper = {
     this.lib.LinuxDesktopShortcutReader = RequireHelper.require('./helpers/LinuxDesktopShortcutReader')
     
     this.lib.ImageMagickHelper = RequireHelper.require('./helpers/autoit/ImageMagickHelper')
+    
+    this.lib.PredefinedIconsHelper = RequireHelper.require('./helpers/autoit/PredefinedIconsHelper')
     
     // -------------
     this.inited = true
@@ -413,40 +417,19 @@ let ShortcutHelper = {
       return this
     }
     
+    //console.log('extractIcon', data)
     let icon = data.Icon
-    
     
     if (icon.endsWith('.ico')) {
       let dimensions = this.lib.ImageMagickHelper.sizeOf(icon)
+      //console.log(dimensions)
       if (dimensions.width > 128 || dimensions.height > 128) {
         // 轉換成png之後另存新檔
         return this.lib.ImageMagickHelper.icoToPng(icon, callback)
       }
     }
     
-    
-    //console.log(data)
-    //console.log([icon === '', this.lib.ElectronFileHelper.existsSync(icon), this.lib.ElectronFileHelper.existsSync(data.Target)])
-    if (icon === '' 
-            || this.lib.ElectronFileHelper.existsSync(icon) === false) {
-      if (this.lib.ElectronFileHelper.existsSync(data.Target) === true) {
-        icon = data.Target
-        
-        if (this.lib.ElectronFileHelper.isDirSync(icon)) {
-          icon = this.lib.path.join(__dirname, '/imgs/predefined/folderopened_yellow.png')
-        }
-        else if (icon.endsWith('.bat')) {
-          icon = this.lib.path.join(__dirname, '/imgs/predefined/filetype_bat.png')
-        }
-        else if (icon.endsWith('.yaml')) {
-          icon = this.lib.path.join(__dirname, '/imgs/predefined/text_xml.png')
-        }
-      }
-    }
-    
-    if (icon === 'C:\\Windows\\system32\\narrator.exe') {
-      icon = this.lib.path.join(__dirname, '/imgs/predefined/narrator.png')
-    }
+    icon = this.lib.PredefinedIconsHelper(icon, data)
     
     if (typeof(icon) === 'string' 
             && icon.endsWith('.exe') === false 

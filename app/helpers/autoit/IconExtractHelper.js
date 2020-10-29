@@ -11,7 +11,7 @@ let IconExtractHelper = {
       return this
     }
     
-    this.lib.fs = require('fs')
+    this.lib.fs = require('fs-extra')
     this.lib.path = require('path')
     this.lib.exec = require('child_process').exec
     
@@ -29,12 +29,15 @@ let IconExtractHelper = {
       return false
     }
     
-    if (filename.endsWith('.png') === false) {
+    if (filename.endsWith('.lnk') === false) {
+      filename = filename + '.ico'
+    }
+    else if (filename.endsWith('.png') === false) {
       filename = filename + '.png'
     }
-    
+    //console.log('filename', filename)
     let command = `"${this.iconExtractorPath}" "${exePath}" "${filename}"`
-    //console.log(command)
+    //console.log('command', command)
     this.lib.exec(command, (err, stdout, stderr) => {
       let filepath = this.lib.path.resolve(__dirname, '../win32-helpers/icon-extractor/' + filename)
       

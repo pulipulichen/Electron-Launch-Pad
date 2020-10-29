@@ -20,7 +20,8 @@ let ElectronFileHelper = {
     this.lib.readChunk = RequireHelper.require('read-chunk')
     this.lib.fileType = RequireHelper.require('file-type')
     this.lib.path = RequireHelper.require('path')
-    this.lib.fs = RequireHelper.require('fs')
+    this.lib.fs = RequireHelper.require('fs-extra')
+    //console.log(typeof(this.lib.fs.copySync), typeof(this.lib.fs.copy))
     const child_process = RequireHelper.require('child_process')
     this.lib.exec = child_process.exec
     this.lib.spawn = child_process.spawn
@@ -217,9 +218,9 @@ let ElectronFileHelper = {
         }
       }
       else {
-        execCommand = '"' + this.resolve('win32-helpers/exec-external/exec-external.exe') + '" ' + execCommand
-        console.log(execCommand)
-
+        execCommand = '"' + this.resolve('win32-helpers/exec-external/exec-external.exe') + '" "' + execCommand + '"'
+        //console.log(execCommand)
+        //window.alert(execCommand)
         //const exec = require('child_process').exec
         this.lib.exec(execCommand, callback)
       }

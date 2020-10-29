@@ -14,7 +14,7 @@ let ElectronHelper = {
     }
     
     this.lib.ElectronFileHelper = RequireHelper.require('./ElectronFileHelper')
-    this.lib.fs = RequireHelper.require('fs')
+    this.lib.fs = RequireHelper.require('fs-extra')
     this.lib.path = RequireHelper.require('path')
     let electron = RequireHelper.require('electron')
     this.lib.clipboard = electron.clipboard

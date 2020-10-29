@@ -16,7 +16,7 @@ let ImageMagickHelper = {
       return this
     }
     
-    this.lib.fs = require('fs')
+    this.lib.fs = require('fs-extra')
     this.lib.path = require('path')
     this.lib.exec = require('child_process').exec
     
@@ -68,11 +68,11 @@ let ImageMagickHelper = {
       basenameNoExt = basenameNoExt.slice(0, basenameNoExt.lastIndexOf('.'))
       ext = basename.slice(basename.lastIndexOf('.') + 1)
     }
-    console.log(basenameNoExt)
+    //console.log(basenameNoExt)
     if (basenameNoExt.endsWith(']') && basenameNoExt.indexOf('[') > 0) {
       basenameNoExt = basenameNoExt.slice(0, basenameNoExt.indexOf('['))
     }
-    console.log(basenameNoExt)
+    //console.log(basenameNoExt)
     
     // ---------------------
     // 合併
@@ -84,6 +84,7 @@ let ImageMagickHelper = {
     return this.lib.path.join(dirPath, basename)
   },
   icoToPng: function (icoPath, callback) {
+    //console.log({ icoPath, cb: typeof(callback) })
     this.init()
     if (typeof(callback) !== 'function') {
       return false
@@ -91,10 +92,13 @@ let ImageMagickHelper = {
     
     const source = this.lib.fs.readFileSync(icoPath)
     
-    let pngPath = icoPath.slice(0, -3) +  'png'
+    let pngPath = icoPath.slice(0, -3) + 'png'
     pngPath = this.transfromSafeName(pngPath)
     
+    //console.log({pngPath})
     if (this.lib.fs.existsSync(pngPath)) {
+      // 把它變成base64好了
+      pngPath = this.base64_encode(pngPath)
       return callback(pngPath)
     }
 
@@ -132,9 +136,14 @@ let ImageMagickHelper = {
       }
     })
     */
+  },
+  base64_encode(file) {
+      // read binary data
+      var bitmap = this.lib.fs.readFileSync(file);
+      // convert binary data to base64 encoded string
+      return 'data:image/png;base64,' + new Buffer(bitmap).toString('base64')
   }
 }
-
 
 if (typeof(window) === 'object') {
   window.ImageMagickHelper = ImageMagickHelper

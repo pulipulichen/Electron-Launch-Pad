@@ -16,7 +16,7 @@ let WindowsShortcutHelper = {
       return this
     }
     
-    this.lib.fs = require('fs')
+    this.lib.fs = require('fs-extra')
     this.lib.path = require('path')
     this.lib.exec = require('child_process').exec
     this.lib.iconv = require('iconv-lite')
@@ -125,13 +125,13 @@ let WindowsShortcutHelper = {
         
         // 把目標檔案的圖片，複製到我的icon底下
         let altName = this.lib.path.basename(altPath)
+        let iconDir = this.lib.path.resolve(__dirname, './config/icon/')
         let cloneAltPath = this.lib.path.resolve(iconDir, altName)
         
         if (this.lib.fs.existsSync(cloneAltPath) === false) {
-          let iconDir = this.lib.path.resolve(__dirname, './config/icon/')
-          this.lib.fs.copySync(altPath, iconDir)
+          this.lib.fs.copySync(altPath, cloneAltPath)
         }
-        console.log('copyed: ', altPath, cloneAltPath)
+        //console.log('copyed: \n', altPath, '\n', cloneAltPath, '\n', cloneAltPath)
         return cloneAltPath
       }
     }

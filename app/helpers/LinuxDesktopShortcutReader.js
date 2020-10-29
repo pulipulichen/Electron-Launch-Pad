@@ -10,7 +10,7 @@ let LinuxDesktopShortcutReader = {
     }
     
     this.lib.path = require('path')
-    this.lib.fs = require('fs')
+    this.lib.fs = require('fs-extra')
     
     this.inited = true
     return this
