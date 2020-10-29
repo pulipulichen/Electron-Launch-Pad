@@ -34,7 +34,7 @@ let ShortcutHelper = {
     
     this.lib.ImageMagickHelper = RequireHelper.require('./helpers/autoit/ImageMagickHelper')
     
-    this.lib.PredefinedIconsHelper = RequireHelper.require('./helpers/autoit/PredefinedIconsHelper')
+    this.lib.PredefinedIconsHelper = RequireHelper.require('./helpers/PredefinedIconsHelper')
     
     // -------------
     this.inited = true
