@@ -100,6 +100,7 @@ let VueControllerConfig = {
     */
     
     this.lib.ElectronHelper.mount(this, this.persistAttrs, () => {
+      //console.log('mounted?')
       this._afterMounted()
     })
   },
@@ -312,7 +313,9 @@ let VueControllerConfig = {
   },  // computed
   methods: {
     _afterMounted: function () {
+      //console.log('_afterMounted()')
       this.lib.ShortcutHelper.get(this.shortcutsFolderPath, (shortcuts) => {
+        //console.log('after ShortcutHelper.get()')
         this.shortcuts = shortcuts
         
         this.initDraggable()
@@ -320,15 +323,17 @@ let VueControllerConfig = {
         this.initMouseWheelKeys()
         this.initIPCEvent()
         this.initDropdownMenu()
+        //console.log('before initCurrentPage()')
         this.initCurrentPage(() => {
           this.mainItemsInited = true
           //this.setupSearchInputKeyEvents()
           this.$refs.SearchInput.focus()
-
+          //console.log('finished?')
           //console.log(this.shortcutsFolderPath)
           if (this.debug.enableAskDirPath === true 
                   && this.lib.ElectronFileHelper.isDirSync(this.shortcutsFolderPath) === false) {
             this.changeFolder()
+            
           }
         })
       })  // this.lib.ShortcutHelper.get(this.shortcutDirPath, (shortcuts) => {
@@ -1077,7 +1082,7 @@ let VueControllerConfig = {
         }
       }
       
-      let duration = 700
+      let duration = 100
       if (typeof(doTransition) === 'number') {
         duration = doTransition
       }

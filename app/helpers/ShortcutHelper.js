@@ -15,6 +15,7 @@ let ShortcutHelper = {
     FolderConfigHelper: null,
     LinuxDesktopShortcutReader: null,
     ImageMagickHelper: null,
+    PredefinedIconsHelper: null
   },
   init: function () {
     if (this.inited === true) {
@@ -35,6 +36,10 @@ let ShortcutHelper = {
     this.lib.ImageMagickHelper = RequireHelper.require('./helpers/autoit/ImageMagickHelper')
     
     this.lib.PredefinedIconsHelper = RequireHelper.require('./helpers/PredefinedIconsHelper')
+    if (typeof(this.lib.PredefinedIconsHelper) === 'object') {
+      this.lib.PredefinedIconsHelper = this.lib.PredefinedIconsHelper.default
+    }
+    //console.log(this.lib.PredefinedIconsHelper)
     
     // -------------
     this.inited = true
@@ -129,8 +134,9 @@ let ShortcutHelper = {
       i++
       loop(i)
     }
-    
+    //console.log('getDirListShortcuts', -1)
     let loop = (i) => {
+      //console.log('getDirListShortcuts', i)
       if (i < dirList.length) {
         let dirPath = dirList[i]
         //console.log(dirPath)
@@ -275,9 +281,17 @@ let ShortcutHelper = {
     }
   },
   getShortcutMetadata: function (baseDirPath, shortcutPath, callback) {
+    let cacheShortcutMetadata = localStorage.getItem('getShortcutMetadata' + '.'  + baseDirPath + '.' + shortcutPath)
+    if (cacheShortcutMetadata) {
+      if (typeof(callback) === 'function') {
+        return callback(JSON.parse(cacheShortcutMetadata))
+      }
+    }
+    
     let addShortcutCache = (shortcut) => {
       
       this.cache.shortcuts[shortcutPath] = shortcut
+      localStorage.setItem('getShortcutMetadata' + '.'  + baseDirPath + '.' + shortcutPath, JSON.stringify(shortcut))
       
       if (typeof(callback) === 'function') {
         callback(shortcut)
@@ -429,6 +443,11 @@ let ShortcutHelper = {
       }
     }
     
+//    console.log(this.lib.PredefinedIconsHelper)
+//    if (!this.lib.PredefinedIconsHelper) {
+//      this.lib.PredefinedIconsHelper = RequireHelper.require('./helpers/PredefinedIconsHelper')
+//      console.log(this.lib.PredefinedIconsHelper)
+//    }
     icon = this.lib.PredefinedIconsHelper(icon, data)
     
     if (typeof(icon) === 'string' 
@@ -496,6 +515,8 @@ let ShortcutHelper = {
   },
   */
   get: function (dirPath, callback) {
+    
+    //console.log('get', 1)
     this.init()
     //console.log(dirPath)
     if (typeof(callback) !== 'function') {
@@ -513,8 +534,8 @@ let ShortcutHelper = {
     else if (process.platform === 'linux') {
       shortcuts = this.getShortcutsOnLinux(dirPath)
     }
-     */
-    
+    */
+    //console.log('get', 2)
     if (this.debug.useTestDir === true) {
       if (process.platform === 'linux') {
         //dirPath = '/home/pudding/.local/share/applications/test/'
@@ -525,15 +546,18 @@ let ShortcutHelper = {
       }
     }
     
-    
+    //console.log('get', 3)
     this.lib.ElectronFileHelper.readDirectory(dirPath, (list) => {
+      //console.log('get', 5)
       this.getDirListShortcuts(dirPath, list.dir, (shortcuts) => {
+        //console.log('get', 6)
         //console.log(shortcuts)
         let dirShortcuts = []
         if (Array.isArray(shortcuts)) {
           dirShortcuts = shortcuts
         }
         
+        //console.log('get', 7)
         this.getFileListShortcuts(dirPath, list.file, (shortcuts) => {
           //console.log(shortcuts)
           let fileShortcus = []
@@ -542,7 +566,7 @@ let ShortcutHelper = {
           }
           
           let totalShortcuts = dirShortcuts.concat(fileShortcus)
-          
+          //console.log('get', 8)
           if (this.debug.enableShortcutCache === true) { 
             this.lib.FolderConfigHelper.write(dirPath, 'ShortcutMetadata', this.cache.shortcuts)
           }
@@ -552,7 +576,7 @@ let ShortcutHelper = {
       })
     })
     
-    
+    //console.log('get', 4)
     //console.log(shortcuts)
     
     return this

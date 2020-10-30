@@ -208,7 +208,15 @@ let FolderConfigHelper = {
   },
   readShortcutMetadata: function (folderPath, shortcutPath, key) {
     this.init()
-    let shortcutMetadata = this.read(folderPath, 'ShortcutMetadata')
+    //let shortcutMetadata = this.read(folderPath, 'ShortcutMetadata')
+    let shortcutMetadata = localStorage.getItem(folderPath + 'ShortcutMetadata')
+    if (!shortcutMetadata) {
+      shortcutMetadata = this.read(folderPath, 'ShortcutMetadata')
+      localStorage.setItem(folderPath + 'ShortcutMetadata', JSON.stringify(shortcutMetadata))
+    }
+    else {
+      shortcutMetadata = JSON.parse(shortcutMetadata)
+    }
     
     if (typeof(shortcutMetadata) !== 'object') {
       //console.error('no config data :' + folderPath)

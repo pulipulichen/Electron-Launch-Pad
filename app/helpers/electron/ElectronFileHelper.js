@@ -218,7 +218,11 @@ let ElectronFileHelper = {
         }
       }
       else {
-        execCommand = '"' + this.resolve('win32-helpers/exec-external/exec-external.exe') + '" "' + execCommand + '"'
+        if (execCommand.indexOf('"') === -1) {
+          execCommand = `"${execCommand}"`
+        }
+        
+        execCommand = '"' + this.resolve('win32-helpers/exec-external/exec-external.exe') + '" ' + execCommand
         //console.log(execCommand)
         //window.alert(execCommand)
         //const exec = require('child_process').exec
@@ -267,6 +271,15 @@ let ElectronFileHelper = {
   },
   readDirectoryFilesRecursively: function (dirPath, callback) {
     let fileList = []
+//    let fileList = localStorage.getItem('readDirectoryFilesRecursively.' + dirPath)
+//    //console.log(fileList)
+//    if (fileList) {
+//      callback(JSON.parse(fileList))
+//      return this
+//    }
+//    else {
+//      fileList = []
+//    }
     
     if (typeof(callback) !== 'function') {
       return this
@@ -299,6 +312,7 @@ let ElectronFileHelper = {
     }
     
     addDir(dirPath, () => {
+      //localStorage.setItem('readDirectoryFilesRecursively.' + dirPath, JSON.stringify(fileList))
       callback(fileList)
     })
     

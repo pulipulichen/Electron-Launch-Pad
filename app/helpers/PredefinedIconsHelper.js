@@ -1,28 +1,32 @@
 /* global __dirname */
 
 exports.default = function (icon, data) {
+  
+  let ElectronFileHelper = RequireHelper.require('./helpers/electron/ElectronFileHelper')
+  let path = RequireHelper.require('path')
+
 
   //console.log(data)
-  //console.log([icon === '', this.lib.ElectronFileHelper.existsSync(icon), this.lib.ElectronFileHelper.existsSync(data.Target)])
+  //console.log([icon === '', ElectronFileHelper.existsSync(icon), ElectronFileHelper.existsSync(data.Target)])
   if (icon === ''
-          || this.lib.ElectronFileHelper.existsSync(icon) === false) {
-    if (this.lib.ElectronFileHelper.existsSync(data.Target) === true) {
+          || ElectronFileHelper.existsSync(icon) === false) {
+    if (ElectronFileHelper.existsSync(data.Target) === true) {
       icon = data.Target
 
-      if (this.lib.ElectronFileHelper.isDirSync(icon)) {
-        icon = this.lib.path.join(__dirname, '/imgs/predefined/folderopened_yellow.png')
+      if (ElectronFileHelper.isDirSync(icon)) {
+        icon = path.join(__dirname, '/imgs/predefined/folderopened_yellow.png')
       } else if (icon.endsWith('.bat')) {
-        icon = this.lib.path.join(__dirname, '/imgs/predefined/filetype_bat.png')
+        icon = path.join(__dirname, '/imgs/predefined/filetype_bat.png')
       } else if (icon.endsWith('.yaml')) {
-        icon = this.lib.path.join(__dirname, '/imgs/predefined/text_xml.png')
+        icon = path.join(__dirname, '/imgs/predefined/text_xml.png')
       } else if (icon.indexOf('Firefox') > -1) {
-        icon = this.lib.path.join(__dirname, '/imgs/predefined/firefox-logo-300x310.png')
+        icon = path.join(__dirname, '/imgs/predefined/firefox-logo-300x310.png')
       }
     }
   }
 
   if (icon === 'C:\\Windows\\system32\\narrator.exe') {
-    icon = this.lib.path.join(__dirname, '/imgs/predefined/narrator.png')
+    icon = path.join(__dirname, '/imgs/predefined/narrator.png')
   }
 
   return icon
