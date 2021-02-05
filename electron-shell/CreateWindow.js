@@ -9,6 +9,7 @@ const {
   app,
   BrowserWindow,
   clipboard,
+  globalShortcut 
 } = electron
 
 const url = require('url')
@@ -103,5 +104,15 @@ module.exports = function (shortcutsDirPath, callback) {
       callback(win)
     }
   })
+  
+  globalShortcut.register('Ctrl+W', () => {
+    win.close()
+  })
+  
+  let escPressed = false
+  globalShortcut.register('ESC', () => {
+    win.close()
+  })
+  
   return win
 }
